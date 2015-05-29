@@ -1,2 +1,2 @@
 # pics.jonathancross.com
-JCDSee web photo gallery
+JCDSee: a web based photo viewing / cataloging system written in the Perl scripting language.
