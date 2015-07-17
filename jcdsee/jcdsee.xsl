@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-     Jonathan Cross (2008)
+  XSL code used to parse folder information from sitemap.xml file.
+  This is called from the CGI script to get site-wide meta data.
 -->
 <xsl:stylesheet version="1.0" 
                 xmlns:html="http://www.w3.org/1999/xhtml"
