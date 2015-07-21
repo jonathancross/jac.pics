@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-my $VERSION = '1.9.91';
+my $VERSION = '1.0.0';
 #
 # Jonathan Cross : www.JonathanCross.com : 2004-2012
 # This script may be used free for any non-commercial purpose.
