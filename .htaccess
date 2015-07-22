@@ -1,0 +1,39 @@
+AddDefaultCharset utf-8
+DefaultLanguage en-US
+AddType application/xhtml+xml .xhtml
+# AddType text/xml .xhtml
+
+DirectoryIndex index.xhtml index.html index.cgi
+
+# Secure htaccess file
+<Files .htaccess>
+ order allow,deny
+ deny from all
+</Files>
+
+# Protect against DOS attacks by limiting file upload size
+LimitRequestBody 10240000
+
+# Minimize image flicker in IE6
+ExpiresActive On
+ExpiresByType image/gif A2592000
+ExpiresByType image/jpg A2592000
+ExpiresByType image/png A2592000
+
+# Custom error pages
+ErrorDocument 404 /error.html
+ErrorDocument 500 /error.html
+
+# Clean urls for folders.
+RewriteEngine on
+RewriteRule ^([^?]*/)$ /jcdsee.cgi?cur_url=/$1
+
+# Provide a universal error document
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ /error.html?$1 [L]
+
+
+
+
+
