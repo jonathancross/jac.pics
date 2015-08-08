@@ -32,7 +32,7 @@
         -->
         <xsl:comment><![CDATA[[if lt IE 8]>  <script src='jcdsee/IE8/IE8.js' type='text/javascript'></script>  <![endif]]]></xsl:comment>
         <style type="text/css">
-          body {font-family:arial,helvetica,sans-serif;margin: 15px;}
+          body {font-family:arial,helvetica,sans-serif;margin: 15px;padding-top: 0;}
           h1 {color:#888;margin:0;}
           h1 a {text-decoration:none;color:#222;}
           h1 a:hover {color:#777;}
@@ -59,7 +59,7 @@
           a.tabR:hover img {opacity:1;}
           .openTab .tabL {background:url('jcdsee/icon_tab_bg.png') no-repeat top left;}
           .openTab .tabR {background:url('jcdsee/icon_tab_bg.png') no-repeat top right;}
-          .openTab .imgCount {display:inline;top:-1px;position:relative;margin-left:7px;font-size:0.8em;color:#aaa;}
+          .openTab .imgCount {display:inline;top:-1px;position:relative;margin-left:7px;font-size:0.8em;color:#aaa;float:right;max-width: 26%;}
           .openTab .tabContent {display:block;background-color:#d5d5ff;border:1px solid #99f;padding:1pt 4px 4px 7px;}
           .tabContent,.imgCount {display:none;overflow:hidden;}
           /* JCDSee 2 styles below. */
@@ -152,12 +152,12 @@
   
   <xsl:template name="parseItemName">
     <xsl:param name="itemName"/>
-    <xsl:param name="indent" select="10"/>
+    <xsl:param name="indent" select="2"/>
     <xsl:choose>
       <xsl:when test="contains($itemName,'/')">
         <xsl:call-template name="parseItemName">
           <xsl:with-param name="itemName" select="substring-after($itemName,'/')"/>
-          <xsl:with-param name="indent" select="$indent + 25"/>
+          <xsl:with-param name="indent" select="$indent + 2"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -251,7 +251,7 @@
 </xsl:text>
     <!-- do onmouseover in javascript -->
     <tr title="{jcd:desc}">
-      <td id="TAB{$i}" class="l" style="padding-left:{$itemIndent}px;" valign="top"><!-- T,R,B,L -->
+      <td id="TAB{$i}" class="l" style="padding-left:{$itemIndent}%;" valign="top"><!-- T,R,B,L -->
         <div class="tabPosition">
           <a href="{sitemap:loc}" class="tabL">
             <xsl:value-of select="$itemTitle"/>
