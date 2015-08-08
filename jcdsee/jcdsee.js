@@ -1,7 +1,8 @@
 /**
- * Code for jcdsee file navigator and slideshow.
+ * JCDSee file navigator and slideshow.
  * @author Jonathan Cross.
  * @url http://pics.jonathancross.com
+ * @see https://github.com/jonathancross/pics.jonathancross.com
  */
 "use strict";
 
@@ -202,7 +203,7 @@ jcd.SlideShow.prototype.getIntervalSelectControl_ = function() {
   for (var intervalName in this.intervals_) {
     var option = document.createElement('option');
     var interval = this.intervals_[intervalName];
-    option.textContent = intervalName;
+    option.textContent = intervalName + ' - ' + (interval / 1000) + 's';
     option.value = intervalName;
     if (interval == this.selectedInterval_) {
       option.selected = true;

@@ -2,56 +2,14 @@
 #
 my $VERSION = '2.0.0';
 #
-# Jonathan Cross : www.JonathanCross.com : 2004-2015
-# This script may be used free for any non-commercial purpose.
+# JCDSee by Jonathan Cross : www.JonathanCross.com
+# See GitHub for license, usage, examples and more info:
+#  • https://github.com/jonathancross/pics.jonathancross.com
 #
-# JCDSee creates a user-customizable linked directory listing for websites.
-# Will also generate thumbnail images of any GIF, JPEG or PNG images it finds.
-# Also contains a sequential image viewer, slideshow and various navigation devices.
-#
-# COMMANDLINE DEBUG PARAMS (YMMV):
-#     [script-name] debug <directory> <display_mode> <pic_cur_idx>
-#     All args in <> are optional.
-#
-# URL PARAMS (Everything is optional.  If no url is provided, the current location of the script is used):
-#    index.cgi?pic=[full path to picture]&display_mode=[LIST|THUMBS|SINGLE|SLIDESHOW]&cur_url=[full path to folder]
-#    Defaults: display_mode=LIST
-#              cur_url=<current folder>
-#
-#    EXAMPLE URLs (assuming JCDSee is in the web root):
-#      http://zzz.com/
-#      http://zzz.com/jcdsee.cgi?cur_url=/pics/
-#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg
-#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=SLIDESHOW
-#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=THUMBS
-#
-#    Using mod_rewrite you can have "clean" URLs like so:
-#      http://zzz.com/pics/2/  (results in: http://zzz.com/jcdsee.cgi?cur_url=/pics/2/)
-#
-# FEATURES:
-#   - Recognizes 5 general file types: image, folder, music, text and "unknown".
-#     "unknown" file types can include video, or anything else, but will not
-#     have an icon unless you provide one manually.
-#   - Will generate & cache thumbnail icons of any jpeg, gif or png files it finds.
-#   - 4 display modes ("list","thumbnail", "single" and "slideshow").
-#   - Properly handles slow connections with pre-caching.
-#   - Will maintain display settings across folders.
-#   - Clean URLs.
-#   - Progressive enhancement (can be used without JavaScript or Cookies).
-#
-# JCDSEE ADMIN CONSOLE (admin script available upon request):
-#   - Easily add new folders.
-#   - Add / edit file descriptions in your browser.
-#   - Generate Google sitemap.xml file.
-#   - Various backup, cleaning and undo tasks.
-#   - Live editing of JCDSee software or the admin script itself!
-#
-# WISHLIST / FIXES:
+# WISHLIST / FIXES / TODOs:
 #  - Simplify this script and move view settings into browser.
-#  - Remove all file system IO after initial cache.
-#  - Inline player for video & audio.
-#    eg: Mpeg video: http://fresh.t-systems-sfr.com/unix/src/misc/mpeg2vidcodec_v12.tar.gz/
-#  - Re-write in php or node.js
+#  - Load and cache all file info just once.
+#  - Inline player for video & audio. html5 video?
 #  - Nonlinear slideshow with thumbs, next and previous.
 #    Then merge "single" mode with "slideshow".
 #  - PSD icons: complex to flatten...
