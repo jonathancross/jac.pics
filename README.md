@@ -8,19 +8,24 @@ Will also generate thumbnail images of any gif, jpg or png images it finds and w
 Also contains a sequential image viewer, slideshow and various navigation devices.
 
 ####Commandline debug parameters (YMMV):
-You can use this script from the shell to generate thumbnails, create the `.jcdsee` database, debug problems, etc.
+You can use this script from the shell to generate thumbnails, create the `.jcdsee` database, debug problems, etc:
+
     ./jcdsee.cgi debug <directory> <display_mode> <pic_cur_idx>
 All args in `<>` are optional.
 
 ####URL parameters
+Note: All parameters are optional.  If no url is provided, the current location of the script is used with the defaults below.
+
     ./jcdsee.cgi?pic=[full path to picture]&display_mode=[LIST|THUMBS|SINGLE|SLIDESHOW]&cur_url=[full path to folder]
 Defaults:
-    `display_mode=LIST`
-    `cur_url=<current folder>`
-Note: All parameters are optional.  If no url is provided, the current location of the script is used with the defaults above.
+
+    display_mode=LIST
+    cur_url=<current folder>
+
 
 ####Example URLs
 Assuming JCDSee is in the web root, this would be the URL structure on zzz.com:
+
     http://zzz.com/
     http://zzz.com/jcdsee.cgi?cur_url=/pics/
     http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg
