@@ -32,19 +32,19 @@
         -->
         <xsl:comment><![CDATA[[if lt IE 8]>  <script src='jcdsee/IE8/IE8.js' type='text/javascript'></script>  <![endif]]]></xsl:comment>
         <style type="text/css">
-          body {font-family:arial,helvetica,sans-serif;}
+          body {font-family:arial,helvetica,sans-serif;margin: 15px;}
           h1 {color:#888;margin:0;}
           h1 a {text-decoration:none;color:#222;}
           h1 a:hover {color:#777;}
-          h5 {font-weight:normal;margin-top:0.5em;margin-bottom:1em;}
-          #file_list a {color:#88f;}
-          #file_list a:hover {color:#00f;}
+          h5 {color: #666;font-weight:normal;margin-top:0.5em;margin-bottom:1em;}
+          #file_list a {color:#66a;}
+          #file_list a:hover {color:#00f;text-decoration:underline;}
           tr:hover {background-color:#e3e3ff;color:#000;}
-          tr:hover td div {color:#666;}
+          tr:hover td div {color:#333;}
           tr:hover .date,
-          tr:hover .imgCount {color:#666;}
-          td.date {white-space:nowrap;border-left:1px solid #ccc;text-align:center;color:#ccc;}
-          th {white-space:nowrap;font-size:11px;background-color:#ccd;color:#333;}
+          tr:hover .imgCount {color:#333;}
+          td.date {white-space:nowrap;border-left:1px solid #ccc;text-align:center;color:#888;}
+          th {white-space:nowrap;font-size:11px;background-color:#aaa;color:black;}
           th.date {border-left:1px solid #ccc;text-align:center;}
           A {text-decoration:none;cursor:pointer;}
           img {border:none;}
@@ -62,9 +62,14 @@
           .openTab .imgCount {display:inline;top:-1px;position:relative;margin-left:7px;font-size:0.8em;color:#aaa;}
           .openTab .tabContent {display:block;background-color:#d5d5ff;border:1px solid #99f;padding:1pt 4px 4px 7px;}
           .tabContent,.imgCount {display:none;overflow:hidden;}
+          /* JCDSee 2 styles below. */
+          table#file_list {
+            font-size: 12px;
+            max-width: 700px;
+          }
         </style>       
       </head> 
-      <body class="LIST">
+      <body id="mode-list">
         <h1>Sitemap for: <a href="{$baseURL}"><xsl:value-of select="$simpleWebsiteURL"/></a></h1>
         <h5>BUILT: <xsl:value-of select="sitemap:urlset/@jcd:date"/> <code>  </code> (<xsl:value-of select="count(sitemap:urlset/sitemap:url)"/> URLs, Size: <xsl:value-of select="$base/@jcd:dsize"/> / 285GB)</h5>          
         <xsl:call-template name="sitemapTable"/>
