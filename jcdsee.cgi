@@ -1,81 +1,66 @@
 #!/usr/bin/perl
 #
-my $VERSION = '1.0.0';
+my $VERSION = '2.0.0';
 #
-# Jonathan Cross : www.JonathanCross.com : 2004-2012
+# Jonathan Cross : www.JonathanCross.com : 2004-2015
 # This script may be used free for any non-commercial purpose.
 #
-# JCDSee creates a user-customizable linked directory listing in HTML format.
-# Will also generate and cache thumbnails of any GIF, JPEG or PNG images it finds.
+# JCDSee creates a user-customizable linked directory listing for websites.
+# Will also generate thumbnail images of any GIF, JPEG or PNG images it finds.
 # Also contains a sequential image viewer, slideshow and various navigation devices.
-# Best viewed with IE6+ or Mozilla/Firefox 1.0+
 #
 # COMMANDLINE DEBUG PARAMS (YMMV):
 #     [script-name] debug <directory> <display_mode> <pic_cur_idx>
 #     All args in <> are optional.
 #
-# URl PARAMS (Everything is optional.  If no url is provided, the current location of the script is used):
+# URL PARAMS (Everything is optional.  If no url is provided, the current location of the script is used):
 #    index.cgi?pic=[full path to picture]&display_mode=[LIST|THUMBS|SINGLE|SLIDESHOW]&cur_url=[full path to folder]
 #    Defaults: display_mode=LIST
 #              cur_url=<current folder>
 #
 #    EXAMPLE URLs (assuming JCDSee is in the web root):
-#     http://zzz.com/
-#     http://zzz.com/jcdsee.cgi?cur_url=/pics/
-#     http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg
-#     http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=SLIDESHOW
-#     http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=THUMBS
-#    If you can use mod_rewrite then you can access folders like so:
-#     http://zzz.com/pics/2/  (results in: http://zzz.com/jcdsee.cgi?cur_url=/pics/2/)
+#      http://zzz.com/
+#      http://zzz.com/jcdsee.cgi?cur_url=/pics/
+#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg
+#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=SLIDESHOW
+#      http://zzz.com/jcdsee.cgi?pic=/pics/my_pic.jpg&display_mode=THUMBS
+#
+#    Using mod_rewrite you can have "clean" URLs like so:
+#      http://zzz.com/pics/2/  (results in: http://zzz.com/jcdsee.cgi?cur_url=/pics/2/)
 #
 # FEATURES:
-#   - Able to recognize 5 file types (image, folder, music, "text document" and "other")
-#     "other" file types can include video, or anything else, but will not have an icon unless you provide one manually.
+#   - Recognizes 5 general file types: image, folder, music, text and "unknown".
+#     "unknown" file types can include video, or anything else, but will not
+#     have an icon unless you provide one manually.
 #   - Will generate & cache thumbnail icons of any jpeg, gif or png files it finds.
-#   - 2 additional thumbnail resolutions.
-#   - Optimized to only read / write necessary image information.
-#   - 4 display modes ("list","thumbnail", "single image" and DHTML "slideshow").
-#   - In "single" (full-size) image display mode, the script will pre-cache next and previous images in browser.
-#   - Will maintain display settings across folders (assuming you only use the links on the page)
-#   - Clean URLs
-#   - Uses advanced page transitions in IE and CSS transparency in Mozilla.
-#   - Adding a new folder of images just requires a unix "hard link" to the script and you are done!
-#   - All "rollovers" are done with CSS transparency and A:hover pseudo-class (no messy javascript)
+#   - 4 display modes ("list","thumbnail", "single" and "slideshow").
+#   - Properly handles slow connections with pre-caching.
+#   - Will maintain display settings across folders.
+#   - Clean URLs.
+#   - Progressive enhancement (can be used without JavaScript or Cookies).
 #
-# JCDSEE ADMIN (admin script available upon request):
-#   - Easily add new folders
-#   - Write file / folder descriptions in browser
-#   - Create google sitemap.xml file.
+# JCDSEE ADMIN CONSOLE (admin script available upon request):
+#   - Easily add new folders.
+#   - Add / edit file descriptions in your browser.
+#   - Generate Google sitemap.xml file.
 #   - Various backup, cleaning and undo tasks.
-#   - Even re-program JCDSee or the admin script itself!
-#
-# BUGS:
-#   - pic parameter needs to handle trailing slashes and non-existant files better?
-#   - broken image name in database just stops processing the list.
-#   - thumbs in SINGLE mode loose transparency after full is loaded.
-#   - FIXED: UTF-8 chars get munged...
-#   - FIXED: Cool CSS hover effect only works in Mozilla right now.
-#   - FIXED: 'filter'  /jcdsee/jcdsee.css  Line: 52
+#   - Live editing of JCDSee software or the admin script itself!
 #
 # WISHLIST / FIXES:
-#  - rss, remove all file system IO, REAL video & audio support and inline player.
-#    re-write in php, search, more robust slideshow with thumbs.
-#    mpeg video: http://fresh.t-systems-sfr.com/unix/src/misc/mpeg2vidcodec_v12.tar.gz/
-#    PSD icons: complex to flatten...
-#    convert databases to xml and allow in-browser editing of descriptions.
-#    non-destructive folder "refresh" when files are added or removed. (part-way ther 2010 with listing in admin console)
-#    COMPLETED:
-#      global database (2008-02-01).
-#      404 Error page (2008-03-01).
-#      Got rid of usage.cgi - re-write in perl
-#      dir descriptions at top of page
-#      thumb mode = remove #_ prefix just like list (2010-07-27) v1.8.5
-#      Fixed thumb display in webkit browsers (2010-07-27) v1.8.5
-#      Consistent thumb height (2012-01-02) v1.8.9
-#      Basic Commandline thumb generation fixed (2012-01-04) v1.9.1
-#      Fixed thumb mode: filenames with periods, update admin button (2012-01-05) v1.9.2
+#  - Simplify this script and move view settings into browser.
+#  - Remove all file system IO after initial cache.
+#  - Inline player for video & audio.
+#    eg: Mpeg video: http://fresh.t-systems-sfr.com/unix/src/misc/mpeg2vidcodec_v12.tar.gz/
+#  - Re-write in php or node.js
+#  - Nonlinear slideshow with thumbs, next and previous.
+#    Then merge "single" mode with "slideshow".
+#  - PSD icons: complex to flatten...
+#  - Convert databases to JSON.
+#  - Allow in-browser editing of descriptions.
+#  - Non-destructive folder "refresh" when files are added or removed.
 #
-# =========================================================================
+###############################################################################
+
 use strict;
 use Image::Magick;
 use CGI ':standard';
@@ -86,8 +71,9 @@ use XML::LibXSLT;
 use XML::LibXML;
 
 my %TIMER;
-$TIMER{'total_s'}=gettimeofday();
-# Allow commandline execution / debugging
+$TIMER{'total_s'} = gettimeofday();
+
+# Allow command line execution / debugging
 my ${COMMANDLINE} = 0;
 if ( defined($ARGV[0]) && ($ARGV[0] eq "debug") ) {
   ${COMMANDLINE} = 1;
@@ -202,7 +188,7 @@ if (${COMMANDLINE}) {
   $STATE{'cur_dir_name'} = $STATE{'url'};
   $STATE{'cur_dir_name'} =~ s:^.*/([^/]+)/:$1:; #get last dir name from the url and remove all slashes
 } else {
-  # Still getting 500 error in browser?
+  # File not found error.
   print "HTTP/1.1 404 Not Found\n";
   print "Content-type: text/html\n\n";
   #die; #die "404 Not Found\nYour requested folder $STATE{'url'} is not found\n";
@@ -219,7 +205,7 @@ while ((my $key, my $value) = each(%DEFAULTS)) {
 
 #DISPLAY MODE SETUP & DEFAULT
 if ($STATE{'display_mode'} eq 'THUMBS') {
-  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normakky all will have same height
+  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normally all will have same height
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_large'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
@@ -236,10 +222,10 @@ if ($STATE{'display_mode'} eq 'THUMBS') {
 }
 
 # CONVIENIENCE VARIABLES
-my ${icon_unknown} = "${assets_root}/icon_unknown$STATE{'prefix_cur'}gif";
+my ${icon_unknown} = "${assets_root}/icon_unknown$STATE{'prefix_cur'}png";
 my ${icon_folder} = "${assets_root}/icon_folder$STATE{'prefix_cur'}png";
-my ${icon_music} = "${assets_root}/icon_music$STATE{'prefix_cur'}gif";
-my ${icon_doc} = "${assets_root}/icon_doc$STATE{'prefix_cur'}gif";
+my ${icon_music} = "${assets_root}/icon_music$STATE{'prefix_cur'}png";
+my ${icon_doc} = "${assets_root}/icon_doc$STATE{'prefix_cur'}png";
 my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
 my ${database_file} = $STATE{'dir'}.'.jcdsee'; #SHOULD BE PUT INTO STATE
 
@@ -325,7 +311,7 @@ sub createImageThumbnail {
 #   getImageTag returns an <img> tag. Will create thumbs if necessary.
 #   getImageTag("file name without path","prefix for image")
 sub getImageTag {
-  my (${image_obj},${border},${alt},${tag});
+  my (${image_obj},${border},${alt});
   my ${image_name} = $_[0];
   my ${image_prefix} = $_[1];
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
@@ -340,14 +326,8 @@ sub getImageTag {
     createImageThumbnail(${image_source}, ${image_thumb});
   }
   $image_thumb_url = escapeURL($image_thumb_url);
-  $border = ($STATE{'display_mode'} eq 'LIST') ? '1' : '3';
-  $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}):'';
-  ${tag} = "<img src='${image_thumb_url}' border='${border}' alt='${alt}'";
-  if ($STATE{'display_mode'} eq 'SLIDESHOW') {
-    ${tag} .= " id='big_pic' onabort='loaded()' onload='loaded()' onerror='loaded()'";
-  }
-  ${tag} .= " />";
-  return ${tag};
+  $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}) : '';
+  return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
 
 #   getCurrentPageTitle() returns a SEO title for the current page which is reverse of path.
@@ -402,7 +382,7 @@ sub removeFileExtension {
 }
 
 #   getSitemapData returns a piece of data from the sitemap XML database based on the "item" (pageDescription|pageDate|pageSize).
-#   getSitemapData("dat
+#   getSitemapData("databaseItem")
 sub getSitemapData {
   my $item=$_[0];
   my $results = $stylesheet->transform($sitemap, NAME => "'$item'", VALUE => "'$STATE{'url_encoded'}'");
@@ -411,21 +391,23 @@ sub getSitemapData {
   return $string;
 }
 
-#   gettitle returns an html formatted string representing the filename passed in
+#   getTitle returns an html formatted string representing the filename passed in
 #   getTitle("file name to be parsed")
 sub getTitle {
   #remove numbered prefix, extension and convert  _  into spaces.
   my ${file_name} = $_[0];
-  my ${strip_date} = ($STATE{'display_mode'}  =~ /^THUMBS|SINGLE|SLIDESHOW$/)?1:0;
+  my ${strip_date} = ($STATE{'display_mode'} =~ /^THUMBS|SINGLE|SLIDESHOW$/) ? 1 : 0;
+  my ${file_name_html} = '<span class="file-name-container">';
   if (${strip_date}) {
-    return getNiceFilename(${file_name});
+    ${file_name_html} .= getNiceFilename(${file_name});
   } elsif (${file_name} =~ /^([0-9]{4}[-][0-9]{2}[-][0-9]{2})[_-]?(.*)/) { #DATED
-    return "<span class='date'>${1}</span><span class='filename'>${2}</span>";
+    ${file_name_html} .= "<span class='file-date'>${1}</span> <span class='file-name file-name-dated'>${2}</span>";
   } elsif (${file_name} =~ /^[0-9]+[_-](.+)/) { #NUMBERED
-    return "<span class='date'>${1}</span>";
+    ${file_name_html} .= "<span class='file-name file-name-numbered'>${1}</span>";
   } else {
-    return "<span class='filename'>${file_name}</span>";
+    ${file_name_html} .= "<span class='file-name'>${file_name}</span>";
   }
+  return ${file_name_html} .= '</span>';
 }
 
 #   stripHTML returns a string with HTMl tags removed and quotes encoded (used by alt tags)
@@ -494,25 +476,40 @@ sub getHREF {
 }
 
 # Functions for file type booleans
-# isFileType ("file name", "type")
+#   isFileType ("file name", "type")
 sub isFileType {
-  return ($file_types{$_[0]} eq $_[1])? 1:0; 
+  return ($file_types{$_[0]} eq $_[1]) ? 1 : 0; 
 }
 
 #   getDepthPath ()
 sub getDepthPath {
-  print '<a href="/">home</a>';
-  foreach my ${path} (split( '/',$STATE{'url'})) {
+  my @directories = split('/', $STATE{'url'});
+  my $last_directory = pop @directories;
+  my $depth_path = '<li><a href="/">home</a></li>';
+
+  foreach my ${path} (@directories) {
     if (${path} ne '/') {
       $STATE{'url'} =~ m:(^/${path}/|^/.+/${path}/):;
       if (${1} ne '') {
         my $itemTitle = getNiceFilename(${path});
-        print "/<a href=\"".getHREF('dir',${1})."\" title=\"${itemTitle}\">${itemTitle}</a>";
+        $depth_path .= '
+      <li><a href="'.getHREF('dir',${1}).'">'.${itemTitle}.'</a></li>';
       }
     } else {
-      print '@';
+      # Not sure what this is for...
+      $depth_path .= '@';
     }
   }
+
+  # TODO: Output current picture name and desc for SINGLE mode here instead:
+  $depth_path .= '<li>
+    <h1>'.getNiceFilename($last_directory).'</h1>';
+    if ("$STATE{'page_description'}") {
+      $depth_path .= "<h2>$STATE{'page_description'}</h2>";
+    }
+  $depth_path .= '</li>';
+
+  return $depth_path;
 }
 
 #   getIcon returns a linked image tag representing the file provided by $file_name
@@ -538,7 +535,7 @@ sub getIcon {
     } elsif (-e ${static_thumbnail_path}) {       ${icon_file} = $STATE{'url'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
     } else {                                      ${icon_file} = ${icon_unknown};
     }
-    ${link_content} = "<img src=\"${icon_file}\" border=\"0\" alt=\"${desc}\" />"; # valign=\"middle\"
+    ${link_content} = "<img src=\"${icon_file}\" alt=\"${desc}\">";
   }
   return getLinkTag(${file_name},${link_content},${desc},${class});
 }
@@ -569,6 +566,8 @@ sub getLinkTag {
   return ${link_tag};
 }
 
+# Returns one of the nav buttons which change the mode.
+# TODO: do this in javascript?
 #   getNavButton("mode","value","text description")
 sub getNavButton {
   my ${mode}=${_[0]};
@@ -576,14 +575,15 @@ sub getNavButton {
   my ${desc}=${_[2]};
   my ${toggle} = (${value} eq $STATE{'display_mode'}) ? 'on' : 'off';
   my ${icon_modifier} = lc(${value}); #Lowercase
-  my ${HREF};
-  my ${rel} = '';
+  my ${href} = getHREF(${mode} , ${value});
+  my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
+  my ${linked_img} = "<a href='${href}' rel='nofollow' title='${desc}'>${img}</a>";
+
   if ($STATE{'display_mode'} eq ${value}) {
-    ${HREF} = 'javascript:void(0)';
+    return ${img};
   } else {
-    ${HREF} = getHREF(${mode} , ${value});
+    return ${linked_img};
   }
-  print "<a href='${HREF}' class='${toggle}' rel='nofollow' title='${desc}'><img src='${assets_root}/icon_button_${icon_modifier}.gif' border='0' alt='${desc}' width='30' height='30' /></a>";
 }
 
 # Dump out the simple image list & create thumbnails as needed - main loop
@@ -612,7 +612,30 @@ sub commandLineMakeThumbs {
   }
 }
 
+# Convert bytes into nice number for humans.
+#   getFormattedFileSize(bytes)
+sub getFormattedFileSize {
+  my $bytes = $_[0];
+  my ${file_size};
+  if (${bytes} > 10000000) { 
+    ${file_size} = int(${bytes} / 1048576) . '&nbsp;MB';
+  } elsif (${bytes} > 1000000) { 
+    ${file_size} = sprintf("%.1f", (${bytes} / 1048576)) . '&nbsp;MB';
+  } elsif (${bytes} > 2047){
+    ${file_size} = int(${bytes} / 1024) . '&nbsp;KB';
+  } elsif (${bytes} > 1023){
+    ${file_size} = sprintf("%.1f", (${bytes} / 1024)) . '&nbsp;KB';
+  } elsif (${bytes} > 0){
+    ${file_size} = ${bytes} . '&nbsp;B';
+  } else {
+    ${file_size} = '0&nbsp;B';
+  }
+  return ${file_size};
+}
+
+
 # Dump out the html formatted dir list - main loop
+# TODO: Rename to getFiles()
 sub dumpDirList {
   #my(@time_info,@month_list);
   #my(${year},${month},${minute},${day},${hour},${file_size},${is_dir});
@@ -626,7 +649,7 @@ sub dumpDirList {
       @file_info = stat $STATE{'dir'}.${file_name};
       #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
       # Not used anymoer... ${is_dir} = S_ISDIR(${file_info[2]});
-      if ($STATE{'display_mode'} eq "LIST") {
+      if ($STATE{'display_mode'} eq 'LIST') {
         #@time_info = localtime ${file_info[9]};
         #EXTRACT FILE INFO FROM ARRAY AND PAD
         #${year} = ${time_info[5]} + 1900;
@@ -635,41 +658,30 @@ sub dumpDirList {
         #${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
         #${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
         if ( ! isFileType(${file_name},'folder')) {
-          if (${file_info[7]} > 10000000) { 
-            ${file_size} = int(${file_info[7]} / 1048576) . "&nbsp;MB";
-          } elsif (${file_info[7]} > 1000000) { 
-            ${file_size} = sprintf("%.1f", (${file_info[7]} / 1048576)) . "&nbsp;MB";
-          } elsif (${file_info[7]} > 2047){
-            ${file_size} = int(${file_info[7]} / 1024) . "&nbsp;KB";
-          } elsif (${file_info[7]} > 1023){
-            ${file_size} = sprintf("%.1f", (${file_info[7]} / 1024)) . "&nbsp;KB";
-          } elsif (${file_info[7]} > 0){
-            ${file_size} = ${file_info[7]} . "&nbsp;B";
-          } else {
-            ${file_size} = "0&nbsp;B";
-          }
+          ${file_size} = getFormattedFileSize(${file_info[7]});
         }
         print "
         <tr>
-          <td align='center'>";
+          <td class='col-picture'>";
             #GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
             print getIcon(${file_name});
             print "</td>
-          <td class='l' width='100%'>";
+          <td class='col-description'>";
             #date isn't really used, but maybe in future?
             #my ${date} = "${day}-${month}-${year} ${hour}:${minute}";
-            print getLinkTag(${file_name},getTitle(${file_name}),'','simple');
+            print getLinkTag(${file_name},getTitle(${file_name}), '', 'simple');
             if ($file_descriptions{${file_name}}) {
-              print "&nbsp;-&nbsp;$file_descriptions{${file_name}}";
+              print "<span class='file-description'>$file_descriptions{${file_name}}</span>";
             }
           print "</td>
-          <td class='r'>${file_size}&nbsp;&nbsp;</td>
+          <td class='col-size'>${file_size}&nbsp;&nbsp;</td>
         </tr>";
-      } elsif ($STATE{'display_mode'} eq "THUMBS") {
+      } elsif ($STATE{'display_mode'} eq 'THUMBS') {
         #GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
-        print '<table border="0" class="thumbBlock" cellpadding="0" cellspacing="1"><tr><td valign="middle" align="center">';
+        # TODO: Use list just like slideshow.
+        print '<table class="picture-icon-container" cellpadding="0" cellspacing="1"><tr><td valign="middle" align="center">';
         print getIcon(${file_name});
-        print '</td></tr><tr><td valign="top" class="thumb_file_name" align="center">'.getTitle(${file_name}).'</td></tr></table>';
+        print '</td></tr><tr><td valign="top" class="picture-icon-file-name" align="center">'.getTitle(${file_name}).'</td></tr></table>';
       }
     }
     if ($STATE{'display_mode'} eq 'THUMBS') {
@@ -682,57 +694,86 @@ sub dumpDirList {
     if (${file_name}) {
       ${tmp} = getImageTag($STATE{'pic_previous_file'},$IMAGE_GLOBAL{'prefix_large'});
       ${tmp} = getImageTag($STATE{'pic_next_file'},$IMAGE_GLOBAL{'prefix_large'});
+
+      print '
+      <h3>
+        <strong>'.getTitle(${file_name}).'</strong>';
+
+        if ($file_descriptions{${file_name}}) {
+          print "
+            <span>$file_descriptions{${file_name}}</span>
+          ";
+        }
+
       print "
-      <table class='singleImage' border='0' cellspacing='8' cellpadding='0'>
-        <tr>
-          <td align='center' colspan='3'><div class='header' id='description'><strong>".getTitle(${file_name})." ($STATE{'pic_cur_number'} of $STATE{'pic_array_length'} images)</strong>";
-            if ($file_descriptions{${file_name}}) {
-              print " - $file_descriptions{${file_name}}";
-            }
-            print "</div></td>
-        </tr>
-        <tr>
-          <td align='center' class='trans'><a title='Previous image' href='".getHREF('pic',$STATE{'pic_previous_file'})."' class='pic'><img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}' alt='' id='PREVIOUS'></a></td>
-          <td><span class='big_pic'><a href='".getHREF('display_mode','SLIDESHOW')."' title='Slideshow...' class='current_pic'>".getImageTag(${file_name},'')."</a></span></td>
-          <td align='center' class='trans'><a title='Next image' href='".getHREF('pic',$STATE{'pic_next_file'})."' class='pic'><img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' alt='' id='NEXT'></a></td>
-        </tr>
-      </table>
-      <br />
+      </h3>
+
+      <a class='picture-link previous' title='Previous image' href='".getHREF('pic',$STATE{'pic_previous_file'})."'>
+        <img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'url'}$STATE{'pic_previous_file'}' alt='' id='PREVIOUS'>
+      </a>
+      <a class='picture-link large-picture-wrapper' href='".getHREF('display_mode','SLIDESHOW')."' title='Slideshow...'>"
+        .getImageTag(${file_name},'')."
+      </a>
+      <a class='picture-link next' title='Next image' href='".getHREF('pic',$STATE{'pic_next_file'})."'>
+        <img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'url'}$STATE{'pic_next_file'}' alt='' id='NEXT'>
+      </a>
       ";
     } else {
-      #COPIED TWICE. Move this to the top... mode should change to list if there are no images...
-      print '<script language="Javascript" type="text/javascript"> refresh("display_mode","LIST"); </script>';
+      # TODO: force back to list mode.
+      print '<div>Sorry, cannot determine current image.</div>';
     }
   } elsif ($STATE{'display_mode'} eq 'SLIDESHOW') {
-    #SLIDESHOW IMAGE MODE
-    #Make sure large thumbs exist
+    # SLIDESHOW IMAGE MODE
+    # TODO: Use this for LIST|THUMBS|SLIDESHOW ########################################################################
+    print '<ul id="files">';
+    # Make sure large thumbs exist
     ${file_name} = $STATE{'pic_cur_file'};
     if (${file_name}) {
-      print "
-      <table border='0' cellspacing='4' cellpadding='0' width='100%'>
-        <tr>
-          <td width='50%' rowspan='2'>&nbsp;</td>
-          <td align='center'><div class='header' id='desc'><strong>".getTitle(${file_name})." ($STATE{'pic_cur_number'} of $STATE{'pic_array_length'} images)</strong>";
-            if ($file_descriptions{${file_name}}) {
-              print " - $file_descriptions{${file_name}}";
-            }
-            print "</div></td>
-          <td width='50%' rowspan='2'>&nbsp;</td>
-        </tr>
-        <tr>
-          <td><span class='big_pic'>".getImageTag(${file_name},'')."</span></td>
-        </tr>
-      </table>
-      <br />
-      ";
+      foreach ${file_name} (@dir_list) {
+        ${file_size} = '';
+        @file_info = stat $STATE{'dir'}.${file_name};
+        #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
+        # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
+
+        #@time_info = localtime ${file_info[9]};
+        #EXTRACT FILE INFO FROM ARRAY AND PAD
+        #${year} = ${time_info[5]} + 1900;
+        #${month} = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) [(${time_info[4]})];
+        #${minute} = (${time_info[1]} < 10) ? "0".${time_info[1]} : ${time_info[1]};
+        #${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
+        #${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
+        if ( ! isFileType(${file_name}, 'folder')) {
+          ${file_size} = getFormattedFileSize(${file_info[7]});
+        }
+
+        my $is_selected = ($STATE{'pic_cur_file'} eq $file_name) ? '1' : '0';
+        my $file_type = $file_types{${file_name}};
+
+        # TODO: data-width and data-height
+        print '
+        <li>
+          <a href="'.$STATE{'url'}.${file_name}.'" class="filename" data-selected="'.${is_selected}.'" data-file-type="'.${file_type}.'" data-size="'.${file_size}.'">'
+          .getTitle(${file_name})
+          .'</a>
+          <div>'.$file_descriptions{$file_name}.'</div>
+        </li>
+        ';
+      }
+
+      print '
+      </ul>
+      ';
+
     } else {
-      #COPIED TWICE. Move this to the top... mode should change to list if there are no images... may be cause of bug???
-      print '<script language="Javascript" type="text/javascript"> refresh("display_mode","LIST"); </script>';
+      # TODO: force back to list mode.
+      print "<div>Sorry, no images found in this folder, cannot start slideshow.</div><script>document.location.href='$STATE{'url_encoded'}';</script>";
     }
   }  
 }
 
+
 # This function figures out the page context, setting, etc. based on the current url.
+#   calculateImageListState()
 sub calculateImageListState {
   if (@image_array > 0) {
     $STATE{'pic_last_idx'}         = $#{image_array};
@@ -762,8 +803,8 @@ sub calculateImageListState {
     $STATE{'pic_previous_file'}    = ${image_array[ $STATE{'pic_previous_idx'} ]};
     $STATE{'pic_next_file'}        = ${image_array[ $STATE{'pic_next_idx'} ]};
    }
-  #Would be ideal if we did'nt unencode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
-  #Problem is that there are several ways to get the 'url' (cur_url or directly from path if no mod_re-write)
+  # Would be ideal if we didn't un-encode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
+  # Problem is that there are several ways to get the 'url' (cur_url or directly from path if no mod_re-write)
   $STATE{'url_encoded'} = $STATE{'url'};
   $STATE{'url_encoded'} =~ s/ /%20/g;
   $STATE{'page_description'} = stripHTML(getSitemapData('pageDescription'));
@@ -783,73 +824,29 @@ if (${COMMANDLINE}) {
 # RENDER HTML ==================================================================================================
 # RENDER HEAD
 print "Content-type: text/html\n\n";
-print "<!DOCTYPE html>
-<html>
+print '<!DOCTYPE html>
+<html class="jcd">
   <head>
-    <meta charset='utf-8' />
-    <title>$STATE{'title'}</title>
-    <meta http-equiv='imagetoolbar' content='no' />
-    <meta name='description' content='$STATE{'page_description'}' />
-    <meta name='keywords' content='travel photography,Jonathan Cross, pics, photos, India, Sri lanka, laos, cambodia, vietnam, indonesia, bangladesh' />
-    <link href='${assets_root}/jcdsee.css' rel='stylesheet' type='text/css' />
-    <!--[if lt IE 8]>  <script src='${assets_root}/IE8/IE8.js' type='text/javascript'></script>  <![endif]-->
-    <script src='${assets_root}/jcdsee.js' type='text/javascript'></script>";
-############
-# Get the description here
-#
-if ($STATE{'display_mode'}  =~ /^SINGLE|SLIDESHOW$/) {
-   #Allows IE to fade between pages
-   print '<meta http-equiv="Page-Exit" content="progid:DXImageTransform.Microsoft.Fade(duration=0.8,overlap=0.8)" />';
-}
-if ($STATE{'display_mode'} eq "SLIDESHOW") {
-print "
-<script language='javascript' type='text/javascript'>
-  var url=\"$STATE{'url'}\"
-  var cur_pic=$STATE{'pic_cur_idx'};
-  var image_array=new Array(";
-  # This should be moved to DOM
-  my $len=$#{image_array};
-  for (my $i=0;$i<=$len;$i++) {
-    print "\n'".$image_array[$i]."'";
-    if ($i!=$len) { print "," };
-  }
-
-  print "
-  );
-  var descriptions_array=new Array(";
-  for (my $i=0;$i<=$len;$i++) {
-  my $desc=$file_descriptions{$image_array[$i]};
-  $desc=~s/'/&#39;/g;
-  print "\n'".$desc."'";
-  if ($i!=$len) { print "," };
-} 
-print "
-);
-</script>
-";
-}
-
-my ${onload}='';
-if ($STATE{'display_mode'} eq 'SLIDESHOW') {
-  ${onload}="startSlideshow();";
-} elsif ($STATE{'display_mode'} eq 'SINGLE') {
-  ${onload}="cacheImages('$STATE{'url'}$STATE{'pic_previous_file'}','$STATE{'url'}$STATE{'pic_next_file'}');";
-}
+    <script>
+      (function(H){H.className=H.className.replace(/\bjcd\b/,"jcd-js")})(document.documentElement)
+    </script>
+    <meta charset="utf-8">
+    <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
+    <title>'.$STATE{'title'}.'</title>
+    <meta name="description" content="'.$STATE{'page_description'}.'">
+    <link href="'.${assets_root}.'/jcdsee.css" rel="stylesheet" type="text/css">
+    <!--[if lt IE 8]>  <script src="'.${assets_root}.'/IE8/IE8.js" type="text/javascript"></script>  <![endif]-->
+';
 
 if ($STATE{'test_mode'}) {
   # make it pink if in test mode
-  print "<style type='text/css'> body {border:10px solid red;margin:0;padding:5px;} </style>";
+  # DISABLED print "<style type='text/css'> body {border:1px solid red;background-color: pink;} </style>";
 }
 
-if ($STATE{'display_mode'} eq 'SINGLE' && $STATE{'pic_array_length'} <= 1) {
-  # This is sloppy, I should not send the code if its not needed
-  print "<style type='text/css'> .trans {display:none;} </style>";
-}
-
-print "
+print '
   </head>
-  <body class=\"$STATE{'display_mode'}\" onload=\"${onload}\"><div id=\"page\">";
-#    <noscript>
+  <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'url'}.'">';
+#  <noscript>
 #      ";
 #  foreach my ${file_name} (@image_array) {
 #    print '<a href="'.$STATE{'url'}.${file_name}.'">'.${file_name};
@@ -859,61 +856,27 @@ print "
 #    print "</a>";
 #  }
 #  </noscript>
-print "
-    <div id='admin_button' role='link' onclick=\"window.open('${assets_root}/admin/index.cgi?display_url${amp}cur_url=$STATE{'url'}')\" title='Login'></div>
-    <!-- Begin Controls -->
-    <table id='control_table' cellpadding='4' cellspacing='0' border='0'>
-      <tr>
-        <td id='depthPath' width='100%'>";
-          #GENERATE THE DEPTH PATH
-          getDepthPath();
-          print '</td>
-        <td id="buttons" nowrap="nowrap">';
-          getNavButton("display_mode","LIST","LIST MODE");
-          getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE");
-          getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE");
-          getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE");
-          print '</td>
-        </tr>';
-      if ($STATE{'display_mode'} eq "SLIDESHOW") {
-        print '
-          <tr>
-          <td colspan="2">
-            <table cellpadding="0" cellspacing="0" border="0" id="slideshowControls">
-              <tr>
-                <td>SLIDESHOW:&nbsp;&nbsp;</td>
-                <td nowrap="nowrap">
-                  <a href="javascript:startSlideshow()" id="startLink" class="slideButtonStart">play</a>&nbsp;
-                  <a href="javascript:stopSlideshow()" id="stopLink" class="slideButton">pause</a>&nbsp;
-                  <a href="javascript:document.location.replace(document.location.href)" class="slideButton">reset</a>
-                </td>
-                <td width="100%" style="text-align:center;">
-                  <span id="count">'.$STATE{'pic_cur_number'}.' of '.$STATE{'pic_array_length'}.'</span>
-                </td>
-                <td align="right" style="text-align:right;">speed:&nbsp;</td>
-                <td>
-                  <div id="select_container">
-                    <select name="speedMenu" onchange="changeSpeed(this.selectedIndex);"><option selected="selected" value="normal">Normal</option><option value="slow">Slow</option><option value="fast">Fast</option></select>
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </td>
-          </tr>
-        ';
-      }
-      print '
-      </table>
-      <form name="control_form" id="control_form" method="post" action="'.$STATE{'url'}.'" target="_self">
-        <input type="hidden" name="display_mode" value="'.$STATE{'display_mode'}.'">
-        <input type="hidden" name="pic_cur_idx" value="'.$STATE{'pic_cur_idx'}.'">
-      </form>';
+
+
+print '
+
+  <div id="nav">
+    <ul id="depth-path">'.getDepthPath().'</ul>
+    <div id="mode-buttons">'
+      .getNavButton("display_mode","LIST","LIST MODE")
+      .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
+      .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
+      .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
+      .'
+    </div>
+  </div>
+
+  <div id="content">
+    <div>';
+
+      # TODO: Use slideshow list instead of table.
+
       if ($STATE{'display_mode'} eq "LIST") {
-        print '<div id="pageDescription"><strong>'.$STATE{'cur_dir_name'}.'</strong>';
-        if ("$STATE{'page_description'}") {
-          print ${title_char}.$STATE{'page_description'};
-        }
-        print '</div>';
         print '
         <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
       }
@@ -925,6 +888,12 @@ print "
         </table>
         ';
       }
+
+print '
+      <!-- close #content div -->
+    </div>
+  </div>
+';
 
 # CREATIVE COMMONS LICENSE
 print '
@@ -972,36 +941,29 @@ if (${ERROR}) {
     </div>";
 }
 
-#HIDE STATS FOR SLIDESHOW MODE
-if ($STATE{'display_mode'} ne "SLIDESHOW") {
-$TIMER{'total_e'} = gettimeofday();
-$TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
-print '
-<br style="line-height:15px;">
-<table border="0" cellpadding="0" cellspacing="0"><tr>
-  <td valign="top">
-    <div id="copyleft">
-      <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/" target="_blank"><img alt="Creative Commons License" border="0" src="'.${icon_copyleft}.'" /></a>
-    </div>
-  </td>
-  <td>
-    <div id="usage">';
-      print "
-      <a href='/jcdsee_latest.txt' title='View the latest source code behind this website.'>JCDSee ${VERSION}</a><br>
-      Script executed in: $TIMER{'total'} seconds.";
-      if (${country_code}) {
-        print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
-      }
-      print '<br>';
-      print getSitemapData('pageDate');
-      print getSitemapData('pageSize');
-      print "
-    </div>
-  </td></tr></table>";
-}
-print "
-    <div style='height:300px;visibility:hidden;'>&nbsp;</div>
+    $TIMER{'total_e'} = gettimeofday();
+    $TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
+
+    print '
+
+    <script src="'.${assets_root}.'/jcdsee.js"></script>
+
+    <div id="footer">
+      <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+        <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
+      </a>
+      <div id="usage">
+        <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
+        Script executed in: '.$TIMER{'total'}.' seconds.';
+        if (${country_code}) {
+          print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
+        }
+        print '<br>'
+        .getSitemapData('pageDate')
+        .getSitemapData('pageSize')
+        .'
+      </div>
     </div>
   </body>
 </html>
-";
+';
