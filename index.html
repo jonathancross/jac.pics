@@ -1,13 +1,16 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html class="jcd">
   <head>
+    <script>
+      (function(H){H.className=H.className.replace(/\bjcd\b/,"jcd-js")})(document.documentElement)
+    </script>
     <meta charset="utf-8">
+    <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
     <title>Jonathan Cross: Travel photography and stories.</title>
-    <meta name="description" content="Travel photography by Jonathan Cross. Includes photos 40+ of countries throughout South Asia, Eastern Europe, and North America." />
-    <meta name="keywords" content="Jonathan A. Cross, san francisco, jcross, india, nepal, sri lanka, thailand, laos, cambodia, vietnam, bangladesh, backpacker, bulgaria, turkey, switzerland, portugal, berlin." />
-    <base href="http://pics.jonathancross.com" />
+    <meta name="description" content="Travel photography by Jonathan Cross. Includes photos of dozens of countries throughout South Asia, Eastern Europe and the Americas.">
+    <link href="/jcdsee/jcdsee.css" rel="stylesheet" type="text/css">
     <!--[if lt IE 8]>  <script src="jcdsee/IE8/IE8.js" type="text/javascript"></script>  <![endif]-->
-    <link href="jcdsee/jcdsee.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
       a {text-decoration:none;}
       a:hover {text-decoration:underline;}
@@ -27,7 +30,7 @@
       p {margin-bottom:1em}
       h5 {border-bottom:1px solid #aaa;margin:2em 0 3px 0;padding-bottom:3px;}
       .col {border-right:1px solid #ccc;}
-      #labels {top:-22px;left:-1px;position:relative;z-index:99;height:11px;/* height determines padding above tab contents... fix later... */}
+      #labels {top:-22px;left:-1px;position:relative;z-index:1;height:11px;/* height determines padding above tab contents... fix later... */}
       #labels a {color:#77c;padding:3px 1em;font-size:11px;background-color:#eee;height:14px;display:inline-block;border-radius: 5px 5px 0 0;-moz-border-radius: 5px 5px 0 0;-webkit-border-radius: 5px 5px 0 0;}
       #labels a:hover {color:#00f;text-decoration:none;border-color:#888;background-color:#e8e8e8;}
       #labels a.active {background-color:#ddd;color:black;border-color:#777;border-bottom-color:transparent;font-weight:bold;outline:none;}
@@ -37,7 +40,7 @@
       input.search_button:hover {background-color:#ddf;color:#44f;border-color:#99f;cursor:pointer;}
       input.text {font-size:12px;background-color:#f8f8f8;color:#666;height:14px;font-family:fixed,"courier new";font-weight:bold;padding:2px;}
       input.text:hover, input.text:focus {background-color:#ff9;border-color:#777;color:black;}
-      input.text:focus {width:225px;outline:none;}
+      input.text:focus {width:125px;outline:none;}
       .depthPath {width:100%;}
       .show {display:inline-block !important;}
       .hide {display:none !important;}
@@ -48,10 +51,9 @@
       #adventures a {color:#66b;}
       #adventures a img {float:right;border:1px solid #aaa;margin-left:1em; width:140px;}
       #adventures a:hover img {border-color:#009;}
-      #map img {width: 567px;height: 376px;margin: 0 6px 9px 11px;opacity:0.6;}
-      /* Overrides */
-      div#email img {padding:0;}
-      .LIST #control_table, .LIST #file_list, #bookmarks {width:610px;max-width:610px;min-width:560px;}
+      /* TODO: Fix the height on mobile */
+      #map img {width: 567px;max-width: 100%;height: 376px;margin: 0 6px 9px 11px;opacity:0.6;}
+
       h1 {
         font-family: arial;
         font-size: 17px;
@@ -59,350 +61,366 @@
     </style>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
   </head>
-  <body class="LIST">
-    <table id='control_table' cellpadding='0' cellspacing='0' border='0'>
-      <tr>
-        <td style="padding:0 1em;width:100%;white-space:nowrap;"><p style="color:#a00;margin-top:1em;">Check out the new <a href="#adventures" id="adventures-link" style="color:rgb(216, 45, 45);text-decoration:underline;">Adventures</a> tab below.</strong></td>
-        <td style="text-align:right;">
-          <form id="gSearch" method="get" action="" onsubmit="document.location.href='http://www.google.com/search?q=site:pics.jonathancross.com '+document.forms.gSearch.q.value;return false;">
-            <!-- input type="hidden" name="sitesearch" value="pics.jonathancross.com" / -->
-            <table>
-              <tr>
-                <td><input name="q" title="Uses Google to search this site..." type="text" size="16" maxlength="255" class="text" /></td>
-                <td><input type="submit" title="Uses Google..." value="search" class="search_button" /></td>
-              </tr>
-            </table>
-          </form>
-        </td>
-      </tr>
-    </table>
-<table id="file_list" cellpadding="4" cellspacing="0" border="0">
-<tr>
-<td class='l'>
-<div id="email">
-<div id="email_head">
-  <h1>Jonathan Cross: Travel photography and stories.</h1>
-  <div id="email_date">2014-05-18</div>
-</div>
-<br/>
-<p>
-Welcome to my <a href="pics/">online archive of photos</a>.  You’ll find photos and stories from dozens countries around the world. Enjoy!
 
-</p>
-<div id="homepagePhotos">
-  <a href="/pics/2006/2006-04-26_India/2006-01-08_Kolkata_pics/" title="Kolkata, India: 2006"><img src="/pics/2006/2006-04-26_India/2006-01-08_Kolkata_pics/.S.HooghlyRiver.jpg.jpg" alt="Kolkata, India: 2006"/></a>
-  <a href="/jcdsee.cgi?pic=/pics/1997/Bust_A_Nut.gif" title="Bust an Nut: the party of The Millenium - 1997"><img src="/pics/1997/.S.Bust_A_Nut.gif.jpg" alt="Bust an Nut: the party of The Millenium - 1997"/></a>
-  <a href="/pics/2002/2002-03-10_Ski_Trip_Europe/" title="Matterhorn: 2002"><img src="/pics/2002/2002-03-10_Ski_Trip_Europe/.S.02_Switzerland_Glacier%20Express%20Train.jpg.jpg" alt="Matterhorn: 2002"/></a>
-  <a href="/pics/2008/2008-10-20_Iceland/" title="Iceland: 2008"><img src="/pics/2008/2008-10-20_Iceland/.S.131_Geysir.jpg.jpg" alt="Iceland: 2008"/></a>
-  <a href="/pics/2004/2004-07-20_Portugal/" title="Portugal: 2004"><img src="/pics/2004/2004-07-20_Portugal/2004-05-16_Lagos/.S.Lagos-07.jpg.jpg" alt="Portugal: 2004"/></a>
-  <a href="/pics/2005/2005-02-17_Vietnam/" title="Vietnam: 2005"><img src="/pics/2005/2005-02-17_Vietnam/2005-01-27_Ho_Chi_Minh_City/.S.10_Friendly.jpg.jpg" alt="Vietnam: 2005"/></a>
-  <a href="/pics/2004/2004-10-23_Tokyo/" title="Tokyo, Japan: 2004"><img src="/pics/2004/2004-10-23_Tokyo/.S.shinjuku2.jpg.jpg" alt="Tokyo, Japan: 2004"/></a>
-  <a href="/pics/2006/2006-01-24_Bangladesh/" title="Bangladesh: 2006"><img src="/pics/2006/2006-01-24_Bangladesh/.S.23_Chittagong.jpg.jpg" alt="Bangladesh: 2006"/></a>
-  <a href="/pics/2006/2006-08-28_Java/" title="Java, Indonesia: 2006"><img src="/pics/2006/2006-08-28_Java/.S.26_Gunung_Bromo.jpg.jpg" alt="Java, Indonesia: 2006"/></a>
-</div>
-<div id="tab-block">
-  <div id="labels">
-    <a id="cat-label" href="#cat" title="Display list of countries, years, etc." class="active">Categories</a>
-    <a id="adventures-label" href="#adventures" title="Archive organized by trip.">Adventures</a>
-    <a id="map-label" href="#map" title="Map of countries visited" rel="nofollow">Map</a>
-    <a id="sitemap-label" title="Click here for a complete list of all links." href="/sitemap.xml" rel="nofollow">Sitemap</a>
-  </div>
-  <div id="cat">
-    <div class="col">
-      <h4>Year</h4>
-      <a href="/pics/" title="Childhood pics listed by date...">1976-1996</a>
-      <a href="/pics/1997/" title="A few pics of old friends.">1997</a>
-      <a href="/pics/2000/" title="A few pics of friends and family.">2000</a>
-      <a href="/pics/2001/" title="Includes pics from San Francisco and Chapel Hill, North Carolina.">2001</a>
-      <a href="/pics/2002/" title="Chicago, Vancouver, BC. and Ski trip to Europe.">2002</a>
-      <a href="/pics/2003/" title="San Francisco, Brooklyn, New York and Whistler, Canada.">2003</a>
-      <a href="/pics/2004/" title="New Years in Madrid. 7 months in Portugal. Skiing the Alps, Amsterdam and making Absinthe. London, (Old) York, New York, Tokyo and Thailand.">2004</a>
-      <a href="/pics/2005/" title="Cambodia, Vietnam, Laos, Thailand, USA: Dallas, Los Angeles, Seattle, San Francisco 'Love Parade', North India and Nepal.">2005</a>
-      <a href="/pics/2006/" title="A year in South Asia: India, Nepal, Bangladesh, Sri Lanka, Malaysia, Singapore, Indonesia, Bangkok and Myanmar. Also Zurich.">2006</a>
-      <a href="/pics/2007/" title="6 months back in the USA then Switzerland, Hungary, Croatia, Serbia, Bulgaria, Greece, Turkey, Slovakia, Austria, Romania, and back for a wedding in Geneva">2007</a>
-      <a href="/pics/2008/" title="Winter in Switzerland, a visit from Jason Shiga, Berlin and a 3 month Nordic Journey from Switzerland to San Francisco (via Scandinavia, Iceland and Canada).">2008</a>
-      <a href="/pics/2009/" title="San Francisco, Venice and Verona Italy, and an overland adventure from my home in Switzerland to the African continent.">2009</a>
-      <a href="/pics/2010/" title="Switzerland: Wängi &amp; New Years in Soglio, Maggia Ticino, Berlin Germany and Poland.">2010</a>
-      <a href="/pics/2011/" title="Living and working in Switzerland.">2011</a>
-      <a href="/pics/2012/" title="Trip over land and Sea down through Italy, over to Corfu (Greece), then up the coast of Albania.">2012</a>
-      <a href="/pics/2013/" title="New Years in California, overland trip to Granada, Spain via Barcelona and Paris, France.">2013</a>
-      <a href="/pics/2014/" title="Berlin, New York and California.">2014</a>
-      <br>
-      <h4>Other</h4>
-      <a href="/pics/Other/3D Renderings/" title="3D computer-generated graphics I created back in the 90’s.">3D Renderings</a>
-      <a href="/pics/Other/Language-Cards/" title="Language cheat sheets for 10 Asian Languages.">Languages</a>
-      <a href="/pics/Other/Graphic/" title="Propaganda and Corporate parodies from my previous life as an underground artist.">Graphics</a>
-      <a href="/pics/Other/Video/" title="Video clips from my travels.">Video</a>
-    </div>
-    <div class="col">
-      <h4>Asia</h4>
-      <a href="/pics/2006/2006-01-24_Bangladesh/" title="3.5 intense weeks overland through Bangladesh. (2006)">Bangladesh</a>
-      <a href="/pics/2005/2005-01-14_Cambodia/" title="3.5 weeks overland through Cambodia. (2005)">Cambodia</a>
-      <a href="/pics/2006/2006-04-26_India/" title="7 months traveling overland through the Indian subcontinent. (2005-2006)">India</a>
-      <a href="/pics/2006/2006-08-28_Java/" title="2 months of island hopping: Bali, Lombok, Java and Sumatra. (2006)">Indonesia</a>
-      <a href="/pics/2004/2004-10-23_Tokyo/" title="10 day visit to Tokyo and nearby area -- beginning of my first 6-month trip to Asia. (2004)">Japan</a>
-      <a href="/pics/2005/2005-03-12_Laos/" title="One month in the magical country of Laos. (2005)">Laos</a>
-      <a href="/pics/2006/2006-09-20_Penang_Bangkok/" title="A few photos from Penang during my 4th trip to Malaysia. (2006)">Malaysia</a>
-      <a href="/pics/2006/2006-11-04_Myanmar-Burma/" title="45 days almost entirely overland / sea through this amazing country. (2006)">Myanmar (Burma)</a>
-      <a href="/pics/2005/2005-12-11_Nepal/" title="Two amazing months traveling the length of Nepal. Includes photos Kathmandu and my 3-week trek in the Annapurna mountain range. (2005)">Nepal</a>
-      <a href="/pics/2006/2006-08-07_Singapore_Bali_Lombok/" title="A short visit to Singapore and then on to Indonesia. (2006)">Singapore</a>
-      <a href="/pics/2006/2006-06-28_Sri_Lanka/" title="2 months on the island of Sri Lanka.  (2006)">Sri Lanka</a>
-      <a href="/pics/2005/2005-09-30_Taiwan_Taipei/" title="Short visit to Taipei - and the last meat I ever ate! (2005)">Taiwan</a>
-      <a href="/pics/2004/2004-12-31_Thailand/" title="First of many trips to Thailand. (2004)">Thailand</a>
-      <a href="/pics/2007/2007-08-28_Turkey/" title="Turkey: cycling from the western border of Greece into Turkey and on to Istanbul. (2007)">Turkey</a>
-      <a href="/pics/2005/2005-02-17_Vietnam/" title="35 days traveling from south to north. (2005)">Vietnam</a>
-      <br>
-      <br>
-      <h4>Africa</h4>
-      <a href="/pics/2009/2009-12-23_Morocco/" title="6 weeks exploring Morocco. (2009)">Morocco</a>
-    </div>
-    <div class="col">
-      <h4>Europe (west)</h4>
-      <a href="/pics/2007/2007-09-26_Austria-Vienna/" title="Vienna, Austria (2008)">Austria</a>
-      Belgium<br>
-      <a href="/pics/2008/2008-09-07_Denmark/" title="Hitchhiking through Denmark on our way to Iceland. (2008)">Denmark</a>
-      <a href="/pics/2004/2004-07-24_London/" title="London England (2004)">England</a>
-      <a href="/pics/2008/2008-09-15_Faeroe Islands/" title="3-day ferry from Bergen, Norway to the Faeroe Islands (Føroyar) and then on to Iceland. (2008)">Faeroe Islands</a>
-      <a href="/pics/2013/2013-05-22_France-Paris/" title="Montmartre, Paris... just a couple days enjoying cafes, etc on our way back from Spain. (2013)">France</a>
-      <a href="/pics/2012/2012-09-14_Berlin/" title="One of many trips to Berlin, Germany (2013)">Germany</a>
-      <a href="/pics/2008/2008-10-20_Iceland/" title="5 weeks in  Ísland after arriving by ferry (from Norway).  Volunteering and exploring the stunning natural landscape. (2008)">Iceland</a>
-      <a href="/pics/2012/2012-10-21_Ireland/" title="Ireland : First time in Ireland">Ireland</a>
-      <a href="/pics/2009/2009-09-21_Italy%20Venice%20and%20Verona/" title="Venice and Verona : Nina surprised me by planning a trip to Venice for my 33rd birthday. Also couch-surfing in Verona. (2009)">Italy</a>
-      Liechtenstein<br>
-      Monaco<br>
-      <a href="/pics/2004/2004-04-07_Amsterdam/" title="One of many trips to Amsterdam (2004).">Netherlands</a>
-      <a href="/pics/2008/2008-09-13_Norway/" title="Traveling north-west from Oslo across the mountains to Bergen (on the North Sea). (2008)">Norway</a>
-      <a href="/pics/2004/2004-07-20_Portugal/" title="7 months living in Lisboa, Portugal (2004).">Portugal</a>
-      Scotland<br>
-      <a href="/pics/2013/2013-05-11_Spain-Barcelona/" title="Holidays in Barcelona, Spain on our way to Granada and the Alpujarras. (2013)">Spain</a>
-      <a href="/pics/2008/2008-09-10_Sweden/" title="Hitchhiking through Sweden on our way to Iceland (2008).">Sweden</a>
-      <a href="/pics/2007/2007-12-27_Switzerland_Winter/" title="Half a year in Zurich, Switzerland (2007).">Switzerland</a>
-      <a href="/pics/2010/2010-11-28_Italy/"title="2010: Vatican City, Rome, Napoli, Amalfi coast">Vatican City</a>
-    </div>
+  <body id="mode-list" data-adminurl="/jcdsee/admin/index.cgi?display_url&cur_url=/pics/">
+		<div id="nav">
+      <!--div style="float:left;"><p style="color:#ccc">Don't miss the <a href="#adventures" id="adventures-link" style="color:white;text-decoration:underline;">Adventures</a> tab below.</strong></div -->
+
+      <div style="float:right;">
+        <form id="gSearch" method="get" action="" onsubmit="document.location.href='https://www.google.com/search?q=site:pics.jonathancross.com '+document.forms.gSearch.q.value;return false;">
+          <!-- input type="hidden" name="sitesearch" value="pics.jonathancross.com" / -->
+          <input name="q" title="Uses Google to search this site..." type="text" size="10" maxlength="255" class="text">
+          <input type="submit" title="Uses Google..." value="search" class="search_button">
+        </form>
+      </div>
+
+      <h1 style="margin: 4px 1em 1px 3px; color: #ccc;">Jonathan Cross: Travel photography and stories.</h1>
+
+		</div>
+
+
+  <div id="content">
     <div>
-      <h4>Europe (east)</h4>
-      <a href="/pics/2012/2012-06-23_Albania/" title="Albania: One week exploring Albania after a holiday in Greece, then back to Switzerland via Italy. (2012)">Albania</a>
-      <a href="/pics/2007/2007-08-17_Bulgaria/" title="Bulgaria: cycling from west to east. (2007)">Bulgaria</a>
-      <a href="/pics/2007/2007-07-29_Croatia/" title="Hrvatska: cycling across Slovonia to Serbia. (2007)" lang="hr">Croatia</a>
-      Czech Republic<br>
-      <a href="/pics/2012/2012-06-16_Corfu_Greece/" title="Greece: Fourth trip to Greece, this time visiting Corfu for a week. (2012)">Greece</a>
-      <a href="/pics/2007/2007-07-27_Hungary/" title="Magyarország: cycling from Budapest to Croatia. (2007)" lang="hun">Hungary</a>
-      <a href="/pics/2010/2010-08-26_Poland/" title="A week traveling around northern Poland. (2010)">Poland</a>
-      <a href="/pics/2007/2007-10-04_Romania/" title="Romania: Transylvania and Bucuresti. (2007)">Romania</a>
-      <a href="/pics/2007/2007-08-08_Serbia/" title="Srbija: cycling diagonally through Novi Sad, Beograd and on to Bulgaria. (2007)" lang="sr">Serbia</a>
-      <a href="/pics/2007/2007-09-23_Slovakia/" title="Slovakia: Nina’s roots and High Tatras. (2007)">Slovakia</a>
-      <br>
-      <br>
-      <h4>North America</h4>
-      <a href="/pics/2008/2008-12-03_Canada/" title="Hitchhiking from the far east of Canada (Halifax), up through New Brunswick and over through Québec finally ending up in Montréal for a month. (2008)">Canada</a>
-      Mexico<br>
-      <a href="/pics/2013/2013-01-06_California Holidays/" title="A few of the many pictures from the USA. Christmas and New years eve in California. (2013)">USA</a>
+      <p>
+      Welcome to my <a href="pics/">online archive of photos</a>.  You’ll find photos and stories from dozens countries around the world. Enjoy!
+      </p>
+
+			<div id="homepagePhotos">
+				<a href="/pics/2006/2006-04-26_India/2006-01-08_Kolkata_pics/" title="Kolkata, India: 2006"><img src="/pics/2006/2006-04-26_India/2006-01-08_Kolkata_pics/.S.HooghlyRiver.jpg.jpg" alt="Kolkata, India: 2006"/></a>
+				<a href="/jcdsee.cgi?pic=/pics/1997/Bust_A_Nut.gif" title="Bust an Nut: the party of The Millenium - 1997"><img src="/pics/1997/.S.Bust_A_Nut.gif.jpg" alt="Bust an Nut: the party of The Millenium - 1997"/></a>
+				<a href="/pics/2002/2002-03-10_Ski_Trip_Europe/" title="Matterhorn: 2002"><img src="/pics/2002/2002-03-10_Ski_Trip_Europe/.S.02_Switzerland_Glacier%20Express%20Train.jpg.jpg" alt="Matterhorn: 2002"/></a>
+				<a href="/pics/2008/2008-10-20_Iceland/" title="Iceland: 2008"><img src="/pics/2008/2008-10-20_Iceland/.S.131_Geysir.jpg.jpg" alt="Iceland: 2008"/></a>
+				<a href="/pics/2004/2004-07-20_Portugal/" title="Portugal: 2004"><img src="/pics/2004/2004-07-20_Portugal/2004-05-16_Lagos/.S.Lagos-07.jpg.jpg" alt="Portugal: 2004"/></a>
+				<a href="/pics/2005/2005-02-17_Vietnam/" title="Vietnam: 2005"><img src="/pics/2005/2005-02-17_Vietnam/2005-01-27_Ho_Chi_Minh_City/.S.10_Friendly.jpg.jpg" alt="Vietnam: 2005"/></a>
+				<a href="/pics/2004/2004-10-23_Tokyo/" title="Tokyo, Japan: 2004"><img src="/pics/2004/2004-10-23_Tokyo/.S.shinjuku2.jpg.jpg" alt="Tokyo, Japan: 2004"/></a>
+				<a href="/pics/2006/2006-01-24_Bangladesh/" title="Bangladesh: 2006"><img src="/pics/2006/2006-01-24_Bangladesh/.S.23_Chittagong.jpg.jpg" alt="Bangladesh: 2006"/></a>
+				<a href="/pics/2006/2006-08-28_Java/" title="Java, Indonesia: 2006"><img src="/pics/2006/2006-08-28_Java/.S.26_Gunung_Bromo.jpg.jpg" alt="Java, Indonesia: 2006"/></a>
+			</div>
+			<div id="tab-block">
+				<div id="labels">
+					<a id="cat-label" href="#cat" title="Display list of countries, years, etc." class="active">Categories</a>
+					<a id="adventures-label" href="#adventures" title="Archive organized by trip.">Adventures</a>
+					<a id="map-label" href="#map" title="Map of countries visited" rel="nofollow">Map</a>
+					<a id="sitemap-label" title="Click here for a complete list of all links." href="/sitemap.xml" rel="nofollow">Sitemap</a>
+				</div>
+				<div id="cat">
+					<div class="col">
+						<h4>Year</h4>
+						<a href="/pics/" title="Childhood pics listed by date...">1976-1996</a>
+						<a href="/pics/1997/" title="A few pics of old friends.">1997</a>
+						<a href="/pics/2000/" title="A few pics of friends and family.">2000</a>
+						<a href="/pics/2001/" title="Includes pics from San Francisco and Chapel Hill, North Carolina.">2001</a>
+						<a href="/pics/2002/" title="Chicago, Vancouver, BC. and Ski trip to Europe.">2002</a>
+						<a href="/pics/2003/" title="San Francisco, Brooklyn, New York and Whistler, Canada.">2003</a>
+						<a href="/pics/2004/" title="New Years in Madrid. 7 months in Portugal. Skiing the Alps, Amsterdam and making Absinthe. London, (Old) York, New York, Tokyo and Thailand.">2004</a>
+						<a href="/pics/2005/" title="Cambodia, Vietnam, Laos, Thailand, USA: Dallas, Los Angeles, Seattle, San Francisco 'Love Parade', North India and Nepal.">2005</a>
+						<a href="/pics/2006/" title="A year in South Asia: India, Nepal, Bangladesh, Sri Lanka, Malaysia, Singapore, Indonesia, Bangkok and Myanmar. Also Zurich.">2006</a>
+						<a href="/pics/2007/" title="6 months back in the USA then Switzerland, Hungary, Croatia, Serbia, Bulgaria, Greece, Turkey, Slovakia, Austria, Romania, and back for a wedding in Geneva">2007</a>
+						<a href="/pics/2008/" title="Winter in Switzerland, a visit from Jason Shiga, Berlin and a 3 month Nordic Journey from Switzerland to San Francisco (via Scandinavia, Iceland and Canada).">2008</a>
+						<a href="/pics/2009/" title="San Francisco, Venice and Verona Italy, and an overland adventure from my home in Switzerland to the African continent.">2009</a>
+						<a href="/pics/2010/" title="Switzerland: Wängi &amp; New Years in Soglio, Maggia Ticino, Berlin Germany and Poland.">2010</a>
+						<a href="/pics/2011/" title="Living and working in Switzerland.">2011</a>
+						<a href="/pics/2012/" title="Trip over land and Sea down through Italy, over to Corfu (Greece), then up the coast of Albania.">2012</a>
+						<a href="/pics/2013/" title="New Years in California, overland trip to Granada, Spain via Barcelona and Paris, France.">2013</a>
+						<a href="/pics/2014/" title="Berlin, New York and California.">2014</a>
+						<br>
+						<h4>Other</h4>
+						<a href="/pics/Other/3D Renderings/" title="3D computer-generated graphics I created back in the 90’s.">3D Renderings</a>
+						<a href="/pics/Other/Language-Cards/" title="Language cheat sheets for 10 Asian Languages.">Languages</a>
+						<a href="/pics/Other/Graphic/" title="Propaganda and Corporate parodies from my previous life as an underground artist.">Graphics</a>
+						<a href="/pics/Other/Video/" title="Video clips from my travels.">Video</a>
+					</div>
+					<div class="col">
+						<h4>Asia</h4>
+						<a href="/pics/2006/2006-01-24_Bangladesh/" title="3.5 intense weeks overland through Bangladesh. (2006)">Bangladesh</a>
+						<a href="/pics/2005/2005-01-14_Cambodia/" title="3.5 weeks overland through Cambodia. (2005)">Cambodia</a>
+						<a href="/pics/2006/2006-04-26_India/" title="7 months traveling overland through the Indian subcontinent. (2005-2006)">India</a>
+						<a href="/pics/2006/2006-08-28_Java/" title="2 months of island hopping: Bali, Lombok, Java and Sumatra. (2006)">Indonesia</a>
+						<a href="/pics/2004/2004-10-23_Tokyo/" title="10 day visit to Tokyo and nearby area -- beginning of my first 6-month trip to Asia. (2004)">Japan</a>
+						<a href="/pics/2005/2005-03-12_Laos/" title="One month in the magical country of Laos. (2005)">Laos</a>
+						<a href="/pics/2006/2006-09-20_Penang_Bangkok/" title="A few photos from Penang during my 4th trip to Malaysia. (2006)">Malaysia</a>
+						<a href="/pics/2006/2006-11-04_Myanmar-Burma/" title="45 days almost entirely overland / sea through this amazing country. (2006)">Myanmar (Burma)</a>
+						<a href="/pics/2005/2005-12-11_Nepal/" title="Two amazing months traveling the length of Nepal. Includes photos Kathmandu and my 3-week trek in the Annapurna mountain range. (2005)">Nepal</a>
+						<a href="/pics/2006/2006-08-07_Singapore_Bali_Lombok/" title="A short visit to Singapore and then on to Indonesia. (2006)">Singapore</a>
+						<a href="/pics/2006/2006-06-28_Sri_Lanka/" title="2 months on the island of Sri Lanka.  (2006)">Sri Lanka</a>
+						<a href="/pics/2005/2005-09-30_Taiwan_Taipei/" title="Short visit to Taipei - and the last meat I ever ate! (2005)">Taiwan</a>
+						<a href="/pics/2004/2004-12-31_Thailand/" title="First of many trips to Thailand. (2004)">Thailand</a>
+						<a href="/pics/2007/2007-08-28_Turkey/" title="Turkey: cycling from the western border of Greece into Turkey and on to Istanbul. (2007)">Turkey</a>
+						<a href="/pics/2005/2005-02-17_Vietnam/" title="35 days traveling from south to north. (2005)">Vietnam</a>
+						<br>
+						<br>
+						<h4>Africa</h4>
+						<a href="/pics/2009/2009-12-23_Morocco/" title="6 weeks exploring Morocco. (2009)">Morocco</a>
+					</div>
+					<div class="col">
+						<h4>Europe (west)</h4>
+						<a href="/pics/2007/2007-09-26_Austria-Vienna/" title="Vienna, Austria (2008)">Austria</a>
+						Belgium<br>
+						<a href="/pics/2008/2008-09-07_Denmark/" title="Hitchhiking through Denmark on our way to Iceland. (2008)">Denmark</a>
+						<a href="/pics/2004/2004-07-24_London/" title="London England (2004)">England</a>
+						<a href="/pics/2008/2008-09-15_Faeroe Islands/" title="3-day ferry from Bergen, Norway to the Faeroe Islands (Føroyar) and then on to Iceland. (2008)">Faeroe Islands</a>
+						<a href="/pics/2013/2013-05-22_France-Paris/" title="Montmartre, Paris... just a couple days enjoying cafes, etc on our way back from Spain. (2013)">France</a>
+						<a href="/pics/2012/2012-09-14_Berlin/" title="One of many trips to Berlin, Germany (2013)">Germany</a>
+						<a href="/pics/2008/2008-10-20_Iceland/" title="5 weeks in  Ísland after arriving by ferry (from Norway).  Volunteering and exploring the stunning natural landscape. (2008)">Iceland</a>
+						<a href="/pics/2012/2012-10-21_Ireland/" title="Ireland : First time in Ireland">Ireland</a>
+						<a href="/pics/2009/2009-09-21_Italy%20Venice%20and%20Verona/" title="Venice and Verona : Nina surprised me by planning a trip to Venice for my 33rd birthday. Also couch-surfing in Verona. (2009)">Italy</a>
+						Liechtenstein<br>
+						Monaco<br>
+						<a href="/pics/2004/2004-04-07_Amsterdam/" title="One of many trips to Amsterdam (2004).">Netherlands</a>
+						<a href="/pics/2008/2008-09-13_Norway/" title="Traveling north-west from Oslo across the mountains to Bergen (on the North Sea). (2008)">Norway</a>
+						<a href="/pics/2004/2004-07-20_Portugal/" title="7 months living in Lisboa, Portugal (2004).">Portugal</a>
+						Scotland<br>
+						<a href="/pics/2013/2013-05-11_Spain-Barcelona/" title="Holidays in Barcelona, Spain on our way to Granada and the Alpujarras. (2013)">Spain</a>
+						<a href="/pics/2008/2008-09-10_Sweden/" title="Hitchhiking through Sweden on our way to Iceland (2008).">Sweden</a>
+						<a href="/pics/2007/2007-12-27_Switzerland_Winter/" title="Half a year in Zurich, Switzerland (2007).">Switzerland</a>
+						<a href="/pics/2010/2010-11-28_Italy/"title="2010: Vatican City, Rome, Napoli, Amalfi coast">Vatican City</a>
+					</div>
+					<div>
+						<h4>Europe (east)</h4>
+						<a href="/pics/2012/2012-06-23_Albania/" title="Albania: One week exploring Albania after a holiday in Greece, then back to Switzerland via Italy. (2012)">Albania</a>
+						<a href="/pics/2007/2007-08-17_Bulgaria/" title="Bulgaria: cycling from west to east. (2007)">Bulgaria</a>
+						<a href="/pics/2007/2007-07-29_Croatia/" title="Hrvatska: cycling across Slovonia to Serbia. (2007)" lang="hr">Croatia</a>
+						Czech Republic<br>
+						<a href="/pics/2012/2012-06-16_Corfu_Greece/" title="Greece: Fourth trip to Greece, this time visiting Corfu for a week. (2012)">Greece</a>
+						<a href="/pics/2007/2007-07-27_Hungary/" title="Magyarország: cycling from Budapest to Croatia. (2007)" lang="hun">Hungary</a>
+						<a href="/pics/2010/2010-08-26_Poland/" title="A week traveling around northern Poland. (2010)">Poland</a>
+						<a href="/pics/2007/2007-10-04_Romania/" title="Romania: Transylvania and Bucuresti. (2007)">Romania</a>
+						<a href="/pics/2007/2007-08-08_Serbia/" title="Srbija: cycling diagonally through Novi Sad, Beograd and on to Bulgaria. (2007)" lang="sr">Serbia</a>
+						<a href="/pics/2007/2007-09-23_Slovakia/" title="Slovakia: Nina’s roots and High Tatras. (2007)">Slovakia</a>
+						<br>
+						<br>
+						<h4>North America</h4>
+						<a href="/pics/2008/2008-12-03_Canada/" title="Hitchhiking from the far east of Canada (Halifax), up through New Brunswick and over through Québec finally ending up in Montréal for a month. (2008)">Canada</a>
+						Mexico<br>
+						<a href="/pics/2013/2013-01-06_California Holidays/" title="A few of the many pictures from the USA. Christmas and New years eve in California. (2013)">USA</a>
+					</div>
+				</div>
+				<div id="adventures" class="hide">
+					<ul>
+						<li>
+						  <a href="/pics/2005/2005-03-12_Laos/" title="Laos: 2005"><img src="/pics/2005/2005-03-12_Laos/2005-03-12_Vang_Vieng/.L.25_Sunset.jpg.jpg" style="height:80px;width:140px;" alt="Laos 2005" /></a>
+						  <h3>6 months backpacking South-East Asia</h3> (<a href="/pics/2004/">2004</a> - <a href="/pics/2005/">2005</a>)
+						  <div>
+						  <a href="/pics/2004/2004-10-23_Tokyo/">Tokyo</a>
+						   → <a href="/pics/2004/2004-12-31_Thailand/">Thailand</a>
+						   → <a href="/pics/2005/2005-01-14_Cambodia/">Cambodia</a>
+						   → <a href="/pics/2005/2005-02-17_Vietnam/">Vietnam</a>
+						   → <a href="/pics/2005/2005-03-12_Laos/">Laos</a>
+						   → <a href="/pics/2005/2005-03-14_Thailand/">Thailand</a>
+						  </div>
+						</li>
+						<li>
+						  <a href="/jcdsee.cgi?pic=/pics/2006/South_Eastern_Asia.png" title="Map of adventures in South-East Asia and Indian sub-continent."><img src="/pics/2006/.L.South_Eastern_Asia.png.jpg" alt="Map of South East Asia" /></a>
+						  <h3>14 months backpacking in Southern Asia</h3> (<a href="/pics/2005/">2005</a> - <a href="/pics/2006/">2006</a>)
+						  <div>
+						 India (<a href="/pics/2005/2005-10-01_India_Delhi/">Delhi</a>, <a href="/pics/2005/2005-10-05_India_Agra/">Agra</a>, <a href="/pics/2005/2005-10-14_Rishikesh.html">Rishikesh</a>)
+						   → <a href="/pics/2005/2005-12-11_Nepal/">Nepal</a> (
+						   <a href="/pics/2005/2005-12-11_Nepal/2005-10-18_Nepal_Bardia/">Animals</a>,
+						   <a href="/pics/2005/2005-12-11_Nepal/2005-10-23_Nepal_Thangka_CG_Lama/">Paintings</a>,
+						   <a href="/pics/2005/2005-12-11_Nepal/2005-11-19_Nepal_Annapurna/">Annapurnas</a>,
+						   <a href="/pics/2005/2005-12-11_Nepal/2005-12-06_Nepal_Kathmandu_Valley/">Kathmandu</a>
+						   )
+						   → <a href="/pics/2006/2006-04-26_India/">India (Darjeeling, Sikkim, Calcutta)</a>
+						   → <a href="/pics/2006/2006-01-24_Bangladesh/">Bangladesh</a>
+						   → <a href="/pics/2006/2006-04-26_India/">India</a>
+						   → <a href="/pics/2006/2006-06-28_Sri_Lanka/">Sri Lanka</a>
+						   → <a href="/pics/2006/2006-08-07_Singapore_Bali_Lombok/">Malaysia
+						   → Singapore
+						   → Indonesia (Bali, Lombok</a>, <a href="/pics/2006/2006-08-28_Java/">Java</a>, <a href="/pics/2006/2006-09-08_Sumatra/">Sumatra</a>)
+						   → <a href="/pics/2006/2006-09-20_Penang_Bangkok/">Malaysia
+						   → Thailand</a>
+						   → <a href="/pics/2006/2006-11-04_Myanmar-Burma/">Burma</a>
+						   → <a href="/pics/2006/2006-11-29_Switzerland/">Switzerland</a>
+						  </div>
+						</li>
+						<li>
+						  <a href="/pics/2007/" title="Cycling from Budapest to Istanbul: 2007"><img src="/pics/2007/2007-08-28_Turkey/.L.16_Istanbul%20Sunset.JPG.jpg" alt="Istanbul 2007" /></a>
+						  <h3>Cycling to Istanbul + Exploring Eastern Europe</h3> (<a href="/pics/2007/">2007</a>)
+						  <div>
+						     <a href="/pics/2007/2007-07-27_Hungary/">Hungary</a>
+						   → <a href="/pics/2007/2007-07-29_Croatia/">Croatia</a>
+						   → <a href="/pics/2007/2007-08-08_Serbia/">Serbia</a>
+						   → <a href="/pics/2007/2007-08-17_Bulgaria/">Bulgaria</a>
+						   → <a href="/pics/2007/2007-08-18_Greece/">Greece</a>
+						   → <a href="/pics/2007/2007-08-28_Turkey/">Turkey</a>
+						   <br>
+						   TRAIN: <a href="/pics/2007/2007-09-23_Slovakia/">Slovakia</a>
+						   → <a href="/pics/2007/2007-09-26_Austria-Vienna/">Austria-Vienna</a>
+						   → <a href="/pics/2007/2007-10-04_Romania/">Romania</a>
+						  </div>
+						</li>
+						<li>
+						  <a href="/pics/2008/" title="Hitchiking to California: 2008"><img src="/pics/2008/2008-10-20_Iceland/.L.198_Holmavik%20Hitchhike%20Jonathan.jpg.jpg" alt="Iceland 2008" /></a>
+						  <h3>Berlin to San Francisco without flying?</h3> (<a href="/pics/2008/">2008</a>)
+						  <div>
+						  <a href="/pics/2008/2008-08-14_Berlin%20Summer/">Berlin Summer</a>
+						  <br>
+						  HITCHHIKING:
+						   <a href="/pics/2008/2008-09-05_Germany-Hamburg/">Germany</a>
+						   → <a href="/pics/2008/2008-09-07_Denmark/">Denmark</a>
+						   → <a href="/pics/2008/2008-09-10_Sweden/">Sweden</a>
+						   → <a href="/pics/2008/2008-09-13_Norway/">Norway</a>
+						   → <a href="/pics/2008/2008-09-15_Faeroe%20Islands/">Faeroe Islands</a>
+						   → <a href="/pics/2008/2008-10-20_Iceland/">Iceland</a>
+						   → <a href="/pics/2008/2008-12-03_Canada/">Canada</a>
+						   <br>
+						   TRAIN &amp; BUS:
+						   <a href="/pics/2008/2008-12-11_New%20York/">New York</a>
+						   → <a href="/pics/2008/2008-12-12_Baltimore/">Baltimore</a>
+						   → <a href="/pics/2008/2008-12-17_Chicago%20to%20San%20Francisco/">San Francisco</a>
+						  </div>
+						</li>
+						<li>
+						  <a href="/pics/2009/2009-12-23_Morocco/" title="Stepping off the ferry from Spain to North Africa."><img src="/pics/2009/2009-12-23_Morocco/.L.001_Fresh%20off%20the%20boat.jpg.jpg" alt="Morocco 2009" /></a>
+						  <h3>Overland + Sea from Zürich to Morocco</h3> (<a href="/pics/2009/">2009</a>)
+						  <div>
+						  Zürich
+						   → <a href="/pics/2009/2009-11-16_Spain/">Barcelona
+						   → Malaga (Spain)</a>
+						   → <a href="/pics/2009/2009-12-23_Morocco/">Morocco</a>
+						   → Spain
+						   → Zürich
+						  </div>
+						</li>
+					</ul>
+				</div>
+				<div id="map" class="hide">
+					<!-- Must add a '1' to url for each new country -->
+					<img src="http://chart.apis.google.com/chart?cht=map:fixed=-70,-180,80,180&amp;chs=576x376&amp;chf=bg,s,888888&amp;chd=s:1111111111111111111111111111111111111111111111111&amp;chld=AL|AT|BD|BE|BG|CA|CH|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SK|TH|TR|TW|US|VA|VN" alt="Map of countries visited.">
+				</div>
+			</div>
+			<h5>About this website.</h5>
+			<p>
+			JCDSee is my personal web based photo viewing / cataloging system written in the Perl scripting language.
+			The script is about 43KB, should work without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of JCDSee</a>, and use it as you like.
+			</p>
+      <!--
+			<h5>JCDSee?</h5>
+			<p>
+			I had to name it something... it's an adaptation of "<a href="http://en.wikipedia.org/wiki/ACDSee">ACDSee</a>"
+			(image viewer for windows) which itself took the name from the Australian rock band <a href="http://en.wikipedia.org/wiki/AC/DC">AC/DC</a>.
+			Legend has it that Angus and Malcolm apparently saw the acronym on their sister’s sewing machine (where it indicated
+			"<a href="http://en.wikipedia.org/wiki/Alternating_current">Alternating Current</a>/<a href="http://en.wikipedia.org/wiki/Direct_current">Direct Current</a>").
+			</p>
+    -->
+			<p>
+			This website has evolved slowly over the last 10+ years starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in 2015.
+			</p>
+			<p><a rel="author" href="https://plus.google.com/u/0/+JonathanCr0ss">Jonathan</a></p>
+    </div>
+  </div><!-- Close div#content -->
+
+  <!--div id="bookmarks">
+    <span style="float:left;">
+    <a href="http://www.dreamhost.com/green.cgi" title="Carbon neutral web servers."><img src="jcdsee/icon_sm_dreamhost.png" alt="" /></a>
+    <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" title="CopyLeft.  All content on this site is available free for non-commercial use."><img src="jcdsee/icon_sm_copyleft.png" alt="Copy Left" /></a>
+    </span>
+    <span style="float:right;">
+    <a href="javascript:adFav()" title="Add to Favorites"><img src="jcdsee/syn_favorites.png" alt="favorites" /></a>
+    <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fpics.JonathanCross.com&amp;t=Jonathan%20Cross:%20Travel%20photography%20and%20stories." title="Facebook"><img src="jcdsee/syn_facebook.png" alt="facebook" /></a>
+    </span>
+  </div-->
+
+  <script src="/jcdsee/jcdsee.js"></script>
+
+  <div id="footer">
+    <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+      <img alt="Creative Commons License" src="/jcdsee/icon_copyleft.png">
+    </a>
+    <div id="usage">
+      <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2</a>
+      <div>Page last modified on 2015-08-01</div>
     </div>
   </div>
-  <div id="adventures" class="hide">
-    <ul>
-      <li>
-        <a href="/pics/2005/2005-03-12_Laos/" title="Laos: 2005"><img src="/pics/2005/2005-03-12_Laos/2005-03-12_Vang_Vieng/.L.25_Sunset.jpg.jpg" style="height:80px;width:140px;" alt="Laos 2005" /></a>
-        <h3>6 months backpacking South-East Asia</h3> (<a href="/pics/2004/">2004</a> - <a href="/pics/2005/">2005</a>)
-        <div>
-        <a href="/pics/2004/2004-10-23_Tokyo/">Tokyo</a>
-         → <a href="/pics/2004/2004-12-31_Thailand/">Thailand</a>
-         → <a href="/pics/2005/2005-01-14_Cambodia/">Cambodia</a>
-         → <a href="/pics/2005/2005-02-17_Vietnam/">Vietnam</a>
-         → <a href="/pics/2005/2005-03-12_Laos/">Laos</a>
-         → <a href="/pics/2005/2005-03-14_Thailand/">Thailand</a>
-        </div>
-      </li>
-      <li>
-        <a href="/jcdsee.cgi?pic=/pics/2006/South_Eastern_Asia.png" title="Map of adventures in South-East Asia and Indian sub-continent."><img src="http://pics.jonathancross.com/pics/2006/.L.South_Eastern_Asia.png.jpg" alt="Map of South East Asia" /></a>
-        <h3>14 months backpacking in Southern Asia</h3> (<a href="/pics/2005/">2005</a> - <a href="/pics/2006/">2006</a>)
-        <div>
-       India (<a href="/pics/2005/2005-10-01_India_Delhi/">Delhi</a>, <a href="/pics/2005/2005-10-05_India_Agra/">Agra</a>, <a href="/pics/2005/2005-10-14_Rishikesh.html">Rishikesh</a>)
-         → <a href="/pics/2005/2005-12-11_Nepal/">Nepal</a> (
-         <a href="/pics/2005/2005-12-11_Nepal/2005-10-18_Nepal_Bardia/">Animals</a>,
-         <a href="/pics/2005/2005-12-11_Nepal/2005-10-23_Nepal_Thangka_CG_Lama/">Paintings</a>,
-         <a href="/pics/2005/2005-12-11_Nepal/2005-11-19_Nepal_Annapurna/">Annapurnas</a>,
-         <a href="/pics/2005/2005-12-11_Nepal/2005-12-06_Nepal_Kathmandu_Valley/">Kathmandu</a>
-         )
-         → <a href="/pics/2006/2006-04-26_India/">India (Darjeeling, Sikkim, Calcutta)</a>
-         → <a href="/pics/2006/2006-01-24_Bangladesh/">Bangladesh</a>
-         → <a href="/pics/2006/2006-04-26_India/">India</a>
-         → <a href="/pics/2006/2006-06-28_Sri_Lanka/">Sri Lanka</a>
-         → <a href="/pics/2006/2006-08-07_Singapore_Bali_Lombok/">Malaysia
-         → Singapore
-         → Indonesia (Bali, Lombok</a>, <a href="/pics/2006/2006-08-28_Java/">Java</a>, <a href="/pics/2006/2006-09-08_Sumatra/">Sumatra</a>)
-         → <a href="/pics/2006/2006-09-20_Penang_Bangkok/">Malaysia
-         → Thailand</a>
-         → <a href="/pics/2006/2006-11-04_Myanmar-Burma/">Burma</a>
-         → <a href="/pics/2006/2006-11-29_Switzerland/">Switzerland</a>
-        </div>
-      </li>
-      <li>
-        <a href="/pics/2007/" title="Cycling from Budapest to Istanbul: 2007"><img src="/pics/2007/2007-08-28_Turkey/.L.16_Istanbul%20Sunset.JPG.jpg" alt="Istanbul 2007" /></a>
-        <h3>Cycling to Istanbul + Exploring Eastern Europe</h3> (<a href="/pics/2007/">2007</a>)
-        <div>
-           <a href="/pics/2007/2007-07-27_Hungary/">Hungary</a>
-         → <a href="/pics/2007/2007-07-29_Croatia/">Croatia</a>
-         → <a href="/pics/2007/2007-08-08_Serbia/">Serbia</a>
-         → <a href="/pics/2007/2007-08-17_Bulgaria/">Bulgaria</a>
-         → <a href="/pics/2007/2007-08-18_Greece/">Greece</a>
-         → <a href="/pics/2007/2007-08-28_Turkey/">Turkey</a>
-         <br>
-         TRAIN: <a href="/pics/2007/2007-09-23_Slovakia/">Slovakia</a>
-         → <a href="/pics/2007/2007-09-26_Austria-Vienna/">Austria-Vienna</a>
-         → <a href="/pics/2007/2007-10-04_Romania/">Romania</a>
-        </div>
-      </li>
-      <li>
-        <a href="/pics/2008/" title="Hitchiking to California: 2008"><img src="/pics/2008/2008-10-20_Iceland/.L.198_Holmavik%20Hitchhike%20Jonathan.jpg.jpg" alt="Iceland 2008" /></a>
-        <h3>Berlin to San Francisco without flying?</h3> (<a href="/pics/2008/">2008</a>)
-        <div>
-        <a href="/pics/2008/2008-08-14_Berlin%20Summer/">Berlin Summer</a>
-        <br>
-        HITCHHIKING:
-         <a href="/pics/2008/2008-09-05_Germany-Hamburg/">Germany</a>
-         → <a href="/pics/2008/2008-09-07_Denmark/">Denmark</a>
-         → <a href="/pics/2008/2008-09-10_Sweden/">Sweden</a>
-         → <a href="/pics/2008/2008-09-13_Norway/">Norway</a>
-         → <a href="/pics/2008/2008-09-15_Faeroe%20Islands/">Faeroe Islands</a>
-         → <a href="/pics/2008/2008-10-20_Iceland/">Iceland</a>
-         → <a href="/pics/2008/2008-12-03_Canada/">Canada</a>
-         <br>
-         TRAIN &amp; BUS:
-         <a href="/pics/2008/2008-12-11_New%20York/">New York</a>
-         → <a href="/pics/2008/2008-12-12_Baltimore/">Baltimore</a>
-         → <a href="/pics/2008/2008-12-17_Chicago%20to%20San%20Francisco/">San Francisco</a>
-        </div>
-      </li>
-      <li>
-        <a href="/pics/2009/2009-12-23_Morocco/" title="Stepping off the ferry from Spain to North Africa."><img src="/pics/2009/2009-12-23_Morocco/.L.001_Fresh%20off%20the%20boat.jpg.jpg" alt="Morocco 2009" /></a>
-        <h3>Overland + Sea from Zürich to Morocco</h3> (<a href="/pics/2009/">2009</a>)
-        <div>
-        Zürich
-         → <a href="/pics/2009/2009-11-16_Spain/">Barcelona
-         → Malaga (Spain)</a>
-         → <a href="/pics/2009/2009-12-23_Morocco/">Morocco</a>
-         → Spain
-         → Zürich
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div id="map" class="hide">
-    <!-- Must add a '1' to url for each new country -->
-    <img src="http://chart.apis.google.com/chart?cht=map:fixed=-70,-180,80,180&amp;chs=576x376&amp;chf=bg,s,888888&amp;chd=s:1111111111111111111111111111111111111111111111111&amp;chld=AL|AT|BD|BE|BG|CA|CH|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SK|TH|TR|TW|US|VA|VN" alt="Map of countries visited.">
-  </div>
-</div>
-<h5>About this website.</h5>
-<p>
-JCDSee is my personal web based photo viewing / cataloging system written in the Perl scripting language.
-The script is about 43KB, does not use cookies or contain ads.  Perl h@x3r5 - feel free to  <a href="jcdsee_latest.txt" title="JCDSee Perl script by Jonathan Cross.  Free for non-commercial use.">grab the latest version of JCDSee</a>, and use it as you like.
-The site uses html5, css3, xslt, xml, and to tie it all together.
-</p>
-<h5>JCDSee?</h5>
-<p>
-I had to name it something... its an adaptation of "<a href="http://en.wikipedia.org/wiki/ACDSee">ACDSee</a>"
-(image viewer for windows) which itself took the name from the Australian rock band <a href="http://en.wikipedia.org/wiki/AC/DC">AC/DC</a>.
-Legend has it that Angus and Malcolm apparently saw the acronym on their sister’s sewing machine (where it indicated
-"<a href="http://en.wikipedia.org/wiki/Alternating_current">Alternating Current</a>/<a href="http://en.wikipedia.org/wiki/Direct_current">Direct Current</a>").
-</p>
-<p>
-JCDSee has been built very slowly over the last 10 years starting from a 2-line perl script -- most of the development taking place in random internet cafes around the world.
-</p>
-<p>-<a rel="author" href="https://plus.google.com/u/0/101785420914086546484?rel=author">Jonathan</a></p>
-</div>
-</td>
-</tr>
-</table>
-<div id="bookmarks">
-  <span style="float:left;">
-  <a href="http://www.dreamhost.com/green.cgi" title="Carbon neutral web servers."><img src="jcdsee/icon_sm_dreamhost.png" alt="" /></a>
-  <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" title="CopyLeft.  All content on this site is available free for non-commercial use."><img src="jcdsee/icon_sm_copyleft.png" alt="Copy Left" /></a>
-  </span>
-  <span style="float:right;">
-  <a href="javascript:adFav()" title="Add to Favorites"><img src="jcdsee/syn_favorites.png" alt="favorites" /></a>
-  <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fpics.JonathanCross.com&amp;t=Jonathan%20Cross:%20Travel%20photography%20and%20stories." title="Facebook"><img src="jcdsee/syn_facebook.png" alt="facebook" /></a>
-  </span>
-</div>
-<script type="text/javascript">
 
-/**
- * Container object for toggled tabs.
- * @param {!Array.<string>} tabIds Array of tab ID strings.
- */
-function Toggler(tabIds) {
-  this.tabIds = {};
-  this.tabs = {};
-  for (i in tabIds) {
-    var tabId = tabIds[i];
-    this.tabIds[tabId] = tabId;
-    var tab = new Tab(tabId, this);
-    this.tabs[tabId] = tab;
+	<script type="text/javascript">
+    // TODO: Namespace and move this into external js file.
 
-    if (tab.isInUrlHash()) {
-      this.toggleTab(tabId);
+		/**
+		 * Tab toggler class.
+		 * @param {!Array.<string>} tabIds Array of tab ID strings.
+     * @constructor
+		 */
+		function Toggler(tabIds) {
+			this.tabIds = {};
+			this.tabs = {};
+			for (i in tabIds) {
+				var tabId = tabIds[i];
+				this.tabIds[tabId] = tabId;
+				var tab = new Tab(tabId, this);
+				this.tabs[tabId] = tab;
+
+				if (tab.isInUrlHash()) {
+				  this.toggleTab(tabId);
+				}
+			}
+		};
+
+    /**
+     * Toggles visibility of a tab.
+     * @param {string} tabId ID of the tab to show.
+     */
+		Toggler.prototype.toggleTab = function(tabId) {
+			var currentTab = this.tabs[tabId];
+			for (name in this.tabIds) {
+				if (name == tabId) {
+				  currentTab.show();
+				  document.location.hash = '#tab=' + tabId;
+				}else{
+				  this.tabs[name].hide();
+				}
+			}
+		};
+
+
+		/**
+		 * Individual Tab object.
+		 * @param {string} tabId unique id of tab.
+		 * @param {!Toggler} toggler  Toggler.
+		 */
+		function Tab(tabId, toggler) {
+			this.tabId = tabId;
+			this.toggler = toggler;
+			this.content = document.getElementById(this.tabId);
+			this.label = document.getElementById(this.tabId + '-label');
+			this.label.onclick = function (evt) {
+				toggler.toggleTab(tabId);
+				evt.preventDefault();
+			};
+		};
+
+		Tab.prototype.isInUrlHash = function() {
+			return document.location.hash == '#tab=' + this.tabId;
+		};
+
+		Tab.prototype.show = function() {
+			this.label.className = 'active';
+			this.content.className = 'show';
+		};
+
+		Tab.prototype.show = function() {
+			this.label.className = 'active';
+			this.content.className = 'show';
+		};
+
+		Tab.prototype.hide = function() {
+			this.label.className = '';
+			this.content.className = 'hide';
+		};
+
+		var tabIds = ['cat', 'adventures', 'map'];
+		var toggler = new Toggler(tabIds);
+
+		// Enable the adventures link
+    var adventuresLink = document.getElementById('adventures-link');
+    if (adventuresLink) {
+      adventuresLink.onclick = function (evt) {
+        toggler.toggleTab('adventures');
+        evt.preventDefault();
+      };
     }
-  }
-};
 
-Toggler.prototype.toggleTab = function(tabId) {
-  var currentTab = this.tabs[tabId];
-  for (name in this.tabIds) {
-    if (name == tabId) {
-      currentTab.show();
-      document.location.hash = '#tab=' + tabId;
-    }else{
-      this.tabs[name].hide();
-    }
-  }
-};
-
-
-/**
- * Individual Tab object.
- * @param {string} tabId unique id of tab.
- * @param {Toggler} toggler  Toggler.
- */
-function Tab(tabId, toggler) {
-  this.tabId = tabId;
-  this.toggler = toggler;
-  this.content = document.getElementById(this.tabId);
-  this.label = document.getElementById(this.tabId + '-label');
-  this.label.onclick = function (evt) {
-    toggler.toggleTab(tabId);
-    evt.preventDefault();
-  };
-};
-
-Tab.prototype.isInUrlHash = function() {
-  return document.location.hash == '#tab=' + this.tabId;
-};
-
-Tab.prototype.show = function() {
-  this.label.className = 'active';
-  this.content.className = 'show';
-};
-
-Tab.prototype.show = function() {
-  this.label.className = 'active';
-  this.content.className = 'show';
-};
-
-Tab.prototype.hide = function() {
-  this.label.className = '';
-  this.content.className = 'hide';
-};
-
-var tabIds = ['cat', 'adventures', 'map'];
-var toggler = new Toggler(tabIds);
-
-// Enable the adventures link
-document.getElementById('adventures-link').onclick = function (evt) {
-  toggler.toggleTab('adventures');
-  evt.preventDefault();
-};
-
-</script>
+	</script>
 </body>
 </html>
 
