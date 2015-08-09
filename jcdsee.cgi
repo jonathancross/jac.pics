@@ -459,13 +459,14 @@ sub getDepthPath {
     }
   }
 
-  # TODO: Output current picture name and desc for SINGLE mode here instead:
-  $depth_path .= '<li>
-    <h1>'.getNiceFilename($last_directory).'</h1>';
-    if ("$STATE{'page_description'}") {
-      $depth_path .= "<h2>$STATE{'page_description'}</h2>";
-    }
-  $depth_path .= '</li>';
+  # Append the collection head:
+  $depth_path .= '<li class="depth-path-header"><h1>'.getNiceFilename($last_directory).'</h1></li>';
+
+  # Append the collection description:
+  # Consider replacing with current picture name + desc for SINGLE mode here.
+  if ("$STATE{'page_description'}") {
+    $depth_path .= '<li class="depth-path-header"><h2>'.$STATE{'page_description'}.'</h2></li>';
+  }
 
   return $depth_path;
 }
@@ -815,11 +816,12 @@ print '
 #  }
 #  </noscript>
 
-
 print '
 
   <div id="nav">
-    <ul id="depth-path">'.getDepthPath().'</ul>
+    <ul id="depth-path">'
+      .getDepthPath().'
+    </ul>
     <div id="mode-buttons">'
       .getNavButton("display_mode","LIST","LIST MODE")
       .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")

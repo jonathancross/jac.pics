@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
-<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2014-05-18" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<!-- Built: "2014-05-18" -->
+<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-08-08" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<!-- Built: "2015-08-08" -->
   <url jcd:imgs="0" jcd:dsize="1.2G">
     <loc>http://pics.jonathancross.com/</loc>
-    <lastmod>2013-07-16</lastmod>
+    <lastmod>2015-07-29</lastmod>
     <priority>1.0</priority>
   </url>
   <url jcd:imgs="0" jcd:dsize="1.2G">
@@ -49,12 +49,12 @@
   </url>
   <url jcd:imgs="0" jcd:dsize="1.2G">
     <loc>http://pics.jonathancross.com/pics/</loc>
-    <lastmod>2014-05-18</lastmod>
+    <lastmod>2015-08-08</lastmod>
     <jcd:desc>Archive of travel stories and photos.</jcd:desc>
   </url>
   <url jcd:imgs="5" jcd:dsize="540K">
     <loc>http://pics.jonathancross.com/pics/1976/</loc>
-    <lastmod>2012-10-28</lastmod>
+    <lastmod>2015-07-07</lastmod>
     <jcd:desc>Born.</jcd:desc>
   </url>
   <url jcd:imgs="13" jcd:dsize="1.4M">
@@ -484,7 +484,7 @@
   </url>
   <url jcd:imgs="10" jcd:dsize="652K">
     <loc>http://pics.jonathancross.com/pics/2005/2005-03-12_Laos/2005-03-11_Luang_Prabang/</loc>
-    <lastmod>2007-07-07</lastmod>
+    <lastmod>2015-07-16</lastmod>
     <jcd:desc> Tourist town, but pretty nice nevertheless.  A World Heritage Site and great place to shop for Lao Silk, swim in waterfalls and eat good food!</jcd:desc>
   </url>
   <url jcd:imgs="15" jcd:dsize="660K">
@@ -894,7 +894,7 @@
   </url>
   <url jcd:imgs="59" jcd:dsize="5.7M">
     <loc>http://pics.jonathancross.com/pics/2009/2009-12-23_Morocco/</loc>
-    <lastmod>2010-05-30</lastmod>
+    <lastmod>2015-08-08</lastmod>
     <jcd:desc>6 weeks exploring Morocco.</jcd:desc>
   </url>
   <url jcd:imgs="3" jcd:dsize="11M">
@@ -1042,7 +1042,7 @@
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
   </url>
-  <url jcd:imgs="36" jcd:dsize="4.1M">
+  <url jcd:imgs="36" jcd:dsize="4.4M">
     <loc>http://pics.jonathancross.com/pics/2014/2014-03-13_Berlin/</loc>
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
@@ -1056,6 +1056,16 @@
     <loc>http://pics.jonathancross.com/pics/2014/2014-05-03_California/</loc>
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
+  </url>
+  <url jcd:imgs="0" jcd:dsize="13M">
+    <loc>http://pics.jonathancross.com/pics/2015/</loc>
+    <lastmod>2015-08-08</lastmod>
+    <jcd:desc>Colombia</jcd:desc>
+  </url>
+  <url jcd:imgs="105" jcd:dsize="13M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-05-22_Colombia/</loc>
+    <lastmod>2015-08-08</lastmod>
+    <jcd:desc>Two months backpacking and visiting friends in Colombia.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="744M">
     <loc>http://pics.jonathancross.com/pics/Other/</loc>

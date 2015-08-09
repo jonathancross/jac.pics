@@ -399,10 +399,6 @@ DIV#email IMG         {padding:5px;}
     white-space: nowrap;
   }
 
-  #depth-path h2:before {
-    content: ' : ';
-  }
-
   #depth-path h2 {
     display: inline;
     font-size: inherit;
@@ -415,8 +411,24 @@ DIV#email IMG         {padding:5px;}
     margin: 0 5px;
   }
 
-  #depth-path li:last-child:after {
+  /* Remove '<' from header(s) items at the end of the depth path. */
+  #depth-path li.depth-path-header:after {
+    content: ''; /* Older webkit doesn't support none. */
     content: none;
+  }
+
+  /* Add ':' after all depth-path h1s. */
+  #depth-path li.depth-path-header h1:after {
+    content: ':';
+    font-weight: bold;
+    padding: 0 .5ex;
+  }
+
+  /* Remove trailing ':' if depth-path h1 is last item. */
+  #depth-path li.depth-path-header:last-child h1:after {
+    content: ''; /* Older webkit doesn't support none. */
+    content: none;
+    padding: 0;
   }
 
   #depth-path a,
@@ -465,7 +477,11 @@ DIV#email IMG         {padding:5px;}
     float: left;
     margin: 0;
     min-width: 228px;
-    padding: 0 0 0 .5em;
+    padding: 0;
+  }
+
+  #mode-slideshow #slideshow-controls {
+    margin-left: 7px;
   }
 
   #slideshow-buttons li {
@@ -739,6 +755,10 @@ DIV#email IMG         {padding:5px;}
     margin-right: 80px;
   }
 
+  #mode-slideshow #depth-path {
+    min-height: 55px; /* Prevent buttons from overlapping. */
+  }
+
   #mode-slideshow #slideshow-controls {
     float: left;
   }
@@ -757,12 +777,21 @@ DIV#email IMG         {padding:5px;}
     padding-top: 110px;
   }
 
-  #counter {
+  #mode-slideshow #counter {
     border-left: none;
-    display: block;
+    display: inline;
     font-size: 13px;
-    margin: 5px 0 0 8px;
+    margin-left: 8px;
     padding: 0;
+    white-space: nowrap;
+  }
+
+  #mode-slideshow #slideshow-controls {
+    line-height: 30px;
+  }
+
+  #mode-slideshow #depth-path {
+    min-height: 65px; /* Prevent buttons from overlapping. */
   }
 
   #mode-list .file-name-container {
