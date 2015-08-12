@@ -1,6 +1,6 @@
 ###JCDSee: a web-based photo viewing / cataloging system written in Perl.
 * Production server: http://pics.jonathancross.com
-* Test server: http://test-pics.jonathancross.com
+* Dev server: http://test-pics.jonathancross.com
 
 ####What it does:
 JCDSee creates an html directory listing of any folders it finds so that they can be browsed as a website.  It is focused around handeling images but can support any type of document.
