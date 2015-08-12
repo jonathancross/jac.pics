@@ -10,8 +10,9 @@
     <title>Jonathan Cross: Travel photography and stories.</title>
     <meta name="description" content="Travel photography by Jonathan Cross. Includes photos of dozens of countries throughout South Asia, Eastern Europe and the Americas.">
     <link href="/jcdsee/jcdsee.css" rel="stylesheet" type="text/css">
-    <!--[if lt IE 8]>  <script src="jcdsee/IE8/IE8.js" type="text/javascript"></script>  <![endif]-->
+    <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
     <style type="text/css">
+      /* TODO: Cleanup this mess. */
       a {text-decoration:none;}
       a:hover {text-decoration:underline;}
       a:visited {color:blue}
@@ -41,9 +42,8 @@
       input.text {font-size:12px;background-color:#f8f8f8;color:#666;height:14px;font-family:fixed,"courier new";font-weight:bold;padding:2px;}
       input.text:hover, input.text:focus {background-color:#ff9;border-color:#777;color:black;}
       input.text:focus {width:125px;outline:none;}
-      .depthPath {width:100%;}
-      .show {display:inline-block !important;}
-      .hide {display:none !important;}
+      .jcd-js .show {display:inline-block !important;}
+      .jcd-js .hide {display:none !important;}
       #adventures h3 {float: left;margin: 0 .5em 1pt 0;font-size:11.62pt;font-weight:bold;color:black;font-family:tahoma,arial,sans-serif}
       #adventures ul {margin:0 0 -9px;padding:0 8px 0;}
       #adventures li {margin-bottom:1.7em;list-style-type:none;display:inline-block;}
@@ -55,8 +55,24 @@
       #map img {width: 567px;max-width: 100%;height: 376px;margin: 0 6px 9px 11px;opacity:0.6;}
 
       h1 {
+        color: #ccc;
         font-family: arial;
         font-size: 17px;
+        margin: 4px 1em 1px 3px;
+      }
+      #search-container {
+        float: right;
+      }
+      .jcd #labels {
+        display: block;
+        margin: 0 !important;
+      }
+      .jcd #tab-block > div {
+        margin: 1em 0;
+      }
+      /* Sitemap doesn't work without JS as it disables xsl too. */
+      .jcd #sitemap-label {
+        display: none;
       }
     </style>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
@@ -64,9 +80,8 @@
 
   <body id="mode-list" data-adminurl="/jcdsee/admin/index.cgi?display_url&cur_url=/pics/">
     <div id="nav">
-      <!--div style="float:left;"><p style="color:#ccc">Don't miss the <a href="#adventures" id="adventures-link" style="color:white;text-decoration:underline;">Adventures</a> tab below.</strong></div -->
 
-      <div style="float:right;">
+      <div id="search-container">
         <form id="gSearch" method="get" action="" onsubmit="document.location.href='https://www.google.com/search?q=site:pics.jonathancross.com '+document.forms.gSearch.q.value;return false;">
           <!-- input type="hidden" name="sitesearch" value="pics.jonathancross.com" / -->
           <input name="q" title="Uses Google to search this site..." type="text" size="10" maxlength="255" class="text">
@@ -74,7 +89,7 @@
         </form>
       </div>
 
-      <h1 style="margin: 4px 1em 1px 3px; color: #ccc;">Jonathan Cross: Travel photography and stories.</h1>
+      <h1>Jonathan Cross: Travel photography and stories.</h1>
 
     </div>
 
@@ -82,7 +97,7 @@
   <div id="content">
     <div>
       <p>
-      Welcome to my <a href="pics/">online archive of photos</a>.  You’ll find photos and stories from dozens countries around the world. Enjoy!
+      Welcome to the <a href="pics/">JCDSee photo archive</a>.  You’ll find photos and stories from dozens countries around the world. Enjoy!
       </p>
 
       <div id="homepagePhotos">
@@ -293,7 +308,7 @@
       <h5>About this website.</h5>
       <p>
       JCDSee is my personal web based photo viewing / cataloging system written in the Perl scripting language.
-      The script is about 43KB, should work without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of JCDSee</a>, and use it as you like.
+      The script is about 43KB, should work without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of this code</a>, and use it as you like.
       </p>
       <!--
       <h5>JCDSee?</h5>
@@ -330,7 +345,8 @@
     </a>
     <div id="usage">
       <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2</a>
-      <div>Page last modified on 2015-08-09</div>
+      <div>Page last modified on 2015-08-12</div>
+      <noscript><div>Javascript is disabled</div></noscript>
     </div>
   </div>
 

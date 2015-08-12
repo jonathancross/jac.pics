@@ -788,7 +788,7 @@ print '<!DOCTYPE html>
     <title>'.$STATE{'title'}.'</title>
     <meta name="description" content="'.$STATE{'page_description'}.'">
     <link href="'.${assets_root}.'/jcdsee.css" rel="stylesheet" type="text/css">
-    <!--[if lt IE 8]>  <script src="'.${assets_root}.'/IE8/IE8.js" type="text/javascript"></script>  <![endif]-->
+    <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
 ';
 
 if ($STATE{'test_mode'}) {
