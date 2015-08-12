@@ -13,7 +13,7 @@ DIV#email_date        {font-size:12px;font-family:courier new,courier,fixed;colo
 DIV#email IMG         {padding:5px;}
 
 
-/* New styles 2015 */
+/* New styles JCDSee 2.0 */
 
 @media all {
 
@@ -655,6 +655,10 @@ DIV#email IMG         {padding:5px;}
 
   h3 {
     font-size: 12px;
+  }
+
+  #mode-thumbs #content {
+    text-align: left;
   }
 
   /* Make the 'next' and 'previous' 20px larger (70px => 90px) */
