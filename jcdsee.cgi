@@ -22,7 +22,7 @@ my $VERSION = '2.0.0';
 use strict;
 use Image::Magick;
 use CGI ':standard';
-use CGI::Carp 'fatalsToBrowser'; 
+use CGI::Carp 'fatalsToBrowser';
 use Fcntl ':mode';
 use Time::HiRes 'gettimeofday';
 use XML::LibXSLT;
@@ -167,12 +167,12 @@ if ($STATE{'display_mode'} eq 'THUMBS') {
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_large'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
-} elsif ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/) {
+} elsif ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && $STATE{'pic_cur_file'}) { # Only allow SINGLE|SLIDESHOW if there is 1 or more images.
   #do not prefix image name, use full-size image
   $STATE{'prefix_cur'} = '';
   $STATE{'thumb_ext_cur'} = '';
 } else {
-  $STATE{'display_mode'} = "LIST";
+  $STATE{'display_mode'} = 'LIST';
   $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_small'}; #max dimension of small thumbnail
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_small'}; #max dimension of small thumbnail
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_small'};
@@ -373,13 +373,13 @@ sub getTitle {
 sub stripHTML {
   my ${string} = $_[0];
   ${string} =~ s/<[^>]+>//g;
-  ${string} =~ s/"/&quot;/g; #quotes
-  ${string} =~ s/'/&#39;/g; #apos
+  ${string} =~ s/"/&quot;/g; # quotes: "
+  ${string} =~ s/'/&#39;/g; # apos: '
   return ${string};
 }
 
 #   escapeURL returns a URL with spaces escaped.
-#   escapeURL("URL")
+#   escapeURL('URL')
 sub escapeURL {
   my $URL = $_[0];
   $URL =~ s: :%20:g;
@@ -389,7 +389,7 @@ sub escapeURL {
 #   getHREF Builds a custom HREF given the object you want to link to.
 #   getHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
 sub getHREF {
- 
+
   # display_mode
   #   dir          = norm
   #   pic          = do not use
@@ -402,11 +402,11 @@ sub getHREF {
   my ${HREF};
   #my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'url'} ;
   #BASE SCRIPT NAME
-  if (${action} eq 'dir') { 
+  if (${action} eq 'dir') {
     # Special case for dir when we can dump display_mode setting
     ${HREF} = "${value}";
     return ${HREF};
-  } elsif (${action} eq 'dispaly_mode' && ${value} eq $DEFAULTS{'display_mode'}) { 
+  } elsif (${action} eq 'dispaly_mode' && ${value} eq $DEFAULTS{'display_mode'}) {
     # Special case when button turns it into the default
     ${HREF} = "$STATE{'url'}";
     return ${HREF};
@@ -436,7 +436,7 @@ sub getHREF {
 # Functions for file type booleans
 #   isFileType ("file name", "type")
 sub isFileType {
-  return ($file_types{$_[0]} eq $_[1]) ? 1 : 0; 
+  return ($file_types{$_[0]} eq $_[1]) ? 1 : 0;
 }
 
 #   getDepthPath ()
@@ -507,7 +507,7 @@ sub getLinkTag {
   my ${desc} =         $_[2];
   my ${class} =        $_[3];
   my ${link_tag};
-  #This is a bit annoying, see if google picks up the site 
+  #This is a bit annoying, see if google picks up the site
   if (! "${desc}") {
     ${desc} = ${file_name};
     ${desc} .= ($file_descriptions{${file_name}} ne "")? " - ".stripHTML($file_descriptions{${file_name}}) : "";
@@ -536,7 +536,7 @@ sub getNavButton {
   my ${icon_modifier} = lc(${value}); #Lowercase
   my ${href} = getHREF(${mode} , ${value});
   my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
-  my ${linked_img} = "<a href='${href}' rel='nofollow' title='${desc}'>${img}</a>";
+  my ${linked_img} = "<a href='${href}' rel='nofollow' title='${desc}' id='button-${icon_modifier}'>${img}</a>";
 
   if ($STATE{'display_mode'} eq ${value}) {
     return ${img};
@@ -576,9 +576,9 @@ sub commandLineMakeThumbs {
 sub getFormattedFileSize {
   my $bytes = $_[0];
   my ${file_size};
-  if (${bytes} > 10000000) { 
+  if (${bytes} > 10000000) {
     ${file_size} = int(${bytes} / 1048576) . '&nbsp;MB';
-  } elsif (${bytes} > 1000000) { 
+  } elsif (${bytes} > 1000000) {
     ${file_size} = sprintf("%.1f", (${bytes} / 1048576)) . '&nbsp;MB';
   } elsif (${bytes} > 2047){
     ${file_size} = int(${bytes} / 1024) . '&nbsp;KB';
@@ -646,6 +646,7 @@ sub dumpDirList {
     if ($STATE{'display_mode'} eq 'THUMBS') {
       print '<div>&nbsp;</div>';
     }
+
   } elsif ($STATE{'display_mode'} eq 'SINGLE') {
     #SINGLE IMAGE MODE
     #Make sure large thumbs exist
@@ -677,9 +678,6 @@ sub dumpDirList {
         <img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'url'}$STATE{'pic_next_file'}' alt='' id='NEXT'>
       </a>
       ";
-    } else {
-      # TODO: force back to list mode.
-      print '<div>Sorry, cannot determine current image.</div>';
     }
   } elsif ($STATE{'display_mode'} eq 'SLIDESHOW') {
     # SLIDESHOW IMAGE MODE
@@ -722,12 +720,8 @@ sub dumpDirList {
       print '
       </ul>
       ';
-
-    } else {
-      # TODO: force back to list mode.
-      print "<div>Sorry, no images found in this folder, cannot start slideshow.</div><script>document.location.href='$STATE{'url_encoded'}';</script>";
     }
-  }  
+  }
 }
 
 
@@ -833,23 +827,32 @@ print '
 
   <div id="content">
     <div>';
+      # Show warning if trying to access slideshow without JS.
+      if ($STATE{'display_mode'} eq 'SLIDESHOW') {
+        print '
+        <noscript>
+          <h1>JavaScript is disabled</h1>
+          <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
+          <meta http-equiv="refresh" content="10; url='.getHREF('display_mode', 'SINGLE').'">
+        </noscript>
+        ';
+      }
 
-      # TODO: Use slideshow list instead of table.
-
-      if ($STATE{'display_mode'} eq "LIST") {
+      # TODO: Use slideshow list instead of this table.
+      if ($STATE{'display_mode'} eq 'LIST') {
         print '
         <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
       }
       #CALL THE LOOP THAT RENDERS THE FILE LIST
       dumpDirList();
       #FINISH TABLE FOR LIST
-      if ($STATE{'display_mode'} eq "LIST") {
+      if ($STATE{'display_mode'} eq 'LIST') {
         print '
         </table>
         ';
       }
 
-print '
+      print '
       <!-- close #content div -->
     </div>
   </div>
@@ -857,7 +860,7 @@ print '
 
 # CREATIVE COMMONS LICENSE
 print '
-<!-- 
+<!--
 <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <Work rdf:about="">
     <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.5/" />

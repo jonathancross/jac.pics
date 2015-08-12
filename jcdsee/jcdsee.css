@@ -2,14 +2,9 @@
 /**
  * JCDSee styles.
  * Jonathan Cross: 2004-2015
- * TODO: Refactor:
- *   .thumb_file_name
- *   Standardize on use of "picture" or "image" eg:
- *     large-image-wrapper
- *     picture-icon-wrapper
- *     picture-icon
  */
 
+/* TODO: Remove these after static HTML is updated, etc. */
 A.pic IMG,A.current_pic IMG {color:#777;}
 A.txt                 {color:#0000bb;text-decoration:none;}
 DIV#email             {color:#333333;font-size:12px;padding:5px;}
@@ -147,8 +142,7 @@ DIV#email IMG         {padding:5px;}
   }
 
   body#mode-single #content {
-    /* I don't know why margin left is not needed here but it breaks layout. */
-    margin: 2%; /* changed from margin-right to margin. */
+    margin: 2%;
   }
 
   #mode-list #content {
@@ -186,7 +180,7 @@ DIV#email IMG         {padding:5px;}
     text-align: left;
   }
 
-  /* Target just the file-description.  Would be better to use class. */
+  /* Target just the file-description.  Might be better to use class, but needs update in slideshow and single. */
   h3 > span:before {
     content: ' : ';
   }
@@ -203,18 +197,6 @@ DIV#email IMG         {padding:5px;}
     top: 50%;
   }
 
-  /* Slideshow next, previous buttons not supported yet.
-  #mode-slideshow .previous,
-  #mode-slideshow .next {
-    background-color: white;
-    border: 0;
-    height: 100%;
-    opacity: .5;
-    position: absolute;
-    width: 70px;
-  }
-  */
-
   .previous img,
   .next img {
     -webkit-filter: grayscale(100%);
@@ -223,7 +205,6 @@ DIV#email IMG         {padding:5px;}
     -o-filter: grayscale(100%);
     filter: grayscale(100%);
     height: 70px;
-    /* margin-bottom: -3px; to make better circles when large in chrome */
     opacity: .3;
     -moz-transition: opacity 150ms ease-in, filter 50ms ease-in;
     -ms-transition: opacity 150ms ease-in, filter 50ms ease-in;
@@ -262,18 +243,23 @@ DIV#email IMG         {padding:5px;}
     right: -4px;
   }
 
-  /* Slideshow next, previous buttons not supported yet.
-    #mode-slideshow .next {
-      right: 0;
-    }
-   */
-
   #mode-slideshow #content > div {
     display: inline-block;
     position: relative;
   }
 
-  /* Simplify: add .picture-link class to all three a tags. */
+  /* Show error if trying to view slideshow without javascript. */
+  .jcd #mode-slideshow #content noscript {
+    color: white;
+    font-size: 10px;
+  }
+
+  /* Hide slideshow button if javascript disabled. */
+  .jcd #button-slideshow {
+    display: none;
+  }
+
+  /* previous, next and main image are all part of .picture-link class. */
   .picture-link,
   .picture-link:visited {
     border: 4px solid #666;
@@ -445,6 +431,7 @@ DIV#email IMG         {padding:5px;}
     outline: none;
   }
 
+  /* TODO: rename to "display-mode-button-container" to prevent confusion with body#mode-* */
   #mode-buttons {
     position: absolute;
     right: 24px;
@@ -526,17 +513,19 @@ DIV#email IMG         {padding:5px;}
 
   #slideshow-buttons button:before {
     float: left;
-    line-height: 1.1;
+    line-height: 1;
     padding-right: 6px;
+    padding-top: 0;
+    font-family: 'lucida sans unicode', sans-serif;
   }
 
   #slideshow-buttons li.active button {
     opacity: 1;
   }
 
-  #slideshow-play:before {
+  #slideshow-buttons #slideshow-play:before {
     content: '▶';
-    font-size: .9em;
+    font-size: 14px;
     padding-top: 2px;
   }
 
@@ -546,9 +535,9 @@ DIV#email IMG         {padding:5px;}
     border-color: #cfc;
   }
 
-  #slideshow-pause:before {
+  #slideshow-buttons #slideshow-pause:before {
     content: 'Ⅱ';
-    font-size: 1em;
+    font-size: 15px;
     font-weight: bold;
     margin-top: 1px;
   }
@@ -559,10 +548,10 @@ DIV#email IMG         {padding:5px;}
     border-color: #ffc;
   }
 
-  #slideshow-restart:before {
-    content: '⟲';
-    font-size: 1.1em;
-    margin-top: -1px;
+  #slideshow-buttons #slideshow-restart:before {
+    content: '↻';
+    font-size: 16px;
+    font-weight: bold;
   }
 
   li.active #slideshow-restart {
@@ -576,10 +565,6 @@ DIV#email IMG         {padding:5px;}
     border-radius: 3px;
     height: 24px;
     text-transform: lowercase;
-  }
-
-  #slideshow-speed:before {
-    content: '▼';
   }
 
   #slideshow-speed:focus {
