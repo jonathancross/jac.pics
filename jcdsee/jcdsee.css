@@ -1,132 +1,794 @@
 @charset "utf-8";
-/*
-  JCDSee styles.
-  Jonathan Cross :: 2004-2012
-  Warning, in IE version 7 and earlier, all values here may be changed by IE8.js which attempts to bring standards to older IE.
-*/
-/* Styles for ALL browsers */
-.version{content: '1.9.91';}
-BODY                  {background:#b6bbbc url("bg_logo.gif") no-repeat fixed right top;padding:15px;margin:0px;font-family:verdana,arial,helvetica,sans-serif;}
-TD                    {color:#888888;text-align:center;font-size:11px;}
-.head                 {background-color:#CCD2D8;font-weight:bold;color:#556677;font-family:arial;font-size:11px;}
-A.nav_text,DIV.header {color:#333333;font-size:9px;text-decoration:none;}
-TD.thumb_file_name    {color:#666666;text-align:center;font-family:arial;font-size:10px;line-height:1em;white-space:normal;}
-TD.r                  {text-align:right;color:#aaaabb;}
-TD.l                  {text-align:left;}
+/**
+ * JCDSee styles.
+ * Jonathan Cross: 2004-2015
+ */
+
+/* TODO: Remove these after static HTML is updated, etc. */
 A.pic IMG,A.current_pic IMG {color:#777;}
-.thumbBlock img {height:140px;}/* target all thumbnail images */
 A.txt                 {color:#0000bb;text-decoration:none;}
-#usage                {color:#888;font-family:courier new,courier,fixed;font-size:10px;line-height:11px;text-align:left;}
-#usage a {
-  color: #888;
-  text-decoration: none;
-}
-#usage a {
-  color: #888;
-  text-decoration: none;
-}
-#usage a:hover {
-  color: #008;
-  text-decoration: underline;
-}
-FORM                  {margin:0;padding:0;}
-TD#depthPath          {color:#222222;font-family:arial;font-size:13px;vertical-align:middle;text-align:left;}
-#admin_button         {z-index:1;left:17px;top:17px;height:7px;width:7px;position:absolute;}
-#admin_button:hover   {background-color:blue;opacity:0.3;cursor:pointer;}
 DIV#email             {color:#333333;font-size:12px;padding:5px;}
 DIV#email_subject     {font-family:arial;font-size:17px;font-weight:bold;color:black;}
 DIV#email_date        {font-size:12px;font-family:courier new,courier,fixed;color:#666;}
 DIV#email IMG         {padding:5px;}
-TABLE.thumbBlock      {display:inline;margin:7px;}
-#pageDescription   {font-size:14px;color:#444;width:560px;margin-bottom:3px;}
-#pageDescription STRONG {font-family:arial;color:#333;width:560px;}
-#control_table,#file_list {margin-bottom:5px;width:560px;}
+
+
+/* New styles JCDSee 2.0 */
 
 @media all {
-  /* Styles which need to be hidden from Netscape 4 and older browsers */
-  .LIST #page {margin:0}
-  table.thumbBlock {display:inline-block;}
+
+  body {
+    background-color: #b6bbbc;
+    font-family: verdana,arial,helvetica,sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    padding: 80px 0 150px; /* make sure we can scroll everything onto screen */
+  }
+
+  form {
+    margin: 0;
+    padding: 0;
+  }
+
+  #mode-slideshow {
+    background: black;
+    color: white;
+  }
+
+  #mode-slideshow a {
+    color: #ccc;
+  }
+
+  #mode-slideshow a:visited {
+    color: #777;
+  }
+
+  a {
+    outline: none;
+  }
+
+  img {
+    border: none;
+  }
+
+  #admin-button {
+    height: 7px;
+    left: 0;
+    opacity: .7;
+    position: absolute;
+    width: 7px;
+    top: 0;
+    z-index: 999;
+  }
+
+  #admin-button:hover {
+    cursor: pointer;
+    background: red;
+    opacity: 1;
+  }
+
+  /* Table columns. */
+
+  #mode-list table {
+    border: 1px solid #aaa;
+  }
+
+  #mode-list tr:nth-of-type(even) td {
+    background-color: #ccc;
+  }
+
+  #mode-list tr:nth-of-type(odd) td {
+    background-color: #c0c0c0;
+  }
+
+  .col-picture {
+    text-align: center;
+    vertical-align: top;
+  }
+
+  .col-size {
+    color: #777;
+    text-align: right;
+  }
+
+  .col-description {
+    text-align: left;
+  }
+
+  a .picture-icon {
+    border: 1px solid #888;
+    opacity: .95;
+  }
+
+  a:hover .picture-icon {
+    border-color: #222;
+    opacity: 1;
+  }
+
+  /* Perhaps .picture icon should be named "picture" here? Or we could remove the class for #mode-single. */
+  #mode-single .large-picture-wrapper .picture-icon {
+    border: none;
+    opacity: 1;
+  }
+
+  #mode-thumbs .picture-icon-container {
+    display: inline-block;
+    margin: 7px;
+  }
+
+  #mode-thumbs img {
+    max-height: 140px;
+  }
+
+  #mode-thumbs .picture-icon-file-name {
+    font-family: arial,helvetica,sans-serif;
+    font-size: 10px;
+    line-height: 1em;
+    text-align: center;
+  }
+
   /* For list mode text links */
-  A.simple {text-decoration:none;}
-  A.simple:hover {color:#00a;}
-  TD#buttons A IMG     {margin:0px 0px 0px 4px;}
-  A.nav_text   {display:block;text-align:center;border:2px solid #777777;white-space:nowrap;margin-top:2px;margin-bottom:2px;padding:1px;}
-  DIV.header   {display:block;text-align:center;border:2px solid #777777;margin-top:2px;margin-bottom:2px;padding:1px;background-color:#cccccc;color:#444444;}
-  td.trans a:link {
-    margin-bottom: 2px;
-    display: block;
+  a.simple {
+    text-decoration: none;
+  }
+
+  a.simple:hover {
+    color: #00a;
+  }
+
+  #content {
+    color: #666;
+    font-size: 0; /* Removes tiny margin-bottom between image and its border. */
+  }
+
+  body#mode-single #content {
+    margin: 2%;
+  }
+
+  #mode-list #content {
+    font-size: 11px;
+    max-width: 100%;
+    width: 700px;
+  }
+
+  #mode-list #content > div {
+    padding: 0 10px;
+  }
+
+  #mode-thumbs #content {
+    text-align: center;
+  }
+
+  h3 {
+    font-size: 11px;
+    font-weight: normal;
+  }
+
+  #mode-single h3 {
+    background-color: #ddd;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     border: 4px solid #666;
-    border-radius: 50px;
-    opacity: 0.50;
-    -moz-transition: opacity 250ms ease-in;
-    -ms-transition: opacity 250ms ease-in;
-    -o-transition: opacity 250ms ease-in;
-    -webkit-transition: opacity 250ms ease-in;
-    transition: opacity 250ms ease-in;
+    box-shadow: 0 8px 36px 5px rgba(150, 150, 150, 1) !important;
+    clip: rect(0px, 9999px, 999px, -999px); /* clip off the top of the shadow */
+    color: #222;
+    margin: -4px 66px 0 -4px;
+    padding: .6em .4em .7em;
+    position: absolute;
+    text-align: center;
+    top: 100%;
   }
-  TD.trans A:hover,
-  TD.trans A:hover IMG {
-    opacity:1.0 !important;
+
+  #mode-slideshow h3 {
+    text-align: left;
   }
-  SPAN.big_pic IMG       {border-color:#000000;}
-  .SINGLE a.pic img {
+
+  /* Target just the file-description.  Might be better to use class, but needs update in slideshow and single. */
+  h3 > span:before {
+    content: ' : ';
+  }
+
+  #mode-single .previous,
+  #mode-single .next {
+    background-color: #888;
     border-radius: 50px;
+    box-shadow: 0 5px 40px rgba(102, 102, 102, .5);
+    display: block;
+    margin-bottom: 2px;
+    margin-top: -35px;
+    position: absolute;
+    top: 50%;
+  }
+
+  .previous img,
+  .next img {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
     height: 70px;
-    margin-bottom: -2px;
+    opacity: .3;
+    -moz-transition: opacity 150ms ease-in, filter 50ms ease-in;
+    -ms-transition: opacity 150ms ease-in, filter 50ms ease-in;
+    -o-transition: opacity 150ms ease-in, filter 50ms ease-in;
+    -webkit-transition: opacity 150ms ease-in, filter 50ms ease-in;
+    transition: opacity 150ms ease-in, filter 50ms ease-in;
     width: 70px;
   }
-  A.current_pic IMG {border-color:#000000;color:#000000;}
-  A.nav_text:hover, A.pic:hover IMG, A.current_pic:hover IMG {border-color:#cc5500 !important;color:#cc5500 !important;}
-  A.txt:hover            {color:#cc5500;}
-  #file_list, #control_table {width:100%;border:2px solid #555;background-color:#eee;}
-  #page {}/*need to research*/
-  .SINGLE #page, .THUMBS #page {margin:0 auto;}
-  .SINGLE .singleImage {width:560px;margin:0 auto;}
-  .LIST #control_table, .LIST #file_list {width:560px;}
-  SPAN.filename          {font-weight:bold;}
-  SPAN.date, SPAN.filename {padding:1px;color:#888;}
-  SPAN.date                {background-color:#e0e0e0;border:1px solid #ccc;margin-right:2px;line-height:1.5em;}
-  SPAN.filename_single {color:black;}
-  #copyleft {padding-right:9px;}
-  #copyleft A IMG {
-    opacity: 0.3; /* CSS-3 Standards */
+
+  #mode-single .previous img,
+  #mode-single .next img {
+    border-radius: 50px;
   }
-  #copyleft A:hover IMG {
-    opacity: 1.0; /* CSS-3 Standards */
+
+  .next:focus img,
+  .next:hover img,
+  .previous:focus img,
+  .previous:hover img {
+    -webkit-filter: grayscale(0%);
+    -moz-filter: grayscale(0%);
+    -ms-filter: grayscale(0%);
+    -o-filter: grayscale(0%);
+    filter: grayscale(0%);
+    opacity: 1.0 !important;
   }
-  TABLE#file_list TD {border-top:1px solid #ccc;}
-  TABLE#file_list TD.head {border-top:none;}
-  TD#buttons A, IMG {display:inline !important;}
-  TD#buttons A:hover IMG {opacity:1.0 !important;}
-  TD#buttons A.off IMG   {opacity:0.50;}
-  /* SLIDESHOW STYLES */
-  BODY.SLIDESHOW       {background:black none;}
-  BODY.SLIDESHOW DIV.header A {color:#aaaabb;}
-  #slideshowControls {
-    width:100%;text-align:left;border:1px solid #567;font-size:10px;padding:3px;margin-bottom:2px;background-color:#124;
+
+  #mode-single .previous {
+    /* -400 clip value is to prevent box-shadow clipping, +400 is to to allow large thumbs */
+    clip: rect(-400px, 74px, 400px, -30px);
+    left: -4px;
   }
-  #slideshowControls td {
-    color:#78a;
+
+  #mode-single .next {
+    /* -400 clip value is to prevent box-shadow clipping, +400 is to to allow large thumbs */
+    clip: rect(-400px, 400px, 400px, 4px);
+    right: -4px;
   }
-  #slideshowControls a {
-    border:1px solid #124;padding:1px;color:#abd;text-decoration:none;
+
+  #mode-slideshow #content > div {
+    display: inline-block;
+    position: relative;
   }
-  #slideshowControls a:hover {color:#def;}
-  #slideshowControls select {
-    font-size:10px;background-color:#333;color:#999;line-height:1.5em;border:1px solid #567;
+
+  /* Show error if trying to view slideshow without javascript. */
+  .jcd #mode-slideshow #content noscript {
+    color: white;
+    font-size: 10px;
   }
-  #slideshowControls a.slideButtonStart {border:1px solid #0f0 !important;background-color:#262;color:#0f0;}
-  #slideshowControls a.slideButtonStop  {border:1px solid red !important;background-color:#622;color:red;}
-  #slideshowControls a.slideButton      {border:1px solid #124;}
-  BODY.SLIDESHOW TABLE#control_table {opacity:0.80;border:2px solid #444;background-color:#222222;}
-  #depthPath a       {color:#6D70D7;padding-right:2px;padding-left:1px;}
-  #depthPath a:hover {color:#00f;}
-  BODY.SLIDESHOW #depthPath a:hover  {color:#abf;}
-  BODY.SLIDESHOW #depthPath  {color:#666;}
-  BODY.SLIDESHOW DIV.header   {border:1px solid #444;background-color:#191919;color:#aaa;}
-  BODY.SLIDESHOW SPAN.big_pic IMG {border: 1px solid #999;}
-  #slideshowControls #select_container select {opacity:0.60;background-color:#012;color:#abf; }
-  #bookmarks { width:560px;margin-top:4px;margin-bottom:50px;}
-  #bookmarks A IMG { border:0;margin:1px;opacity:0.65; }
-  #bookmarks A:hover IMG { opacity:1.0; }
+
+  /* Hide slideshow button if javascript disabled. */
+  .jcd #button-slideshow {
+    display: none;
+  }
+
+  /* previous, next and main image are all part of .picture-link class. */
+  .picture-link,
+  .picture-link:visited {
+    border: 4px solid #666;
+  }
+
+  .picture-link:focus {
+    border-color: #66f; /* Keyboard nav. */
+  }
+
+  .picture-link.large-picture-wrapper {
+    box-shadow: 0 14px 36px 5px rgba(150,150,150,1);
+    display: inline-block;
+    margin: 0 -4px; /* Compensate for border */
+  }
+
+  .large-picture-wrapper img {
+    max-width: 100%;
+    width: 100%; /* Needed by FF only. */
+  }
+
+  #mode-single #content {
+    display: inline-block;
+    /* left: 50%; #scroll-x */
+    margin: 1% 0 0;
+    position: relative;
+    /* right: -50%; #scroll-x */
+  }
+
+  #mode-single #content > div {
+    /* left: -50%; Replaced with right: -50%; above */
+    padding: 0 70px;
+    position: relative;
+  }
+
+  #nav,
+  #footer {
+    background-color: rgba(0, 0, 0, .7);
+    border-color: black;
+    border-style: solid;
+    opacity: .6;
+    position: fixed;
+    -webkit-transition: opacity 1s;
+    z-index: 10;
+  }
+
+  /* Slideshow */
+
+  /* Slideshow counter element inserted with JS. */
+  #counter {
+    border-left: 1px dashed #888;
+    color: #666;
+    display: inline-block;
+    font-size: 12px;
+    margin-left: 18px;
+    padding: 3px 14px;
+  }
+
+  #files.hide {
+    display: none;
+  }
+
+  #mode-slideshow #content {
+    margin: 5%;
+    text-align: center;
+  }
+
+  #mode-slideshow .large-picture-wrapper {
+    border: 1px solid #666;
+    border-radius: 2px;
+    box-shadow: none;
+    margin: 0;
+    padding: 2px;
+  }
+
+  #content .active {
+    /* Do something with the slideshow once active. */
+  }
+
+  #mode-slideshow #nav,
+  #mode-slideshow #footer {
+    background-color: black;
+    border-color: #888;
+    -webkit-transition: opacity 1s;
+  }
+
+  #mode-slideshow #nav {
+    overflow-y: hidden; /* Should we have this on all versions? */
+    padding-bottom: 15px;
+  }
+
+  #nav {
+    border-width: 0 0 1px 0;
+    padding: 7px;
+    top: 0;
+    width: 100%;
+  }
+
+  #nav ul {
+    list-style: none;
+  }
+
+  #nav li {
+    display: block;
+    float: left;
+  }
+
+  #nav li:last-child {
+    float: none;
+  }
+
+  #depth-path {
+    color: #d8d8d8;
+    font-family: arial, sans-serif;
+    margin: 7px 157px 7px 7px; /* margin-right is for #mode-buttons */
+    padding: 0;
+  }
+
+  #depth-path h1 {
+    color: white;
+    display: inline;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  #depth-path h2 {
+    display: inline;
+    font-size: inherit;
+    font-weight: normal;
+    max-width: 100%;
+  }
+
+  #depth-path li:after {
+    content: '<';
+    margin: 0 5px;
+  }
+
+  /* Remove '<' from header(s) items at the end of the depth path. */
+  #depth-path li.depth-path-header:after {
+    content: ''; /* Older webkit doesn't support none. */
+    content: none;
+  }
+
+  /* Add ':' after all depth-path h1s. */
+  #depth-path li.depth-path-header h1:after {
+    content: ':';
+    font-weight: bold;
+    padding: 0 .5ex;
+  }
+
+  /* Remove trailing ':' if depth-path h1 is last item. */
+  #depth-path li.depth-path-header:last-child h1:after {
+    content: ''; /* Older webkit doesn't support none. */
+    content: none;
+    padding: 0;
+  }
+
+  #depth-path a,
+  #depth-path a:visited {
+    color: #ccc;
+    font-weight: normal;
+    opacity: .8;
+  }
+
+  #depth-path a:hover,
+  #depth-path a:focus {
+    color: white;
+    opacity: 1;
+    outline: none;
+  }
+
+  /* TODO: rename to "display-mode-button-container" to prevent confusion with body#mode-* */
+  #mode-buttons {
+    position: absolute;
+    right: 24px;
+    top: 8px;
+  }
+
+  /* Inactive mode buttons. */
+  #mode-buttons a img {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: .4;
+  }
+
+  #mode-buttons a,
+  #mode-buttons > img {
+    margin: 0 3px;
+  }
+
+  #mode-buttons img,
+  #mode-buttons a:focus img,
+  #mode-buttons a:hover img {
+    border: 0;
+    opacity: .9;
+  }
+
+  #slideshow-buttons {
+    float: left;
+    margin: 0;
+    min-width: 228px;
+    padding: 0;
+  }
+
+  #mode-slideshow #slideshow-controls {
+    margin-left: 7px;
+  }
+
+  #slideshow-buttons li {
+    margin-right: .5em;
+  }
+
+  #slideshow-buttons button,
+  #slideshow-speed {
+    /* Prevent selection of text. */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #666;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 6px 4px;    
+    margin: 0;
+    opacity: .85;
+  }
+
+  #slideshow-buttons button:focus,
+  #slideshow-buttons button:hover,
+  #slideshow-speed:focus,
+  #slideshow-speed:hover {
+    color: #ddd;
+    background-color: #555;
+    border-color: #bbb;
+    opacity: 1;
+    outline: none;
+    transition: all .2s ease-out;
+  }
+
+  #slideshow-buttons button:focus {
+    /* TODO: Vendor prefixes!!!! */
+  }
+
+  #slideshow-buttons button:before {
+    float: left;
+    line-height: 1;
+    padding-right: 6px;
+    padding-top: 0;
+    font-family: 'lucida sans unicode', sans-serif;
+  }
+
+  #slideshow-buttons li.active button {
+    opacity: 1;
+  }
+
+  #slideshow-buttons #slideshow-play:before {
+    content: '▶';
+    font-size: 14px;
+    padding-top: 2px;
+  }
+
+  li.active #slideshow-play {
+    color: #cfc;
+    background-color: #373;
+    border-color: #cfc;
+  }
+
+  #slideshow-buttons #slideshow-pause:before {
+    content: 'Ⅱ';
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 1px;
+  }
+
+  li.active #slideshow-pause {
+    color: #ffc;
+    background-color: #773;
+    border-color: #ffc;
+  }
+
+  #slideshow-buttons #slideshow-restart:before {
+    content: '↻';
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  li.active #slideshow-restart {
+    color: #fcc;
+    background-color: #733;
+    border-color: #fcc;
+  }
+
+  #slideshow-speed {
+     /* -webkit-appearance: initial; Can use menulist-button to show arrows... but then border-radius increases.  Can apply to a parent element... */
+    border-radius: 3px;
+    height: 24px;
+    text-transform: lowercase;
+  }
+
+  #slideshow-speed:focus {
+    background: #050;
+    border: 1px solid #cfc;
+    color: #cfc;
+    outline: none;
+  }
+
+  /* List mode file name formatting. */
+
+  #mode-list .file-name {
+    color: #555;
+    font-weight: 600;
+  }
+
+  #mode-list .file-description:before {
+    content: ' - ';
+  }
+
+  #mode-list .file-date {
+    color: #999;
+    margin-right: 2px;
+  }
+
+  #footer {
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 25px;
+    bottom: 0;
+    padding: 14px;
+    width: 265px;
+  }
+
+  #copyleft {
+    float: left;
+    margin-right: 9px;
+    opacity: .3;
+  }
+
+  #copyleft img {
+    height: 46px;
+    width: 46px;
+  }
+
+  /* Outline the icon when on black background. */
+  #mode-slideshow #copyleft img {  
+    border: 1px solid #ccc;
+    border-radius: 50px;
+  }
+
+  #usage,
+  #usage a {
+    color: #bbb;
+    font-family: courier new, courier, fixed;
+    font-size: 10px;
+    line-height: 11px;
+    text-decoration: none;
+  }
+
+  #usage:hover a {
+    text-decoration: underline;
+  }
+
+  #footer #copyleft:focus,
+  #footer:hover #copyleft,
+  #footer:hover #usage {
+    color: white;
+    opacity: 1;
+  }
+
+  /* Allow the entire nav and footer to change opacity with hover. */
+  #mode-slideshow #footer:hover,
+  #footer:hover,
+  #mode-slideshow #nav:hover,
+  #nav:hover {
+    opacity: 1;
+  }
+
+}
+
+
+@media screen and (min-width: 1281px) {
+
+  h3 {
+    font-size: 12px;
+  }
+
+  #mode-thumbs #content {
+    text-align: left;
+  }
+
+  /* Make the 'next' and 'previous' 20px larger (70px => 90px) */
+  #mode-single .next img,
+  #mode-single .previous img {
+    border-radius: 70px;
+    height: 90px;
+    width: 90px;
+  }
+
+  #mode-single .previous {
+    /* add 20px from left and add it to right clip */
+    clip: rect(-400px, 94px, 400px, -30px);
+    left: -24px;
+  }
+
+  #mode-single .next {
+    right: -24px;
+  }
+
+}
+
+
+@media screen and (max-width: 700px) {
+
+  #footer {
+    background: none !important;
+    border: none; 
+    padding: 0;
+  }
+
+  #copyleft {
+    float: none;
+    margin: 0;
+    opacity: .7;
+  }
+
+  #nav,
+  #footer {
+    background-color: rgba(0, 0, 0, .6);
+    opacity: .8;
+  }
+
+  #usage {
+    display: none;
+  }
+
+}
+
+
+@media screen and (max-width: 600px) {
+
+  body {
+    padding-top: 80px;
+  }
+
+  body#mode-slideshow {
+    padding-top: 0;
+  }
+
+  #mode-slideshow #nav {
+    opacity: 1;
+    position: initial;
+  }
+
+  #nav {
+    min-height: 68px;
+    padding: 0 0 7px 0;
+  }
+
+  #nav li:last-child {
+    float: left;
+  }
+
+  #nav #depth-path {
+    margin-right: 80px;
+  }
+
+  #mode-slideshow #depth-path {
+    min-height: 55px; /* Prevent buttons from overlapping. */
+  }
+
+  #mode-slideshow #slideshow-controls {
+    float: left;
+  }
+
+  #nav #mode-buttons {
+    max-width: 72px;
+    right: 5px;
+  }
+
+}
+
+
+@media screen and (max-width: 480px) {
+
+  body {
+    padding-top: 110px;
+  }
+
+  #mode-slideshow #counter {
+    border-left: none;
+    display: inline;
+    font-size: 13px;
+    margin-left: 8px;
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  #mode-slideshow #slideshow-controls {
+    line-height: 30px;
+  }
+
+  #mode-slideshow #depth-path {
+    min-height: 65px; /* Prevent buttons from overlapping. */
+  }
+
+  #mode-list .file-name-container {
+    display: block;
+  }
+
+  #mode-list .file-description:before {
+    content: '';
+  }
+
+  .previous img,
+  .next img {
+    opacity: 1;
+    transition: none;
+    -webkit-transition: none;    
+  }
+
 }

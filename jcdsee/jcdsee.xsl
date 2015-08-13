@@ -22,7 +22,7 @@
       <xsl:when test="$NAME='pageDate'">
         <xsl:variable name="pageDate" select="$NODE/sitemap:lastmod"/>
         <xsl:if test="$pageDate != ''">
-            <div>Last Modified: <xsl:value-of select="$pageDate"/></div>
+            <div>Page last modified on: <xsl:value-of select="$pageDate"/></div>
         </xsl:if>
       </xsl:when>
       <xsl:when test="$NAME='pageSize'">
