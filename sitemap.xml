@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
-<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-08-08" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<!-- Built: "2015-08-08" -->
+<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-08-13" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<!-- Built: "2015-08-13" -->
   <url jcd:imgs="0" jcd:dsize="1.2G">
     <loc>http://pics.jonathancross.com/</loc>
-    <lastmod>2015-07-29</lastmod>
+    <lastmod>2015-08-13</lastmod>
     <priority>1.0</priority>
   </url>
   <url jcd:imgs="0" jcd:dsize="1.2G">
@@ -49,7 +49,7 @@
   </url>
   <url jcd:imgs="0" jcd:dsize="1.2G">
     <loc>http://pics.jonathancross.com/pics/</loc>
-    <lastmod>2015-08-08</lastmod>
+    <lastmod>2015-08-13</lastmod>
     <jcd:desc>Archive of travel stories and photos.</jcd:desc>
   </url>
   <url jcd:imgs="5" jcd:dsize="540K">
@@ -1057,15 +1057,20 @@
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
   </url>
-  <url jcd:imgs="0" jcd:dsize="13M">
+  <url jcd:imgs="0" jcd:dsize="14M">
     <loc>http://pics.jonathancross.com/pics/2015/</loc>
-    <lastmod>2015-08-08</lastmod>
-    <jcd:desc>Colombia</jcd:desc>
+    <lastmod>2015-08-13</lastmod>
+    <jcd:desc>Two months backpacking in Colombia and some time in California.</jcd:desc>
   </url>
-  <url jcd:imgs="105" jcd:dsize="13M">
+  <url jcd:imgs="104" jcd:dsize="13M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-05-22_Colombia/</loc>
-    <lastmod>2015-08-08</lastmod>
+    <lastmod>2015-08-12</lastmod>
     <jcd:desc>Two months backpacking and visiting friends in Colombia.</jcd:desc>
+  </url>
+  <url jcd:imgs="7" jcd:dsize="1.5M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-06-24_California/</loc>
+    <lastmod>2015-08-13</lastmod>
+    <jcd:desc>Visiting family in California.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="744M">
     <loc>http://pics.jonathancross.com/pics/Other/</loc>

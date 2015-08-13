@@ -138,7 +138,7 @@
             <a href="/pics/2012/" title="Trip over land and Sea down through Italy, over to Corfu (Greece), then up the coast of Albania.">2012</a>
             <a href="/pics/2013/" title="New Years in California, overland trip to Granada, Spain via Barcelona and Paris, France.">2013</a>
             <a href="/pics/2014/" title="Berlin, New York and California.">2014</a>
-            <a href="/pics/2015/" title="Colombia">2015</a>
+            <a href="/pics/2015/" title="Two months backpacking in Colombia and some time in California.">2015</a>
             <br>
             <h4>Other</h4>
             <a href="/pics/Other/3D Renderings/" title="3D computer-generated graphics I created back in the 90’s.">3D Renderings</a>
@@ -320,9 +320,9 @@
       </p>
       -->
       <p>
-      This website has evolved slowly over the last 10+ years starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in 2015.
+      This website has evolved slowly over the last 10+ years starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in August of 2015.
       </p>
-      <p><a rel="author" href="https://plus.google.com/u/0/+JonathanCr0ss">Jonathan</a></p>
+      <p><a rel="author" href="https://plus.google.com/u/0/+JonathanCr0ss" target="_blank">Jonathan Cross</a></p>
     </div>
   </div><!-- Close div#content -->
 
@@ -345,97 +345,102 @@
     </a>
     <div id="usage">
       <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2</a>
-      <div>Page last modified on 2015-08-12</div>
+      <div>Page last modified on 2015-08-13</div>
       <noscript><div>Javascript is disabled</div></noscript>
     </div>
   </div>
 
   <script type="text/javascript">
     // TODO: Namespace and move this into external js file.
+    (function() {
+      "use strict";
 
-    /**
-     * Tab toggler class.
-     * @param {!Array.<string>} tabIds Array of tab ID strings.
-     * @constructor
-     */
-    function Toggler(tabIds) {
-      this.tabIds = {};
-      this.tabs = {};
-      for (i in tabIds) {
-        var tabId = tabIds[i];
-        this.tabIds[tabId] = tabId;
-        var tab = new Tab(tabId, this);
-        this.tabs[tabId] = tab;
+      /**
+       * Tab toggler class.
+       * @param {!Array.<string>} tabIds Array of tab ID strings.
+       * @constructor
+       */
+      function Toggler(tabIds) {
+        this.tabIds = {};
+        this.tabs = {};
+        for (var i in tabIds) {
+          var tabId = tabIds[i];
+          this.tabIds[tabId] = tabId;
+          var tab = new Tab(tabId, this);
+          this.tabs[tabId] = tab;
 
-        if (tab.isInUrlHash()) {
-          this.toggleTab(tabId);
+          if (tab.isInUrlHash()) {
+            this.toggleTab(tabId);
+          }
         }
-      }
-    };
+      };
 
-    /**
-     * Toggles visibility of a tab.
-     * @param {string} tabId ID of the tab to show.
-     */
-    Toggler.prototype.toggleTab = function(tabId) {
-      var currentTab = this.tabs[tabId];
-      for (name in this.tabIds) {
-        if (name == tabId) {
-          currentTab.show();
-          document.location.hash = '#tab=' + tabId;
-        }else{
-          this.tabs[name].hide();
+      /**
+       * Toggles visibility of a tab.
+       * @param {string} tabId ID of the tab to show.
+       */
+      Toggler.prototype.toggleTab = function(tabId) {
+        var currentTab = this.tabs[tabId];
+        for (var name in this.tabIds) {
+          if (name == tabId) {
+            currentTab.show();
+            document.location.hash = '#tab=' + tabId;
+          }else{
+            this.tabs[name].hide();
+          }
         }
+      };
+
+
+      /**
+       * Class representation of a single Tab.
+       * @param {string} tabId unique id of tab.
+       * @param {!Toggler} toggler Toggler.
+       * @constructor
+       */
+      function Tab(tabId, toggler) {
+        this.tabId = tabId;
+        this.toggler = toggler;
+        this.content = document.getElementById(this.tabId);
+        this.label = document.getElementById(this.tabId + '-label');
+        this.label.onclick = function(evt) {
+          toggler.toggleTab(tabId);
+          evt.preventDefault();
+        };
+      };
+
+      Tab.prototype.isInUrlHash = function() {
+        return document.location.hash == '#tab=' + this.tabId;
+      };
+
+      Tab.prototype.show = function() {
+        this.label.className = 'active';
+        this.content.className = 'show';
+      };
+
+      Tab.prototype.show = function() {
+        this.label.className = 'active';
+        this.content.className = 'show';
+      };
+
+      Tab.prototype.hide = function() {
+        this.label.className = '';
+        this.content.className = 'hide';
+      };
+
+      var tabIds = ['cat', 'adventures', 'map'];
+      var toggler = new Toggler(tabIds);
+
+      // Enable the adventures link if needed.  Currently disabled.
+      var adventuresLink = document.getElementById('adventures-link');
+      if (adventuresLink) {
+        adventuresLink.onclick = function(evt) {
+          toggler.toggleTab('adventures');
+          evt.preventDefault();
+        };
       }
-    };
-
-
-    /**
-     * Individual Tab object.
-     * @param {string} tabId unique id of tab.
-     * @param {!Toggler} toggler  Toggler.
-     */
-    function Tab(tabId, toggler) {
-      this.tabId = tabId;
-      this.toggler = toggler;
-      this.content = document.getElementById(this.tabId);
-      this.label = document.getElementById(this.tabId + '-label');
-      this.label.onclick = function (evt) {
-        toggler.toggleTab(tabId);
-        evt.preventDefault();
-      };
-    };
-
-    Tab.prototype.isInUrlHash = function() {
-      return document.location.hash == '#tab=' + this.tabId;
-    };
-
-    Tab.prototype.show = function() {
-      this.label.className = 'active';
-      this.content.className = 'show';
-    };
-
-    Tab.prototype.show = function() {
-      this.label.className = 'active';
-      this.content.className = 'show';
-    };
-
-    Tab.prototype.hide = function() {
-      this.label.className = '';
-      this.content.className = 'hide';
-    };
-
-    var tabIds = ['cat', 'adventures', 'map'];
-    var toggler = new Toggler(tabIds);
-
-    // Enable the adventures link
-    var adventuresLink = document.getElementById('adventures-link');
-    if (adventuresLink) {
-      adventuresLink.onclick = function (evt) {
-        toggler.toggleTab('adventures');
-        evt.preventDefault();
-      };
-    }
+      // End Self-executing anonymous function.
+    })();
 
   </script>
 </body>
