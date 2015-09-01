@@ -93,7 +93,7 @@
       h5 {border-bottom:1px solid #aaa;margin:2em 0 3px 0;padding-bottom:3px;}
       #labels {white-space: nowrap;top:-22px;left:-1px;position:relative;z-index:1;}
       #labels a {color:#44c;padding:3px 1em;font-size:11px;background-color:#ccc;height:14px;display:inline-block;border-radius: 5px 5px 0 0;-moz-border-radius: 5px 5px 0 0;-webkit-border-radius: 5px 5px 0 0;}
-      #labels a:hover {color:#00f;}
+      #labels a:hover {color:#00c;}
       #labels a.active {color:black;border-color:#777;border-bottom-color:transparent;font-weight:bold;outline:none;text-decoration: none;}
       form {margin:0;padding:0;}
       input {border:1px solid #999;}
@@ -242,9 +242,9 @@
 
     <div id="nav">
       <div id="search-container">
-        <form id="gSearch" method="get" action="" onsubmit="document.location.href='https://www.google.com/search?q=site:pics.jonathancross.com '+document.forms.gSearch.q.value;return false;">
-          <!-- input type="hidden" name="sitesearch" value="pics.jonathancross.com" / -->
-          <input name="q" title="Uses Google to search this site..." type="text" size="10" maxlength="255" class="text">
+        <form method="get" action="https://www.google.com/search">
+          <input type="hidden" name="sitesearch" value="pics.jonathancross.com">
+          <input type="text" name="q" title="Uses Google to search this site..." size="10" maxlength="255" class="text">
           <input type="submit" title="Uses Google..." value="search" class="search_button">
         </form>
       </div>
@@ -280,7 +280,7 @@
         </div>
         <div id="countries-tab">
           <div class="col">
-            <h4>A to H</h4>
+            <h4>A - H</h4>
             <a href="/pics/2012/2012-06-23_Albania/" title="Albania: One week exploring Albania after a holiday in Greece, then back to Switzerland via Italy. (2012)">Albania</a>
             <a href="/pics/2007/2007-09-26_Austria-Vienna/" title="Vienna, Austria (2008)">Austria</a>
             <a href="/pics/2006/2006-01-24_Bangladesh/" title="3.5 intense weeks overland through Bangladesh. (2006)">Bangladesh</a>
@@ -300,7 +300,7 @@
             <a href="/pics/2007/2007-07-27_Hungary/" title="Magyarország: cycling from Budapest to Croatia. (2007)" lang="hun">Hungary</a>
           </div>
           <div class="col">
-            <h4>I - R</h4>
+            <h4>I - Q</h4>
             <a href="/pics/2008/2008-10-20_Iceland/" title="5 weeks in  Ísland after arriving by ferry (from Norway).  Volunteering and exploring the stunning natural landscape. (2008)">Iceland</a>
             <a href="/pics/2006/2006-04-26_India/" title="7 months traveling overland through the Indian subcontinent. (2005-2006)">India</a>
             <a href="/pics/2006/2006-08-28_Java/" title="2 months of island hopping: Bali, Lombok, Java and Sumatra. (2006)">Indonesia</a>
@@ -308,7 +308,6 @@
             <a href="/pics/2009/2009-09-21_Italy%20Venice%20and%20Verona/" title="Venice and Verona : Nina surprised me by planning a trip to Venice for my 33rd birthday. Also couch-surfing in Verona. (2009)">Italy</a>
             <a href="/pics/2004/2004-10-23_Tokyo/" title="10 day visit to Tokyo and nearby area -- beginning of my first 6-month trip to Asia. (2004)">Japan</a>
             <a href="/pics/2005/2005-03-12_Laos/" title="One month in the magical country of Laos. (2005)">Laos</a>
-            <span title="No photos uploaded yet.">Liechtenstein</span><br>
             <a href="/pics/2006/2006-09-20_Penang_Bangkok/" title="A few photos from Penang during my 4th trip to Malaysia. (2006)">Malaysia</a>
             <span title="No photos uploaded yet.">Mexico</span><br>
             <span title="No photos uploaded yet.">Monaco</span><br>
@@ -319,11 +318,11 @@
             <a href="/pics/2008/2008-09-13_Norway/" title="Traveling north-west from Oslo across the mountains to Bergen (on the North Sea). (2008)">Norway</a>
             <a href="/pics/2010/2010-08-26_Poland/" title="A week traveling around northern Poland. (2010)">Poland</a>
             <a href="/pics/2004/2004-07-20_Portugal/" title="7 months living in Lisboa, Portugal (2004).">Portugal</a>
-            <a href="/pics/2007/2007-10-04_Romania/" title="Romania: Transylvania and Bucuresti. (2007)">Romania</a>
           </div>
           <div class="col">
-            <h4>S - Z</h4>
+            <h4>R - Z</h4>
             <span title="No photos uploaded yet.">Scotland</span><br>
+            <a href="/pics/2007/2007-10-04_Romania/" title="Romania: Transylvania and Bucuresti. (2007)">Romania</a>
             <a href="/pics/2007/2007-08-08_Serbia/" title="Srbija: cycling diagonally through Novi Sad, Beograd and on to Bulgaria. (2007)" lang="sr">Serbia</a>
             <a href="/pics/2006/2006-08-07_Singapore_Bali_Lombok/" title="A short visit to Singapore and then on to Indonesia. (2006)">Singapore</a>
             <a href="/pics/2007/2007-09-23_Slovakia/" title="Slovakia: Nina’s roots and High Tatras. (2007)">Slovakia</a>
@@ -490,7 +489,7 @@
       <h2>About this website</h2>
       <p>
       JCDSee is my personal web based photo viewing / cataloging system written in the Perl scripting language.
-      The script is about 43KB, should work without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of this code</a>, and use it as you like.
+      The script is about 43KB, can be used without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of this code</a>, and use it as you like.
       </p>
       <!--
       <h5>JCDSee?</h5>
@@ -535,7 +534,7 @@
   <script type="text/javascript">
     // TODO: Namespace and move this into external js file.
     (function() {
-      "use strict";
+      'use strict';
 
       /**
        * Tab toggler class.
@@ -623,7 +622,6 @@
         };
       };
 
-
       /** @returns {boolean} true if this tab is selected in URL hash. */
       Tab.prototype.isInUrlHash = function() {
         return (document.location.hash == '#tab=' + this.tabId);
@@ -653,16 +651,18 @@
       var tabIds = ['countries-tab', 'dates-tab', 'adventures-tab', 'map-tab'];
       var toggler = new Toggler(tabIds);
 
-      // Adventures link currently disabled.
-      var adventuresLink = document.getElementById('adventures-link');
-      if (adventuresLink) {
-        adventuresLink.onclick = function(evt) {
-          toggler.toggleTab('adventures-tab');
-          evt.preventDefault();
-        };
-      }
-      // End Self-executing anonymous function.
-    })();
+      /**
+       * // Adventures link currently disabled.
+       * var adventuresLink = document.getElementById('adventures-link');
+       * if (adventuresLink) {
+       *   adventuresLink.onclick = function(evt) {
+       *     toggler.toggleTab('adventures-tab');
+       *     evt.preventDefault();
+       *   };
+       * }
+      */
+
+    })(); // End Self-executing anonymous function.
 
   </script>
 </body>
