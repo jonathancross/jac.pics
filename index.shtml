@@ -114,13 +114,13 @@
             <a href="/pics/2004/2004-12-31_Thailand/" title="First of many trips to Thailand. (2004)">Thailand</a>
             <a href="/pics/2007/2007-08-28_Turkey/" title="Turkey: cycling from the western border of Greece into Turkey and on to Istanbul. (2007)">Turkey</a>
             <a href="/pics/2013/2013-01-06_California Holidays/" title="A few of the many pictures from the USA. Christmas and New years eve in California. (2013)">USA</a>
-            <a href="/pics/2010/2010-11-28_Italy/"title="2010: Vatican City, Rome, Napoli, Amalfi coast">Vatican City</a>
+            <a href="/pics/2010/2010-11-28_Italy/" title="2010: Vatican City, Rome, Napoli, Amalfi coast">Vatican City</a>
             <a href="/pics/2005/2005-02-17_Vietnam/" title="35 days traveling from south to north. (2005)">Vietnam</a>
           </div>
         </div>
         <div id="dates-tab" class="jcd-tab">
-          <h2>Photo albums listed by date</h2>
-          <div>
+          <section>
+            <h3>Photo albums listed by date</h3>
             <a href="/pics/1976/">1976</a>
             <a href="/pics/1977/">1977</a>
             <a href="/pics/1978/">1978</a>
@@ -135,40 +135,27 @@
             <a href="/pics/2001/" title="Includes pics from San Francisco and Chapel Hill, North Carolina.">2001</a>
             <!-- TODO: consider listing all subfolders -->
             <a href="/pics/2002/" title="Chicago, Vancouver, BC. and Ski trip to Europe.">2002</a>
-
             <a href="/pics/2003/" title="San Francisco, Brooklyn, New York and Whistler, Canada.">2003</a>
-
             <a href="/pics/2004/" title="New Years in Madrid. 7 months in Portugal. Skiing the Alps, Amsterdam and making Absinthe. London, (Old) York, New York, Tokyo and Thailand.">2004</a>
-
             <a href="/pics/2005/" title="Cambodia, Vietnam, Laos, Thailand, USA: Dallas, Los Angeles, Seattle, San Francisco 'Love Parade', North India and Nepal.">2005</a>
-
             <a href="/pics/2006/" title="A year in South Asia: India, Nepal, Bangladesh, Sri Lanka, Malaysia, Singapore, Indonesia, Bangkok and Myanmar. Also Zurich.">2006</a>
-
             <a href="/pics/2007/" title="6 months back in the USA then Switzerland, Hungary, Croatia, Serbia, Bulgaria, Greece, Turkey, Slovakia, Austria, Romania, and back for a wedding in Geneva">2007</a>
-
             <a href="/pics/2008/" title="Winter in Switzerland, a visit from Jason Shiga, Berlin and a 3 month Nordic Journey from Switzerland to San Francisco (via Scandinavia, Iceland and Canada).">2008</a>
-
             <a href="/pics/2009/" title="San Francisco, Venice and Verona Italy, and an overland adventure from my home in Switzerland to the African continent.">2009</a>
-
             <a href="/pics/2010/" title="Switzerland: Wängi &amp; New Years in Soglio, Maggia Ticino, Berlin Germany and Poland.">2010</a>
-
             <a href="/pics/2011/" title="Living and working in Switzerland.">2011</a>
-
             <a href="/pics/2012/" title="Trip over land and Sea down through Italy, over to Corfu (Greece), then up the coast of Albania.">2012</a>
-
             <a href="/pics/2013/" title="New Years in California, overland trip to Granada, Spain via Barcelona and Paris, France.">2013</a>
-
             <a href="/pics/2014/" title="Berlin, New York and California.">2014</a>
-
             <a href="/pics/2015/" title="Two months backpacking in Colombia and some time in California.">2015</a>
-
-            <br>
-            <h4>Other</h4>
+          </section>
+          <section>
+            <h3>Other albums which didn’t fit anywhere else</h3>
             <a href="/pics/Other/3D Renderings/" title="3D computer-generated graphics I created back in the 90’s.">3D Renderings</a>
             <a href="/pics/Other/Language-Cards/" title="Language cheat sheets for 10 Asian Languages.">Languages</a>
             <a href="/pics/Other/Graphic/" title="Propaganda and Corporate parodies from my previous life as an underground artist.">Graphics</a>
             <a href="/pics/Other/Video/" title="Video clips from my travels.">Video</a>
-          </div>
+          </section>
         </div>
         <div id="adventures-tab" class="jcd-tab">
           <h2 class="tab-header">Adventures</h2>

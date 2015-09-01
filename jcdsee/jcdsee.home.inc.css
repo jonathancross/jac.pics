@@ -1,7 +1,15 @@
-/* Homapage CSS (included into /index.shtml) */
+/* Homepage CSS (included into /index.shtml) */
+
+body {
+  padding-top: 70px;
+}
 
 #content {
   color: #333;
+}
+
+#nav {
+  min-height: 0; /* Override */
 }
 
 a,
@@ -24,19 +32,26 @@ h2 {
   text-align: center;
 }
 
+h3 {
+  color: #111;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 12pt;
+  margin: 8px .5em 3pt 0;
+}
+
 h4 span {
   font-weight: normal;
 }
 
 #homepage-intro-thumbs {
-  margin-bottom: 0.5em;
+  margin: 3em 0;
   text-align: center;
 }
 
 #homepage-intro-thumbs a img {
   border: 1px solid #999;
   margin: 3px;
-  opacity: 0.85;
+  opacity: .85;
   padding: 0;
 }
 
@@ -70,7 +85,7 @@ h4 span {
 #tabset {
   border-color: #777;
   border-top-left-radius: 0 0;
-  box-shadow: rgba(0,0,0,.2) 2px 6px 16px;
+  box-shadow: rgba(0, 0, 0, .2) 2px 6px 16px;
   display: inline-block;
   margin: 25px 0 0 0;
   padding: 0;
@@ -101,11 +116,6 @@ h4 {
   margin: 10px 0 0;
 }
 
-#dates-tab h4 {
-  font-size: 12px;
-  margin: 12px 0 5px;
-}
-
 #countries-tab br {
   font-size: 6px;
 }
@@ -121,7 +131,7 @@ h4 {
 
 h5,
 p {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
   padding: 0;
 }
@@ -140,7 +150,7 @@ h5 {
   display: table; /* Somehow this forces browser to ignore white-space between tabs. */
   left: -1px;
   position: relative;
-  top: -22px;
+  top: -28px;
   width: 100%;
   white-space: nowrap;
   z-index: 1;
@@ -153,9 +163,9 @@ h5 {
   -webkit-border-radius: 5px 5px 0 0;
   color: #44c;
   display: inline-block;
-  font-size: 11px;
+  font-size: 13px;
   height: 14px;
-  padding: 3px 1em;
+  padding: 6px;
 }
 
 #labels a:hover {
@@ -188,8 +198,7 @@ input.search_button {
   font-size: 11px;
   height: 20px;
   margin-right: 8px;
-  padding-top: 1px;
-  padding: 4px;
+  padding: 1px 4px 4px;
 }
 
 input.search_button: hover {
@@ -202,21 +211,21 @@ input.search_button: hover {
 input.text {
   background-color: #f8f8f8;
   color: #666;
-  font-family: fixed,"courier new";
+  font-family: fixed, 'courier new';
   font-size: 12px;
   font-weight: bold;
   height: 14px;
-  padding:2px;
+  padding: 2px;
 }
 
 input.text:hover,
-input.text: focus {
+input.text:focus {
   background-color: #ff9;
   border-color: #777;
-  color:black;
+  color: black;
 }
 
-input.text: focus {
+input.text:focus {
   outline: none;
   width: 125px;
 }
@@ -231,13 +240,6 @@ input.text: focus {
 
 .jcd-js .tab-header {
   display: none !important;
-}
-
-#adventures-tab h3 {
-  color: #111;
-  font-family: helvetica,arial,sans-serif;
-  font-size: 12pt;
-  margin: 8px .5em 3pt 0;
 }
 
 #adventures-tab ul {
@@ -351,9 +353,14 @@ h1 {
 }
 
 #dates-tab a {
-  padding: 5px;
+  display: inline-block;
+  font-size: 1.1em;
+  margin: .5em .5em 0 0;
 }
 
+#dates-tab section:last-child {
+  margin-top: 3em;
+}
 
 @media screen and (max-width: 600px) {
 
@@ -366,12 +373,12 @@ h1 {
 
 @media screen and (max-width: 480px) {
 
-  #labels {
-    top: -28px;
+  body {
+    padding-top: 80px;
   }
 
   #labels a {
-    padding: 6px;
+    font-size: 12px;
   }
 
   #countries-tab h4 {
