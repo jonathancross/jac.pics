@@ -12,228 +12,7 @@
     <link href="/jcdsee/jcdsee.css" rel="stylesheet" type="text/css">
     <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
     <style type="text/css">
-      /* TODO: Cleanup this mess. */
-      #content {
-        color: #333;
-      }
-      a,
-      a:visited {
-        color: #00b;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      h2 {
-        font-size: 12pt;
-        margin: 2em 0 .5em;
-      }
-      h4 span {
-        font-weight: normal;
-      }
-      #homepage-intro-thumbs {text-align:center;margin-bottom:0.5em;}
-      #homepage-intro-thumbs a img {margin:3px;padding:0;border:1px solid #999;opacity:0.85;}
-      #homepage-intro-thumbs a:hover img {border-color:black;opacity:1;}
-      #tabset > div {
-        margin: -27px 0 8px;
-      }
-      #tabset #labels {
-        margin-top: 0;
-      }
-      #tabset,
-      #labels a {
-        border: 1px solid #999;
-        border-bottom-color: #777;
-        -moz-border-radius: 2px;
-        -webkit-border-radius: 2px;
-        border-radius: 2px;
-      }
-      #tabset,
-      #labels a.active {
-        background-color: #eee;
-      }
-      #tabset {
-        border-color: #777;
-        border-top-left-radius: 0 0;
-        box-shadow: rgba(0,0,0,.2) 2px 6px 16px;
-        display: inline-block;
-        margin: 25px 0 0 0;
-        padding: 0;
-        width: 100%;
-      }
-      #countries-tab {width:100%;}
-      #countries-tab div {
-        border-top: none;
-        color: #aaa;
-        float: left;
-        font-size: 12px;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-        padding-bottom: 5px;
-        text-align: center;
-        vertical-align: top;
-      }
-      h4 {
-        color: #555;
-        font-size: 11px;
-        font-weight: bold;
-        margin: 10px 0 0;
-      }
-
-      #dates-tab h4 {
-        font-size: 12px;
-        margin: 12px 0 5px;
-      }
-      #countries-tab br {font-size:6px;}
-      #countries-tab a {display:block;color:#22b;}
-      #countries-tab a:hover {color:#00f;}
-      h5,p {padding:0;margin:0;font-size:12px;}
-      p {margin-bottom:1em}
-      h5 {border-bottom:1px solid #aaa;margin:2em 0 3px 0;padding-bottom:3px;}
-      #labels {white-space: nowrap;top:-22px;left:-1px;position:relative;z-index:1;}
-      #labels a {color:#44c;padding:3px 1em;font-size:11px;background-color:#ccc;height:14px;display:inline-block;border-radius: 5px 5px 0 0;-moz-border-radius: 5px 5px 0 0;-webkit-border-radius: 5px 5px 0 0;}
-      #labels a:hover {color:#00c;}
-      #labels a.active {color:black;border-color:#777;border-bottom-color:transparent;font-weight:bold;outline:none;text-decoration: none;}
-      form {margin:0;padding:0;}
-      input {border:1px solid #999;}
-      input.search_button {font-size:11px;background-color:#ddd;color:#555;padding:4px;padding-top:1px;height:20px;margin-right:8px;display:inline-block;}
-      input.search_button:hover {background-color:#ddf;color:#44f;border-color:#99f;cursor:pointer;}
-      input.text {font-size:12px;background-color:#f8f8f8;color:#666;height:14px;font-family:fixed,"courier new";font-weight:bold;padding:2px;}
-      input.text:hover, input.text:focus {background-color:#ff9;border-color:#777;color:black;}
-      input.text:focus {width:125px;outline:none;}
-      .jcd-js .show {display:inline-block !important;}
-      .jcd-js .hide {display:none !important;}
-      #adventures-tab h3 {
-        color: #111;
-        font-family: helvetica,arial,sans-serif;
-        font-size: 12pt;
-        margin: 8px .5em 3pt 0;
-      }
-      #adventures-tab ul {margin:0 0 -9px;padding:0 8px 0;}
-      #adventures-tab li {
-        clear: both;
-        min-height: 100px;
-        list-style-type: none;
-        padding-bottom: 1em;
-      }
-      #adventures-tab div {width:73%;}
-      #adventures-tab a {color:#22b;}
-      #adventures-tab a img {
-        border: 1px solid #aaa;
-        float: right;
-        height: 100px;
-        margin-left: 1em;
-        width: 140px;
-      }
-      #adventures-tab a:hover img {border-color:#009;}
-
-      #map-tab {
-        background-repeat: no-repeat;
-        background-size: cover;
-        height: 450px;
-        margin-bottom: -2px !important;
-        width: 100%;
-      }
-      h1 {
-        color: #ccc;
-        font-family: arial;
-        font-size: 17px;
-        margin: 4px 1em 1px 3px;
-      }
-      #search-container {
-        float: right;
-      }
-      .jcd #labels {
-        display: block;
-        margin: 0 !important;
-      }
-      .jcd #tabset > div {
-        margin: 1em 0;
-      }
-
-      /* Sitemap doesn't work without JS because it disables xsl too. */
-      .jcd #sitemap-tab-label {
-        display: none;
-      }
-
-      #countries-tab h4:before {
-        content: 'Countries ';
-      }
-
-      .col {
-        border-right: 1px solid #ccc;
-        width: 33%;
-      }
-
-      .col:last-child {
-        border-right: none;
-      }
-
-      #labels #sitemap-link {
-        background: none;
-        border: none;
-        color: #00a;
-        float: right;
-        padding-right: 1px;
-      }
-
-      #dates-tab {
-        padding: 0 1em 1em;
-      }
-
-      #dates-tab a {
-        padding: 5px;
-      }
-
-
-      @media screen and (max-width: 600px) {
-
-        #map-tab {
-          height: 384px;;
-        }
-
-      }
-
-
-      @media screen and (max-width: 480px) {
-
-        #labels {
-          top: -28px;
-        }
-
-        #labels a {
-          padding: 6px;
-        }
-
-        #countries-tab h4 {
-          display: none;
-        }
-
-        #countries-tab div {
-          line-height: 2;
-        }
-
-        #map-tab {
-          height: 306px;
-        }
-
-        #adventures-tab a img {
-          height: 60px;
-          width: 80px;
-        }
-
-      }
-
-
-      @media screen and (max-width: 360px) {
-
-        #map-tab {
-          height: 226px;
-        }
-
-      }
-
+      <!--#include virtual="/jcdsee/jcdsee.home.inc.css" -->
     </style>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
   </head>
@@ -278,7 +57,8 @@
           <!-- Simple link to sitemap, not a tab -->
           <a id="sitemap-link" title="Click here for a complete list of all links." href="/sitemap.xml" rel="nofollow">Sitemap</a>
         </div>
-        <div id="countries-tab">
+        <div id="countries-tab" class="jcd-tab">
+          <h2 class="tab-header">Countries visited</h2>
           <div class="col">
             <h4>A - H</h4>
             <a href="/pics/2012/2012-06-23_Albania/" title="Albania: One week exploring Albania after a holiday in Greece, then back to Switzerland via Italy. (2012)">Albania</a>
@@ -338,9 +118,9 @@
             <a href="/pics/2005/2005-02-17_Vietnam/" title="35 days traveling from south to north. (2005)">Vietnam</a>
           </div>
         </div>
-        <div id="dates-tab">
+        <div id="dates-tab" class="jcd-tab">
+          <h2>Photo albums listed by date</h2>
           <div>
-            <h4>Growing up</h4>
             <a href="/pics/1976/">1976</a>
             <a href="/pics/1977/">1977</a>
             <a href="/pics/1978/">1978</a>
@@ -351,7 +131,6 @@
             <a href="/pics/1990/">1990</a>
             <a href="/pics/1995/">1995</a>
             <a href="/pics/1997/">1997</a>
-            <h4>The adult years</h4>
             <a href="/pics/2000/" title="A few pics of friends and family.">2000</a>
             <a href="/pics/2001/" title="Includes pics from San Francisco and Chapel Hill, North Carolina.">2001</a>
             <!-- TODO: consider listing all subfolders -->
@@ -391,7 +170,8 @@
             <a href="/pics/Other/Video/" title="Video clips from my travels.">Video</a>
           </div>
         </div>
-        <div id="adventures-tab">
+        <div id="adventures-tab" class="jcd-tab">
+          <h2 class="tab-header">Adventures</h2>
           <ul>
             <li>
               <a href="/pics/2005/2005-03-12_Laos/" title="Laos: 2005"><img src="/pics/2005/2005-03-12_Laos/2005-03-12_Vang_Vieng/.L.25_Sunset.jpg.jpg" alt="Laos 2005" /></a>
@@ -480,9 +260,9 @@
             </li>
           </ul>
         </div>
-
-        <!-- -55,-180,79,180&chs=710x400 -->
-        <div id="map-tab" style="background-image: url('http://chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:11111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SK|TH|TR|TW|US|VA|VN')">
+        <div id="map-tab"
+             class="jcd-tab"
+             style="background-image: url('http://chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:11111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SK|TH|TR|TW|US|VA|VN')">
           <!-- Must add a '1' to url for each new country -->
         </div>
       </div>
@@ -501,7 +281,7 @@
       </p>
       -->
       <p>
-      This website has evolved slowly over the last decade starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in August of 2015.
+      This website has evolved slowly over the last decade starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in September of 2015.
       </p>
       <p><a rel="author" href="https://plus.google.com/u/0/+JonathanCr0ss" target="_blank">Jonathan Cross</a></p>
     </div>
@@ -526,143 +306,21 @@
     </a>
     <div id="usage">
       <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2</a>
-      <div>Page last modified on 2015-08-13</div>
-      <noscript><div>Javascript is disabled</div></noscript>
+      <div>
+        Page last modified on
+        <!--#config timefmt="%Y-%m-%d"-->
+        <!--#flastmod virtual="/index.shtml" -->
+      </div>
+      <div>
+        JavaScript is 
+        <script>document.write('ENABLED');</script>
+        <noscript>DISABLED</noscript>
+      </div>
     </div>
   </div>
 
   <script type="text/javascript">
-    // TODO: Namespace and move this into external js file.
-    (function() {
-      'use strict';
-
-      /**
-       * Tab toggler class.
-       * @param {!Array.<string>} tabIds Array of tab ID strings.
-       * @constructor
-       */
-      function Toggler(tabIds) {
-        /** @private {!Array.<string>} */
-        this.tabIds_ = tabIds;
-        /** @private {string} */
-        this.firstTabId_ = this.tabIds_[0];
-        /** @private {!Object.<!Element>} */
-        this.tabsEls_ = {};
-        /** @private {string} */
-        this.selectedTabId_;
-        this.init_();
-      };
-
-
-      /**
-       * Initializaes all tabs and sets default visibility.
-       */
-      Toggler.prototype.init_ = function() {
-        for (var tabId, n = 0; tabId = tabIds[n]; n++) {
-          var tab = new Tab(tabId, this);
-          this.tabsEls_[tabId] = tab;
-          // Register the selected tab id from the url hash.
-          if (tab.isInUrlHash()) {
-            this.selectedTabId_ = tabId;
-          } else {
-            tab.hide();
-          }
-        }
-
-        // Default to first tab is none selected in url.
-        if (!this.selectedTabId_) {
-          this.selectedTabId_ = this.firstTabId_;
-        }
-
-        // Toggle the apropriate tab.
-        var selectedTab = this.tabsEls_[this.selectedTabId_];
-        selectedTab.show();
-      };
-
-
-      /**
-       * Toggles visibility of a tab.
-       * @param {string} tabIdToToggle ID of the tab to show.
-       */
-      Toggler.prototype.toggleTab = function(tabIdToToggle) {
-        if (tabIdToToggle == this.selectedTabId_) {
-          // Nothing to do.
-          return;
-        }
-
-        var currentlySelectedTab = this.tabsEls_[this.selectedTabId_];
-        // Look for the new tab to toggle.
-        for (var tabId, n = 0; tabId = this.tabIds_[n]; n++) {
-          if (tabIdToToggle == tabId) {
-            currentlySelectedTab.hide();
-            this.selectedTabId_ = tabIdToToggle;
-            var toggledTab = this.tabsEls_[tabIdToToggle];
-            toggledTab.show();
-            return;
-          }
-        }
-      };
-
-
-      /**
-       * Class representation of a single Tab.
-       * @param {string} tabId unique id of tab.
-       * @param {!Toggler} toggler Toggler.
-       * @constructor
-       */
-      function Tab(tabId, toggler) {
-        this.tabId = tabId;
-        this.toggler = toggler;
-        this.content = document.getElementById(this.tabId);
-        this.label = document.getElementById(this.tabId + '-label');
-        // TODO: rewrite using bind so we don't have to use global toggler.
-        this.label.onclick = function(evt) {
-          toggler.toggleTab(tabId);
-          evt.preventDefault();
-        };
-      };
-
-      /** @returns {boolean} true if this tab is selected in URL hash. */
-      Tab.prototype.isInUrlHash = function() {
-        return (document.location.hash == '#tab=' + this.tabId);
-      };
-
-      /**
-       * Sets this tab to selected in URL hash.
-       * @private
-       */
-      Tab.prototype.setUrlHashToThisTab_ = function() {
-        document.location.hash = '#tab=' + this.tabId;
-      };
-
-      /** Shows this tab in UI. */
-      Tab.prototype.show = function() {
-        this.label.className = 'active';
-        this.content.className = 'show';
-        this.setUrlHashToThisTab_();
-      };
-
-      /** Hides this tab in UI. */
-      Tab.prototype.hide = function() {
-        this.label.className = '';
-        this.content.className = 'hide';
-      };
-
-      var tabIds = ['countries-tab', 'dates-tab', 'adventures-tab', 'map-tab'];
-      var toggler = new Toggler(tabIds);
-
-      /**
-       * var adventuresLink = document.getElementById('adventures-link');
-       * if (adventuresLink) {
-       *   adventuresLink.onclick = function(evt) {
-       *     toggler.toggleTab('adventures-tab');
-       *     evt.preventDefault();
-       *   };
-       * }
-       */
-
-    })(); // End Self-executing anonymous function.
-
+    <!--#include virtual="/jcdsee/jcdsee.home.inc.js" -->
   </script>
 </body>
 </html>

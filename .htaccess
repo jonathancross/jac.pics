@@ -3,7 +3,7 @@ DefaultLanguage en-US
 AddType application/xhtml+xml .xhtml
 # AddType text/xml .xhtml
 
-DirectoryIndex index.xhtml index.html index.cgi
+DirectoryIndex index.shtml index.xhtml index.html index.cgi
 
 # Secure htaccess file
 <Files .htaccess>

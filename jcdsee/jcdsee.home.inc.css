@@ -15,8 +15,13 @@ a:hover {
 }
 
 h2 {
+  margin-top: 3em;
+}
+
+#tabset h2 {
   font-size: 12pt;
-  margin: 2em 0 .5em;
+  margin: 1em 0 .5em;
+  text-align: center;
 }
 
 h4 span {
@@ -132,9 +137,11 @@ h5 {
 }
 
 #labels {
+  display: table; /* Somehow this forces browser to ignore white-space between tabs. */
   left: -1px;
   position: relative;
   top: -22px;
+  width: 100%;
   white-space: nowrap;
   z-index: 1;
 }
@@ -156,8 +163,9 @@ h5 {
 }
 
 #labels a.active {
-  border-bottom-color: transparent;
   border-color: #777;
+  border-bottom-color: transparent;
+  box-shadow: rgba(0, 0, 0, .2) 3px 0 1px -1px;
   color: black;
   font-weight: bold;
   outline: none;
@@ -221,6 +229,10 @@ input.text: focus {
   display: none !important;
 }
 
+.jcd-js .tab-header {
+  display: none !important;
+}
+
 #adventures-tab h3 {
   color: #111;
   font-family: helvetica,arial,sans-serif;
@@ -230,7 +242,7 @@ input.text: focus {
 
 #adventures-tab ul {
   margin: 0 0 -9px;
-  padding: 0 8px 0;
+  padding: 0;
 }
 
 #adventures-tab li {
@@ -261,9 +273,11 @@ input.text: focus {
 }
 
 #map-tab {
+  background-position-y: 50%;
   background-repeat: no-repeat;
-  background-size: cover;
-  height: 450px;
+  background-size: contain;
+  height: 452px;
+  padding: 0; /* Overrides .jcd-tab padding.*/
   margin-bottom: -2px !important;
   width: 100%;
 }
@@ -279,6 +293,8 @@ h1 {
   float: right;
 }
 
+/* Styles for non-javascript browsers. */
+
 .jcd #labels {
   display: block;
   margin: 0 !important;
@@ -286,7 +302,16 @@ h1 {
 
 .jcd #tabset > div {
   clear: both;
-  margin: 2em 0;
+  margin: 0 0 4em;
+}
+
+.jcd #tabset h2 {
+  margin-top: 0;
+}
+
+.jcd #dates-tab {
+  padding-bottom: 3em;
+  padding-top: 3em;
 }
 
 /* Sitemap doesn't work without JS because it disables xsl too. */
@@ -315,7 +340,13 @@ h1 {
   padding-right: 1px;
 }
 
-#dates-tab {
+.jcd #sitemap-link {
+  position: absolute;
+  right: 1px;
+}
+
+/* TODO: Use tab class for all common styles. */
+.jcd-tab {
   padding: 0 1em 1em;
 }
 
@@ -327,7 +358,7 @@ h1 {
 @media screen and (max-width: 600px) {
 
   #map-tab {
-    height: 384px;
+    height: 386px;
   }
 
 }
