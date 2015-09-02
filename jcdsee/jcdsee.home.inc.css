@@ -184,11 +184,25 @@ h5 {
 #labels a.active {
   border-color: #777;
   border-bottom-color: transparent;
-  box-shadow: rgba(0, 0, 0, .2) 3px 0 1px -1px;
+  box-shadow: rgba(0, 0, 0, .2) -5px 0px 4px -3px, rgba(0, 0, 0, .2) 5px 0px 4px -3px;
   color: black;
   cursor: default;
   font-weight: bold;
   outline: none;
+  /* Make active tab jump forward. */
+  height: 16px;
+  position: relative;
+  top: -2px;
+}
+
+#labels a.active:first-child:focus,
+#labels a.active:first-child {
+  box-shadow: rgba(0, 0, 0, .2) 5px 0px 4px -3px;
+}
+
+#labels a.active:nth-last-child(2):focus,
+#labels a.active:nth-last-child(2) {
+  box-shadow: rgba(0, 0, 0, .2) -5px 0px 4px -3px;
 }
 
 form {
