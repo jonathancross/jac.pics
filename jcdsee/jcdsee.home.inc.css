@@ -18,7 +18,9 @@ a:visited {
   text-decoration: none;
 }
 
-a:hover {
+a:hover,
+a:focus {
+  color: #00f;
   text-decoration: underline;
 }
 
@@ -55,6 +57,7 @@ h4 span {
   padding: 0;
 }
 
+#homepage-intro-thumbs a:focus img,
 #homepage-intro-thumbs a:hover img {
   border-color: black;
   opacity: 1;
@@ -121,12 +124,7 @@ h4 {
 }
 
 #countries-tab a {
-  color: #22b;
   display: block;
-}
-
-#countries-tab a:hover {
-  color: #00f;
 }
 
 h5,
@@ -158,28 +156,39 @@ h5 {
 
 #labels a {
   background-color: #ccc;
-  border-radius: 5px 5px 0 0;
-  -moz-border-radius: 5px 5px 0 0;
-  -webkit-border-radius: 5px 5px 0 0;
-  color: #44c;
+  border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  -webkit-border-radius: 4px 4px 0 0;
+  color: #333;
   display: inline-block;
   font-size: 13px;
   height: 14px;
-  padding: 6px;
+  padding: 6px 8px;
+  text-decoration: none;
 }
 
-#labels a:hover {
-  color: #00c;
+#labels a:focus {
+  border-color: #888;
+  color: #00f;
 }
 
+#labels a:first-child {
+  border-top-left-radius: 10px;
+}
+
+#labels a:nth-last-child(2) {
+  border-top-right-radius: 10px;
+}
+
+#labels a.active:focus,
 #labels a.active {
   border-color: #777;
   border-bottom-color: transparent;
   box-shadow: rgba(0, 0, 0, .2) 3px 0 1px -1px;
   color: black;
+  cursor: default;
   font-weight: bold;
   outline: none;
-  text-decoration: none;
 }
 
 form {
@@ -267,11 +276,14 @@ input.text:focus {
   float: right;
   height: 100px;
   margin-left: 1em;
+  opacity: .9;
   width: 140px;
 }
 
+#adventures-tab a:focus img,
 #adventures-tab a:hover img {
   border-color: #009;
+  opacity: 1;
 }
 
 #map-tab {
@@ -316,11 +328,6 @@ h1 {
   padding-top: 3em;
 }
 
-/* Sitemap doesn't work without JS because it disables xsl too. */
-.jcd #sitemap-tab-label {
-  display: none;
-}
-
 #countries-tab h4:before {
   content: 'Countries ';
 }
@@ -337,14 +344,20 @@ h1 {
 #labels #sitemap-link {
   background: none;
   border: none;
-  color: #00a;
+  color: #00b;
   float: right;
-  padding-right: 1px;
+  padding-right: 3px;
 }
 
-.jcd #sitemap-link {
-  position: absolute;
-  right: 1px;
+#labels #sitemap-link:focus,
+#labels #sitemap-link:hover {
+  color: #00f;
+  text-decoration: underline;
+}
+
+/* Sitemap doesn't work without JS because it disables xsl too. */
+.jcd #labels #sitemap-link {
+  display: none;
 }
 
 /* TODO: Use tab class for all common styles. */
@@ -375,10 +388,6 @@ h1 {
 
   body {
     padding-top: 80px;
-  }
-
-  #labels a {
-    font-size: 12px;
   }
 
   #countries-tab h4 {

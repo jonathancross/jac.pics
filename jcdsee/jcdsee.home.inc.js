@@ -136,6 +136,7 @@ Tab.prototype.setUrlHashToThisTab_ = function() {
 /** Shows this tab in UI. */
 Tab.prototype.show = function() {
   this.label.classList.add(this.CLASS_ACTIVE);
+  this.label.setAttribute('tabindex', '-1'); // Take it out of tabbing order.
   this.content.classList.add('show');
   this.content.classList.remove('hide');
   this.setUrlHashToThisTab_();
@@ -144,6 +145,7 @@ Tab.prototype.show = function() {
 /** Hides this tab in UI. */
 Tab.prototype.hide = function() {
   this.label.classList.remove(this.CLASS_ACTIVE);
+  this.label.setAttribute('tabindex', ''); // Return to tabbing order.
   this.content.classList.remove('show');
   this.content.classList.add('hide');
 };
