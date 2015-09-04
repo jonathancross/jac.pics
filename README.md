@@ -26,7 +26,7 @@ You can use this script from the shell to generate thumbnails, create the `.jcds
 All arguments in `<>` are optional.
 
 #### URL parameters:
-Note: All parameters are optional.  If no URL is provided, the current location of the script is used with the defaults below.
+Note: All parameters are optional.  If no URL is provided, the current location of the script is used with the defaults below.  Note: these will soon change per [Better URLs](https://github.com/jonathancross/pics.jonathancross.com/milestones/Better%20URLs)
 
 * `display_mode=[LIST|THUMBS|SINGLE|SLIDESHOW]` - defaults to `LIST` mode.
 * `cur_url=/path/to/folder/` - defaults to current folder.
@@ -44,7 +44,7 @@ Assuming JCDSee is in the web root, this would be the URL structure on zzz.com:
 If you use `mod_rewrite`, you can have "clean" URLs like so:
 * `http://zzz.com/pics/2/` maps to: `http://zzz.com/jcdsee.cgi?cur_url=/pics/2/`
 
-See [.htaccess](.htaccess#L29) for example.
+See [.htaccess](.htaccess#L27) for example.
 
 #### Database structure
 JCDSee generates a very basic flat-file database in each folder named `.jcdsee`.  This file is a pipe-delineated file with this format:
@@ -52,9 +52,9 @@ JCDSee generates a very basic flat-file database in each folder named `.jcdsee`.
     filename.jpg|Optional HTML description of the file.  
 
 Exotic file names:
-* `2015-08-13_This-is-the-day.jpg` - Date prefix will be understood by the software and displayed differently to visitors.
-* `99_Almost_number_100.png` - Simple number prefixes (used to set order, etc) will be hidden from website visitors.
-* `El Niño.jpg` - Spaces and UTF8 characters in file names are okay.
+* <code>**2015-08-13**_This-is-the-day.jpg</code> - Date prefix will be understood by the software and displayed differently to visitors.
+* <code>**99**_Almost_number_100.png</code> - Simple number prefixes (used to set order, etc) will be hidden from website visitors.
+* <code>El Ni**ñ**o.jpg</code> - Spaces and UTF8 characters in file names are okay.
 
 #### Warnings:
 * Do not use user-supplied images, files, etc. JCDSee is intended to be used for content you created and are sure is safe.
