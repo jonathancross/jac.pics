@@ -849,10 +849,11 @@ jcd.Page.prototype.createDom_ = function() {
  * @private
  */
 jcd.Page.prototype.init_ = function() {
+  this.footerEl_ = document.getElementById('footer');
   this.fileListContainer_ = document.getElementById('files');
   this.navElement_ = document.getElementById(this.elementIds_.NAV);
   this.displayMode_ = this.getDisplayMode();
-  console.log('DEBUG: Page display mode: ' + this.displayMode_);
+  // console.log('DEBUG: Page display mode: ' + this.displayMode_);
 
   if ((this.displayMode_ == this.displayModes_.SLIDESHOW) && this.fileListContainer_) {
     var fileList = new jcd.FileList(this.fileListContainer_);
@@ -865,11 +866,11 @@ jcd.Page.prototype.init_ = function() {
   } else if (this.displayMode_ == this.displayModes_.SINGLE) {
     jcd.utils.addEvent(window, 'load', this.cacheNextPrev.bind(this));
   } else {
-    console.log('DEBUG: Could not find #files.  Aborting slideshow.');
+    // DEBUG: Could not find #files = will not start slideshow.
   }
 
   // Insert Admin link
-  this.navElement_.appendChild(this.getAdminControl_());
+  this.footerEl_.appendChild(this.getAdminControl_());
 };
 
 

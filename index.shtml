@@ -285,8 +285,6 @@
     </span>
   </div-->
 
-  <script src="/jcdsee/jcdsee.js"></script>
-
   <div id="footer">
     <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="Creative Commons license">
       <img alt="Creative Commons License" src="/jcdsee/icon_copyleft.png">
@@ -305,6 +303,8 @@
       </div>
     </div>
   </div>
+
+  <script src="/jcdsee/jcdsee.js"></script>
 
   <script type="text/javascript">
     <!--#include virtual="/jcdsee/jcdsee.home.inc.js" -->

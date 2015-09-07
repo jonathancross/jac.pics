@@ -908,9 +908,6 @@ if (${ERROR}) {
     $TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
 
     print '
-
-    <script src="'.${assets_root}.'/jcdsee.js"></script>
-
     <div id="footer">
       <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
         <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
@@ -927,6 +924,8 @@ if (${ERROR}) {
         .'
       </div>
     </div>
+
+    <script src="'.${assets_root}.'/jcdsee.js"></script>
   </body>
 </html>
 ';

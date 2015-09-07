@@ -52,19 +52,17 @@ DIV#email IMG         {padding:5px;}
   }
 
   #admin-button {
+    bottom: 0;
     height: 7px;
-    left: 0;
-    opacity: .7;
     position: absolute;
+    right: 0;
     width: 7px;
-    top: 0;
     z-index: 999;
   }
 
   #admin-button:hover {
     cursor: pointer;
     background: red;
-    opacity: 1;
   }
 
   /* Table columns. */
