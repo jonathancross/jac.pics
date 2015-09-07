@@ -95,6 +95,13 @@ DIV#email IMG         {padding:5px;}
     text-align: left;
   }
 
+  /* Fancy hover and keyboard navigation for icons when on a desktop computer.  Disabled later for mobile / tablet. */
+
+  .col-description a:focus .file-name {
+    color: blue;
+    text-decoration: underline;
+  }
+
   a .picture-icon {
     border: 1px solid #888;
     opacity: .95;
@@ -105,7 +112,17 @@ DIV#email IMG         {padding:5px;}
     opacity: 1;
   }
 
-  /* Perhaps .picture icon should be named "picture" here? Or we could remove the class for #mode-single. */
+  /* Handle built-in icons and thumbnail photos. */
+  .picture-icon-container a:focus img,
+  .col-picture a:focus img,
+  a:focus .picture-icon {
+    background-color: rgba(0, 0, 255, .3);
+    border-color: blue;
+    opacity: 1;
+    outline: 1px solid blue;
+  }
+
+  /* Perhaps .picture-icon should be named "picture" here? Or we could remove the class for #mode-single. */
   #mode-single .large-picture-wrapper .picture-icon {
     border: none;
     opacity: 1;
@@ -581,16 +598,16 @@ DIV#email IMG         {padding:5px;}
 
   /* List mode file name formatting. */
 
-  #mode-list .file-name {
+  .col-description a .file-name {
     color: #555;
     font-weight: 600;
   }
 
-  #mode-list .file-description:before {
+  .col-description .file-description:before {
     content: ' - ';
   }
 
-  #mode-list .file-date {
+  .col-description .file-date {
     color: #999;
     margin-right: 2px;
   }
@@ -700,6 +717,12 @@ DIV#email IMG         {padding:5px;}
   #footer {
     background-color: rgba(0, 0, 0, .6);
     opacity: .8;
+  }
+
+  /* Disable the hover effect for mobile. */
+  a .picture-icon {
+    border-color: #222;
+    opacity: 1;
   }
 
   #usage {
