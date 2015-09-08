@@ -17,7 +17,7 @@ my $VERSION = '2.0.1';
 #  - Allow in-browser editing of descriptions.
 #  - Non-destructive folder "refresh" when files are added or removed.
 #
-###############################################################################
+################################################################################
 
 use strict;
 use Image::Magick;
@@ -38,7 +38,7 @@ if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
   print "\nDEBUG MODE - Version: $VERSION\n\n";
 }
 
-# GLOBAL VARIABLES ==================================================================================================
+# GLOBAL VARIABLES #############################################################
 # DIRECTORY LIST ARRAYS
 my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
 my ${tmp};
@@ -82,8 +82,9 @@ my %IMAGE = (
   max_height        => 0       #Max height placeholder
 );
 
-#DISPLAY STATE VARS
+# DISPLAY STATE VARS
 my %STATE = (
+  database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
   web_dir           => '', # The path from the webserver document root.
   web_dir_encoded   => '', # The path from the webserver document root. (URL encoded)
@@ -104,7 +105,7 @@ my %STATE = (
   pic_previous_idx  => 0,
   pic_cur_number    => 0,
   pic_previous_file => '',
-  pic_cur_file      => '',
+  pic_cur_file      => '', # Filename of the currently selected image.
   pic_next_file     => '',
 );
 my %DEFAULTS = (
@@ -114,7 +115,6 @@ my %DEFAULTS = (
 
 # LOAD / SET PARAMS & DEFAULTS
 $STATE{'display_mode'} = param('display_mode');
-$STATE{'pic_cur_file'} = (param('pic_cur_file'))? param('pic_cur_file') : '';
 $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 
 # CURRENT URL FROM PARAM -OR- PATH
@@ -122,7 +122,6 @@ $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 # Deprecated old params: 'cur_url' and 'pic'.
 if (param('cur_url') || param('pic')) {
   $STATE{'is_deprecated_param'} = 1;
-
   if (param('cur_url')) {
     $STATE{'web_dir'} = param('cur_url');
     $STATE{'web_dir'} =~ s:[^/]$:$&\/:;
@@ -140,6 +139,7 @@ if (param('cur_url') || param('pic')) {
 if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
+  # TODO: If there are any images in this dir, use first file per issue #17.
   if ($2) {
     $STATE{'pic_cur_file'} = $2;
     $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'SINGLE';
@@ -173,6 +173,14 @@ if (${COMMANDLINE}) {
   print "Content-type: text/html\n\n";
   #die; #die "404 Not Found\nYour requested folder $STATE{'web_dir'} is not found\n";
 }
+
+$STATE{'database_file'} = $STATE{'server_dir'}.'.jcdsee'; # TODO: Put into STATE.
+
+# Build the list of files.
+# TODO: Move this earlier, but need to refactor so $STATE{'server_dir'} is defined earlier.
+buildDirList();
+
+
 $STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title of the page
 
 # FIGURE OUT IF ALL SETTINGS ARE THE DEFAULT
@@ -207,58 +215,60 @@ my ${icon_folder} = "${assets_root}/icon_folder$STATE{'prefix_cur'}png";
 my ${icon_music} = "${assets_root}/icon_music$STATE{'prefix_cur'}png";
 my ${icon_doc} = "${assets_root}/icon_doc$STATE{'prefix_cur'}png";
 my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
-my ${database_file} = $STATE{'server_dir'}.'.jcdsee'; #SHOULD BE PUT INTO STATE
 
-# BEGIN FUNCTIONS ============================================================================
 
+# Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
+#   buildDirList()
 sub buildDirList {
   my @database_raw = 'null';
   my @dir_list_raw = 'null';
-  # TODO: Add param that allows to "refresh" the database with items newly added to the folder
-  if (! -e ${database_file}) {
+  # TODO: Add param that allows to "refresh" the database with items newly added to the folder.
+  if (! -e $STATE{'database_file'}) {
     opendir(DIR, $STATE{'server_dir'}) or die "Cant open this directory: \"$STATE{'server_dir'}\".";
     @dir_list_raw = readdir DIR;
     closedir(DIR);
-    open(DATA,">>${database_file}") or die "Cant open file: \"${database_file}\".";
+    open(DATA, ">>$STATE{'database_file'}") or die "Cant open file: \"$STATE{'database_file'}\".";
     # Filter the list to remove thumbnail images, hidden files and the stub script.
     foreach my ${line} (sort @dir_list_raw) {
-      #Filter out the muck
-      if ( ${line} !~ /^[.]|${script_name}/ ) {
+      # Filter out current script name and / or dot files.
+      if (${line} !~ /^[.]|${script_name}/) {
         print DATA "${line}|\n";
       }
     }
     close(DATA);
   }
-  open(DATA, ${database_file}) or die "Content-type: html/text\n\nCant open file: \"${database_file}\".";
+  open(DATA, $STATE{'database_file'}) or die "Content-type: html/text\n\nCant open file: \"$STATE{'database_file'}\".";
   @database_raw = <DATA>;
   close(DATA);
-  #PROCESS THE LIST
-  my ${i} = 0;
-  my ${j} = 0;
-  # Fill file info arrays from data
+  # PROCESS THE LIST
+  my ${i} = 0; # TODO: Rename to img_count
+  my ${j} = 0; # TODO: Rename to file_count
+  # Fill file info arrays from data.
   foreach my ${line} (@database_raw){
     chop(${line});
+    # TODO: Allow first line to contain meta data?
     my($file_name, $description) = split(/[|]/, $line);
     if (${file_name} ne '') {
-      if ( ${file_name} =~ /[.](jp[e]?g|gif|png)$/i) { #File is an image
+      if ( ${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
+        # Picture
         $image_array[${i}] = ${file_name};
         $image_hash{${file_name}} = ${i};
         $file_types{${file_name}} = 'pic';
         ${i}++;
       } elsif ( -d "$STATE{'server_dir'}${file_name}") {
-        #Folder
+        # Folder
         $file_types{${file_name}} = 'folder';
       } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
-        #Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
+        # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
         $file_types{${file_name}} = 'music';
       #} elsif (${file_name} =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
       # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
       # $file_types{${file_name}} = 'video';
       } elsif (${file_name} =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
-        #Text Document (pdf,doc,txt,htm,html,nfo,css,js)
+        # Text Document (pdf,doc,txt,htm,html,nfo,css,js)
         $file_types{${file_name}} = 'doc';
       } else {
-        #Unknown file
+        # Unknown file
         $file_types{${file_name}} = 'unknown';
       }
       $dir_list[${j}] = ${file_name};
@@ -268,7 +278,7 @@ sub buildDirList {
   }
 }
 
-#   createImageThumbnail creates thumbs
+# Creates a thumbnail image.
 #   createImageThumbnail("source", "destination thumb")
 sub createImageThumbnail {
   my ${image_source} = $_[0];
@@ -288,7 +298,7 @@ sub createImageThumbnail {
   @${image_obj} = (); # Clear memory
 }
 
-#   getImageTag returns an <img> tag. Will create thumbs if necessary.
+# Returns an <img> tag. Will create thumbs if necessary.
 #   getImageTag("file name without path","prefix for image")
 sub getImageTag {
   my (${image_obj},${border},${alt});
@@ -310,7 +320,7 @@ sub getImageTag {
   return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
 
-#   getCurrentPageTitle() returns a SEO title for the current page which is reverse of path.
+# Returns a SEO title for the current page which is reverse of path.
 #   getCurrentPageTitle("url")
 sub getCurrentPageTitle {
   my $path = $_[0];
@@ -325,7 +335,7 @@ sub getCurrentPageTitle {
   return $path;
 }
 
-#   getNiceFilename returns a string representing a filename with date prefix removed + dash, underscore replaced with space.
+# Returns a string representing a filename with date prefix removed + dash, underscore replaced with space.
 #   getNiceFilename("filename")
 sub getNiceFilename {
   my $fn = $_[0];
@@ -337,7 +347,7 @@ sub getNiceFilename {
   return $fn;
 }
 
-#   removeDatePrefix returns a string representing a filename with date prefix removed
+# Returns a string representing a filename with date prefix removed.
 #   removeDatePrefix("filename")
 sub removeDatePrefix {
   my $fn = $_[0];
@@ -345,7 +355,7 @@ sub removeDatePrefix {
   return $fn;
 }
 
-#   removeNumberPrefix returns a string representing a filename with numbered prefix removed
+# Returns a string representing a filename with numbered prefix removed.
 #   removeNumberPrefix("filename")
 sub removeNumberPrefix {
   my $fn = $_[0];
@@ -353,7 +363,7 @@ sub removeNumberPrefix {
   return $fn;
 }
 
-#   removeFileExtension returns a string representing a filename with the file extension removed
+# Returns a string representing a filename with the file extension removed.
 #   removeFileExtension("filename")
 sub removeFileExtension {
   my $fn = $_[0];
@@ -361,7 +371,7 @@ sub removeFileExtension {
   return $fn;
 }
 
-#   getSitemapData returns a piece of data from the sitemap XML database based on the "item" (pageDescription|pageDate|pageSize).
+# Returns a piece of data from the sitemap XML database based on the "item" (pageDescription|pageDate|pageSize).
 #   getSitemapData("databaseItem")
 sub getSitemapData {
   my $item=$_[0];
@@ -371,7 +381,7 @@ sub getSitemapData {
   return $string;
 }
 
-#   getTitle returns an html formatted string representing the filename passed in
+# Returns an html formatted string representing the filename passed in.
 #   getTitle("file name to be parsed")
 sub getTitle {
   #remove numbered prefix, extension and convert  _  into spaces.
@@ -422,8 +432,8 @@ sub getHREF {
   my ${action} = $_[0];
   my ${value} = $_[1];
   my ${HREF};
-  #my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'web_dir'} ;
-  #BASE SCRIPT NAME
+  # my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'web_dir'} ;
+  # BASE SCRIPT NAME
   if (${action} eq 'dir') {
     # Special case for dir when we can dump display_mode setting
     ${HREF} = "${value}";
@@ -435,7 +445,7 @@ sub getHREF {
   } else {
     ${HREF} = "${script_url}?";
   }
-  #SET URL PARAM
+  # SET URL PARAM
   if (${action} eq 'pic') {
     ${HREF} .= "pic=$STATE{'web_dir'}${value}";
   } elsif (${action} eq 'display_mode') {
@@ -443,7 +453,7 @@ sub getHREF {
   } elsif (${action} eq 'dir') {
     ${HREF} .= "cur_url=${value}";
   }
-  #DISPLAY MODE PARAM
+  # DISPLAY MODE PARAM
   if (${action} ne 'pic' && ${action} ne 'dir') { #for 'pic' and 'dir' we have pre-defined display modes so they are excluded here
     if (${action} eq 'display_mode') {
       ${HREF} .= "${amp}display_mode=${value}";
@@ -456,12 +466,12 @@ sub getHREF {
 }
 
 # Functions for file type booleans
-#   isFileType ("file name", "type")
+#   isFileType("file name", "type")
 sub isFileType {
   return ($file_types{$_[0]} eq $_[1]) ? 1 : 0;
 }
 
-#   getDepthPath ()
+#   getDepthPath()
 sub getDepthPath {
   my @directories = split('/', $STATE{'web_dir'});
   my $last_directory = pop @directories;
@@ -568,6 +578,7 @@ sub getNavButton {
 }
 
 # Dump out the simple image list & create thumbnails as needed - main loop
+#   commandLineMakeThumbs()
 sub commandLineMakeThumbs {
   foreach my ${image_name} (@image_array) {
     my ${image_source} = $STATE{'server_dir'}.${image_name};
@@ -747,7 +758,7 @@ sub dumpDirList {
 }
 
 
-# This function figures out the page context, setting, etc. based on the current url.
+# This function figures out the page context, settings, etc. based on the current url.
 #   calculateImageListState()
 sub calculateImageListState {
   if (@image_array > 0) {
@@ -786,7 +797,6 @@ sub calculateImageListState {
 }
 
 # GET READY TO PARTY!
-buildDirList();
 calculateImageListState();
 
 if (${COMMANDLINE}) {
