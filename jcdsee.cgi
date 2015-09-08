@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-my $VERSION = '2.0.0';
+my $VERSION = '2.0.1';
 #
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
@@ -33,7 +33,7 @@ $TIMER{'total_s'} = gettimeofday();
 
 # Allow command line execution / debugging
 my ${COMMANDLINE} = 0;
-if ( defined($ARGV[0]) && ($ARGV[0] eq "debug") ) {
+if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
   ${COMMANDLINE} = 1;
   print "\nDEBUG MODE - Version: $VERSION\n\n";
 }
@@ -49,8 +49,8 @@ my ${root} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
 my ${pic_root} = '/pics';
 my ${assets_root} = '/jcdsee'; #folder containing assets used by this script. (icons, buttons, css, etc)
 my ${script_name} = 'jcdsee.cgi'; #Name of the stub script, we need this so we don't show it in the dir listing.
-my ${script_url}  = "/${script_name}"; # The main script URL used by links.  Because we name it "index.cgi", we can just use a question mapk after folder name.  This one is always used unless user hits a folder directly.
-my ${test_url}    = "test"; # Special test mode staging url
+my ${script_url} = "/${script_name}"; # The main script URL used by links.  Because we name it "index.cgi", we can just use a question mapk after folder name.  This one is always used unless user hits a folder directly.
+my ${test_url} = 'test'; # Special test mode staging url
 my ${title_char} = ' : ';
 my $amp='&amp;';
 # XML / XSL objects
@@ -63,33 +63,31 @@ if (! -f $xsl_file) { return "lost xsl: $xsl_file"; }
 my $sitemap = $XMLparser->parse_file($xml_sitemap_file);
 my $style_doc = $XMLparser->parse_file($xsl_file);
 my $stylesheet = $xslt->parse_stylesheet($style_doc);
-# ONE STEP
-# my $stylesheet = $xslt->parse_stylesheet_file($xsl_file);
-
 
 # CONSTANTS FOR IMAGE PROCESSING
 my %IMAGE_GLOBAL = (
-  thumb_quality => 80,     #Thumbnail jpeg quality
-  max_width_small => 50,   #Max width of small thumbs
-  max_width_large => 400,  #Max width of large thumbs
-  max_height_small => 50,   #Max height of small thumbs
-  max_height_large => 140,  #Max height of large thumbs
-  prefix_small  => '.S.',  #File name prefix to use for Small generated thumbnail images
-  prefix_large  => '.L.',  #File name prefix to use for Large generated thumbnail images
-  thumb_ext     => '.jpg' #File extension of generated thumbnail images
+  thumb_quality     => 80,     # Thumbnail jpeg quality
+  max_width_small   => 50,     # Max width of small thumbs
+  max_width_large   => 400,    # Max width of large thumbs
+  max_height_small  => 50,     # Max height of small thumbs
+  max_height_large  => 140,    # Max height of large thumbs
+  prefix_small      => '.S.',  # File name prefix to use for Small generated thumbnail images
+  prefix_large      => '.L.',  # File name prefix to use for Large generated thumbnail images
+  thumb_ext         => '.jpg'  # File extension of generated thumbnail images
 );
 
 # VARS FOR CURRENT IMAGE PROCESSING STATE, PERHAPS SHOULD BE MOVED TO %STATE ?
 my %IMAGE = (
-  max_width     => 0,      #Max width placeholder
-  max_height    => 0       #Max height placeholder
+  max_width         => 0,      #Max width placeholder
+  max_height        => 0       #Max height placeholder
 );
 
 #DISPLAY STATE VARS
 my %STATE = (
-  dir               => '', # Full server path to the folder being listed.
-  url               => '', # The path from the webserver document root.
-  url_encoded       => '', # The path from the webserver document root. (URL encoded)
+  server_dir        => '', # Full server path to the folder being listed.
+  web_dir           => '', # The path from the webserver document root.
+  web_dir_encoded   => '', # The path from the webserver document root. (URL encoded)
+  is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
   title             => 'Jonathan Cross', # Document title base
   cur_dir_name      => '', # Will have only the name of the current directory (no slashes)
   display_mode      => '', # Display mode (SINGLE|LIST|THUMBS|SLIDESHOW) Default=LIST
@@ -117,41 +115,52 @@ my %DEFAULTS = (
 # LOAD / SET PARAMS & DEFAULTS
 $STATE{'display_mode'} = param('display_mode');
 $STATE{'pic_cur_file'} = (param('pic_cur_file'))? param('pic_cur_file') : '';
-#Make sure pic_cur_idx is a normal number, otherwise set to 0
-$STATE{'pic_cur_idx'} = ( param('pic_cur_idx') =~ /^[0-9]+$/ ) ? int(param('pic_cur_idx')) : 0;
 $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 
 # CURRENT URL FROM PARAM -OR- PATH
+
+if (param('cur_url') || param('pic')) {
+  $STATE{'is_deprecated_param'} = 1;  
+}
+
+# New 'path' param to replace 'pic' and 'cur_url'.
+if (param('path') && (param('path') =~ m:(.*/)(.*):) ) {
+  $STATE{'is_deprecated_param'} = 0;
+  $STATE{'web_dir'} = $1;
+  $STATE{'pic_cur_file'} = $2;
+  $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
+}
+
 if (param('cur_url')) {
-  $STATE{'url'} = param('cur_url');
-  $STATE{'url'} =~ s:[^/]$:$&/:;
+  $STATE{'web_dir'} = param('cur_url');
+  $STATE{'web_dir'} =~ s:[^/]$:$&/:;
   $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'LIST';
 } elsif (param('pic') && (param('pic') =~ m:(.*/)(.*):) ) {
   #get folder url from the pic param
-  $STATE{'url'} = $1;
+  $STATE{'web_dir'} = $1;
   $STATE{'pic_cur_file'} = $2;
   $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
 } else {
-  $STATE{'url'} = $ENV{REQUEST_URI};
-  $STATE{'url'} =~ s/%20/ /g;
+  $STATE{'web_dir'} = $ENV{REQUEST_URI};
+  $STATE{'web_dir'} =~ s/%20/ /g;
   $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'LIST';
 }
 if (${COMMANDLINE}) {
-  $STATE{'url'} = (${ARGV[1]}) ? ${ARGV[1]} : "${root}${pic_root}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
-  $STATE{'dir'} = $STATE{'url'};
+  $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${root}${pic_root}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
+  $STATE{'server_dir'} = $STATE{'web_dir'};
   $STATE{'display_mode'} = ${ARGV[2]};
   $STATE{'pic_cur_idx'} = int(${ARGV[3]});
-} elsif ($STATE{'url'} =~ m:^/: && $STATE{'url'} !~ m:/[.][.]: && -d $ENV{DOCUMENT_ROOT}.$STATE{'url'}){ # Have to validate the directory for security reasons
-  $STATE{'dir'} = $ENV{DOCUMENT_ROOT}.$STATE{'url'};
-  $STATE{'cur_dir_name'} = $STATE{'url'};
+} elsif ($STATE{'web_dir'} =~ m:^/: && $STATE{'web_dir'} !~ m:/[.][.]: && -d $ENV{DOCUMENT_ROOT}.$STATE{'web_dir'}){ # Have to validate the directory for security reasons
+  $STATE{'server_dir'} = $ENV{DOCUMENT_ROOT}.$STATE{'web_dir'};
+  $STATE{'cur_dir_name'} = $STATE{'web_dir'};
   $STATE{'cur_dir_name'} =~ s:^.*/([^/]+)/:$1:; #get last dir name from the url and remove all slashes
 } else {
   # File not found error.
   print "HTTP/1.1 404 Not Found\n";
   print "Content-type: text/html\n\n";
-  #die; #die "404 Not Found\nYour requested folder $STATE{'url'} is not found\n";
+  #die; #die "404 Not Found\nYour requested folder $STATE{'web_dir'} is not found\n";
 }
-$STATE{'title'} = getCurrentPageTitle($STATE{'url'}); # Figure out the title of the page
+$STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title of the page
 
 # FIGURE OUT IF ALL SETTINGS ARE THE DEFAULT
 while ((my $key, my $value) = each(%DEFAULTS)) {
@@ -185,7 +194,7 @@ my ${icon_folder} = "${assets_root}/icon_folder$STATE{'prefix_cur'}png";
 my ${icon_music} = "${assets_root}/icon_music$STATE{'prefix_cur'}png";
 my ${icon_doc} = "${assets_root}/icon_doc$STATE{'prefix_cur'}png";
 my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
-my ${database_file} = $STATE{'dir'}.'.jcdsee'; #SHOULD BE PUT INTO STATE
+my ${database_file} = $STATE{'server_dir'}.'.jcdsee'; #SHOULD BE PUT INTO STATE
 
 # BEGIN FUNCTIONS ============================================================================
 
@@ -194,7 +203,7 @@ sub buildDirList {
   my @dir_list_raw = 'null';
   # TODO: Add param that allows to "refresh" the database with items newly added to the folder
   if (! -e ${database_file}) {
-    opendir(DIR, $STATE{'dir'}) or die "Cant open this directory: \"$STATE{'dir'}\".";
+    opendir(DIR, $STATE{'server_dir'}) or die "Cant open this directory: \"$STATE{'server_dir'}\".";
     @dir_list_raw = readdir DIR;
     closedir(DIR);
     open(DATA,">>${database_file}") or die "Cant open file: \"${database_file}\".";
@@ -223,7 +232,7 @@ sub buildDirList {
         $image_hash{${file_name}} = ${i};
         $file_types{${file_name}} = 'pic';
         ${i}++;
-      } elsif ( -d "$STATE{'dir'}${file_name}") {
+      } elsif ( -d "$STATE{'server_dir'}${file_name}") {
         #Folder
         $file_types{${file_name}} = 'folder';
       } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
@@ -273,14 +282,14 @@ sub getImageTag {
   my ${image_name} = $_[0];
   my ${image_prefix} = $_[1];
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
-  my ${image_thumb} = $STATE{'dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
-  my ${image_thumb_url} = $STATE{'url'}.${image_thumb_name}; #Image url for browser
+  my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+  my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; #Image url for browser
   # Make a Thumbnail if necessary
   # Datestamp isn't really important so i'm removing test to speed up display in 99% of cases
   # if ( ! (-e ${image_thumb}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb}))[9])) ) {
   if ($STATE{'prefix_cur'} && ! (-e ${image_thumb})) {
     #Make a thumbnail of the image
-    my ${image_source} = $STATE{'dir'}.${image_name};
+    my ${image_source} = $STATE{'server_dir'}.${image_name};
     createImageThumbnail(${image_source}, ${image_thumb});
   }
   $image_thumb_url = escapeURL($image_thumb_url);
@@ -343,7 +352,7 @@ sub removeFileExtension {
 #   getSitemapData("databaseItem")
 sub getSitemapData {
   my $item=$_[0];
-  my $results = $stylesheet->transform($sitemap, NAME => "'$item'", VALUE => "'$STATE{'url_encoded'}'");
+  my $results = $stylesheet->transform($sitemap, NAME => "'$item'", VALUE => "'$STATE{'web_dir_encoded'}'");
   my $string = $stylesheet->output_string($results);
   chomp($string);
   return $string;
@@ -400,7 +409,7 @@ sub getHREF {
   my ${action} = $_[0];
   my ${value} = $_[1];
   my ${HREF};
-  #my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'url'} ;
+  #my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'web_dir'} ;
   #BASE SCRIPT NAME
   if (${action} eq 'dir') {
     # Special case for dir when we can dump display_mode setting
@@ -408,16 +417,16 @@ sub getHREF {
     return ${HREF};
   } elsif (${action} eq 'dispaly_mode' && ${value} eq $DEFAULTS{'display_mode'}) {
     # Special case when button turns it into the default
-    ${HREF} = "$STATE{'url'}";
+    ${HREF} = "$STATE{'web_dir'}";
     return ${HREF};
   } else {
     ${HREF} = "${script_url}?";
   }
   #SET URL PARAM
   if (${action} eq 'pic') {
-    ${HREF} .= "pic=$STATE{'url'}${value}";
+    ${HREF} .= "pic=$STATE{'web_dir'}${value}";
   } elsif (${action} eq 'display_mode') {
-    ${HREF} .= "pic=$STATE{'url'}$STATE{'pic_cur_file'}";
+    ${HREF} .= "pic=$STATE{'web_dir'}$STATE{'pic_cur_file'}";
   } elsif (${action} eq 'dir') {
     ${HREF} .= "cur_url=${value}";
   }
@@ -441,13 +450,13 @@ sub isFileType {
 
 #   getDepthPath ()
 sub getDepthPath {
-  my @directories = split('/', $STATE{'url'});
+  my @directories = split('/', $STATE{'web_dir'});
   my $last_directory = pop @directories;
   my $depth_path = '<li><a href="/">home</a></li>';
 
   foreach my ${path} (@directories) {
     if (${path} ne '/') {
-      $STATE{'url'} =~ m:(^/${path}/|^/.+/${path}/):;
+      $STATE{'web_dir'} =~ m:(^/${path}/|^/.+/${path}/):;
       if (${1} ne '') {
         my $itemTitle = getNiceFilename(${path});
         $depth_path .= '
@@ -486,12 +495,12 @@ sub getIcon {
     ${link_content} = getImageTag(${file_name},$STATE{'prefix_cur'});
   } else {
     #we can create and upload a static thumbnail icon for any filetype... will replace default question mark
-    my ${static_thumbnail_path} = $STATE{'dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+    my ${static_thumbnail_path} = $STATE{'server_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
     #Use built-in icon
          if (isFileType(${file_name},'folder')) { ${icon_file} = ${icon_folder};
     } elsif (isFileType(${file_name},'doc')) {    ${icon_file} = ${icon_doc};
     } elsif (isFileType(${file_name},'music')) {  ${icon_file} = ${icon_music};
-    } elsif (-e ${static_thumbnail_path}) {       ${icon_file} = $STATE{'url'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+    } elsif (-e ${static_thumbnail_path}) {       ${icon_file} = $STATE{'web_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
     } else {                                      ${icon_file} = ${icon_unknown};
     }
     ${link_content} = "<img src=\"${icon_file}\" alt=\"${desc}\">";
@@ -514,13 +523,13 @@ sub getLinkTag {
   }
   if (isFileType(${file_name},'folder')) {
     #Folder
-    ${link_tag} = "<a href=\"".getHREF('dir',"$STATE{'url'}${file_name}")."\" class=\"${class}\" title=\"${desc}\">${link_content}</a>\n";
+    ${link_tag} = "<a href=\"".getHREF('dir',"$STATE{'web_dir'}${file_name}")."\" class=\"${class}\" title=\"${desc}\">${link_content}</a>\n";
   } elsif (isFileType(${file_name},'pic')) {
     #Image
     ${link_tag} = "<a href='".getHREF('pic',${file_name})."' class='${class}' title='${desc}'>".${link_content}.'</a>';
   } else {
     # Music, text or other.  Just link to the file
-    ${link_tag} = "<a href='$STATE{'url'}${file_name}' class='${class}' title='${desc}'>${link_content}</a>\n";
+    ${link_tag} = "<a href='$STATE{'web_dir'}${file_name}' class='${class}' title='${desc}'>${link_content}</a>\n";
   }
   return ${link_tag};
 }
@@ -548,12 +557,12 @@ sub getNavButton {
 # Dump out the simple image list & create thumbnails as needed - main loop
 sub commandLineMakeThumbs {
   foreach my ${image_name} (@image_array) {
-    my ${image_source} = $STATE{'dir'}.${image_name};
+    my ${image_source} = $STATE{'server_dir'}.${image_name};
     print "  + ${image_source} : ";
     # Create small and large thumbnails as needed
     foreach my ${size} ('small', 'large') {
       my ${image_thumb_name} = $IMAGE_GLOBAL{'prefix_'.$size}.${image_name}.$STATE{'thumb_ext_cur'};
-      my ${image_thumb} = $STATE{'dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+      my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
       print " [${size} :";
       # Make a Thumbnail if necessary
       if (! -e ${image_thumb}) {
@@ -605,7 +614,7 @@ sub dumpDirList {
   if ($STATE{'display_mode'} =~ /^(LIST|THUMBS)$/) {
     foreach ${file_name} (@dir_list) {
       ${file_size} = '';
-      @file_info = stat $STATE{'dir'}.${file_name};
+      @file_info = stat $STATE{'server_dir'}.${file_name};
       #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
       # Not used anymoer... ${is_dir} = S_ISDIR(${file_info[2]});
       if ($STATE{'display_mode'} eq 'LIST') {
@@ -669,13 +678,13 @@ sub dumpDirList {
       </h3>
 
       <a class='picture-link previous' title='Previous image' href='".getHREF('pic',$STATE{'pic_previous_file'})."'>
-        <img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'url'}$STATE{'pic_previous_file'}' alt='' id='PREVIOUS'>
+        <img src='$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'web_dir'}$STATE{'pic_previous_file'}' alt='' id='PREVIOUS'>
       </a>
       <a class='picture-link large-picture-wrapper' href='".getHREF('display_mode','SLIDESHOW')."' title='Slideshow...'>"
         .getImageTag(${file_name},'')."
       </a>
       <a class='picture-link next' title='Next image' href='".getHREF('pic',$STATE{'pic_next_file'})."'>
-        <img src='$STATE{'url'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'url'}$STATE{'pic_next_file'}' alt='' id='NEXT'>
+        <img src='$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'web_dir'}$STATE{'pic_next_file'}' alt='' id='NEXT'>
       </a>
       ";
     }
@@ -688,7 +697,7 @@ sub dumpDirList {
     if (${file_name}) {
       foreach ${file_name} (@dir_list) {
         ${file_size} = '';
-        @file_info = stat $STATE{'dir'}.${file_name};
+        @file_info = stat $STATE{'server_dir'}.${file_name};
         #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
         # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
 
@@ -709,7 +718,7 @@ sub dumpDirList {
         # TODO: data-width and data-height
         print '
         <li>
-          <a href="'.$STATE{'url'}.${file_name}.'" class="filename" data-selected="'.${is_selected}.'" data-file-type="'.${file_type}.'" data-size="'.${file_size}.'">'
+          <a href="'.$STATE{'web_dir'}.${file_name}.'" class="filename" data-selected="'.${is_selected}.'" data-file-type="'.${file_type}.'" data-size="'.${file_size}.'">'
           .getTitle(${file_name})
           .'</a>
           <div>'.$file_descriptions{$file_name}.'</div>
@@ -732,11 +741,11 @@ sub calculateImageListState {
     $STATE{'pic_last_idx'}         = $#{image_array};
     $STATE{'pic_array_length'}     = $STATE{'pic_last_idx'} + 1;
     if ($STATE{'pic_cur_file'}){
-      if ( "$image_hash{ $STATE{'pic_cur_file'} }" ne "" ){
+      if ( "$image_hash{ $STATE{'pic_cur_file'} }" ne '' ){
         $STATE{'pic_cur_idx'} = $image_hash{ $STATE{'pic_cur_file'} };
       } else {
-        $ERROR=1;
-        $DUMP.="DID NOT FIND '$STATE{'pic_cur_file'}' IN THE LIST!<br>";
+        $ERROR = 1;
+        $DUMP .= "DID NOT FIND '$STATE{'pic_cur_file'}' IN THE LIST!<br>";
       }
     }
     $STATE{'pic_next_idx'}         = $STATE{'pic_cur_idx'} + 1;
@@ -758,8 +767,8 @@ sub calculateImageListState {
    }
   # Would be ideal if we didn't un-encode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
   # Problem is that there are several ways to get the 'url' (cur_url or directly from path if no mod_re-write)
-  $STATE{'url_encoded'} = $STATE{'url'};
-  $STATE{'url_encoded'} =~ s/ /%20/g;
+  $STATE{'web_dir_encoded'} = $STATE{'web_dir'};
+  $STATE{'web_dir_encoded'} =~ s/ /%20/g;
   $STATE{'page_description'} = stripHTML(getSitemapData('pageDescription'));
 }
 
@@ -792,98 +801,82 @@ print '<!DOCTYPE html>
 ';
 
 if ($STATE{'test_mode'}) {
-  # make it pink if in test mode
-  # DISABLED print "<style type='text/css'> body {border:1px solid red;background-color: pink;} </style>";
+  # Make it pink if in test mode.
+  print "<style type='text/css'> body {outline: 1px solid red;background-color: pink;} </style>";
 }
 
 print '
   </head>
-  <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'url'}.'">';
-#  <noscript>
-#      ";
-#  foreach my ${file_name} (@image_array) {
-#    print '<a href="'.$STATE{'url'}.${file_name}.'">'.${file_name};
-#    if ($file_descriptions{${file_name}}) {
-#      print ' - '.stripHTML($file_descriptions{${file_name}});
-#    }
-#    print "</a>";
-#  }
-#  </noscript>
+  <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
 
-print '
-
-  <div id="nav">
-    <ul id="depth-path">'
-      .getDepthPath().'
-    </ul>
-    <div id="mode-buttons">'
-      .getNavButton("display_mode","LIST","LIST MODE")
-      .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
-      .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
-      .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
-      .'
+    <div id="nav">
+      <ul id="depth-path">'
+        .getDepthPath().'
+      </ul>
+      <div id="mode-buttons">'
+        .getNavButton("display_mode","LIST","LIST MODE")
+        .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
+        .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
+        .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
+        .'
+      </div>
     </div>
-  </div>
 
-  <div id="content">
-    <div>';
-      # Show warning if trying to access slideshow without JS.
-      if ($STATE{'display_mode'} eq 'SLIDESHOW') {
-        print '
-        <noscript>
-          <h1>JavaScript is disabled</h1>
-          <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
-          <meta http-equiv="refresh" content="10; url='.getHREF('display_mode', 'SINGLE').'">
-        </noscript>
-        ';
-      }
+    <div id="content">
+      <div>';
+        # Show warning if trying to access slideshow without JS.
+        if ($STATE{'display_mode'} eq 'SLIDESHOW') {
+          print '
+          <noscript>
+            <h1>JavaScript is disabled</h1>
+            <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
+            <meta http-equiv="refresh" content="10; url='.getHREF('display_mode', 'SINGLE').'">
+          </noscript>
+          ';
+        }
 
-      # TODO: Use slideshow list instead of this table.
-      if ($STATE{'display_mode'} eq 'LIST') {
-        print '
-        <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
-      }
-      #CALL THE LOOP THAT RENDERS THE FILE LIST
-      dumpDirList();
-      #FINISH TABLE FOR LIST
-      if ($STATE{'display_mode'} eq 'LIST') {
-        print '
-        </table>
-        ';
-      }
+        # TODO: Use slideshow list instead of this table.
+        if ($STATE{'display_mode'} eq 'LIST') {
+          print '
+          <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
+        }
+        #CALL THE LOOP THAT RENDERS THE FILE LIST
+        dumpDirList();
+        #FINISH TABLE FOR LIST
+        if ($STATE{'display_mode'} eq 'LIST') {
+          print '
+          </table>
+          ';
+        }
 
-      print '
-      <!-- close #content div -->
+        print '
+        <!-- close #content div -->
+      </div>
     </div>
-  </div>
+    <!--
+      <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <Work rdf:about="">
+          <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.5/" />
+          <dc:title>Photography by Jonathan Cross</dc:title>
+          <dc:description>Various photos from around the world.</dc:description>
+          <dc:creator><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:creator>
+          <dc:rights><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:rights>
+          <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+          <dc:source rdf:resource="http://pics.jonathancross.com" />
+        </Work>
+        <License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.5/">
+          <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
+          <permits rdf:resource="http://web.resource.org/cc/Distribution"/>
+          <requires rdf:resource="http://web.resource.org/cc/Notice"/>
+          <requires rdf:resource="http://web.resource.org/cc/Attribution"/>
+          <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse"/>
+          <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
+          <requires rdf:resource="http://web.resource.org/cc/ShareAlike"/>
+        </License>
+      </rdf:RDF>
+    -->
 ';
-
-# CREATIVE COMMONS LICENSE
-print '
-<!--
-<rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <Work rdf:about="">
-    <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.5/" />
-    <dc:title>Photography by Jonathan Cross</dc:title>
-    <dc:description>Various photos from around the world.</dc:description>
-    <dc:creator><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:creator>
-    <dc:rights><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:rights>
-    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-    <dc:source rdf:resource="http://pics.jonathancross.com" />
-  </Work>
-  <License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.5/">
-    <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
-    <permits rdf:resource="http://web.resource.org/cc/Distribution"/>
-    <requires rdf:resource="http://web.resource.org/cc/Notice"/>
-    <requires rdf:resource="http://web.resource.org/cc/Attribution"/>
-    <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse"/>
-    <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
-    <requires rdf:resource="http://web.resource.org/cc/ShareAlike"/>
-  </License>
-</rdf:RDF>
--->
-';
-#DEBUG ERROR INFORMATION
+# DEBUG ERROR INFORMATION
 if (${ERROR}) {
   ${DUMP} .=  "FILE TYPES: \n";
   foreach my $k (sort keys %file_types) {
@@ -899,7 +892,7 @@ if (${ERROR}) {
   }
   print "
     <div style='margin-top:11px;width:560px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
-      <b style='font-size:10px;color:black;'>ERROR:</b><br />
+      <b style='font-size:10px;color:black;'>ERROR:</b><br>
       <pre>${DUMP}</pre>
     </div>";
 }
