@@ -190,7 +190,7 @@ if ($STATE{'display_mode'} eq 'THUMBS') {
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_large'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
 } elsif ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && $STATE{'pic_cur_file'}) { # Only allow SINGLE|SLIDESHOW if there is 1 or more images.
-  #do not prefix image name, use full-size image
+  # Do not prefix image name, use full-size image
   $STATE{'prefix_cur'} = '';
   $STATE{'thumb_ext_cur'} = '';
 } else {
@@ -915,7 +915,7 @@ if (${ERROR} || $STATE{'test_mode'}) {
 
     print '
     <div id="footer">
-      <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+      <a id="copyleft" rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
         <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
       </a>
       <div id="usage">

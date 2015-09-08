@@ -25,9 +25,7 @@ ErrorDocument 404 /error.html
 ErrorDocument 500 /error.html
 
 # Clean URLs
-# We use 'pic' param instead of 'cur_url' below because it accepts a file or folder.
 # TODO:
-#   #16 Add private 'path' parameter
 #   #17 Allow folder in SLIDESHOW and SINGLE modes
 #   #18 Rename display modes
 #       Will then be able combine last 4 rules into one.
@@ -43,7 +41,7 @@ ErrorDocument 500 /error.html
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ([^/])$ /$1/
   # DIRECTORY: Captures any real directory paths under /pics/ and converts to parameters.
-  RewriteRule ^(pics[^?]*)/$ /jcdsee.cgi?pic=/$1/ [qsappend,last]
+  RewriteRule ^(pics[^?]*)/$ /jcdsee.cgi?pic_path=/$1/ [qsappend,last]
 
   # Force trailing slash if there is no '.' in the final segment (meaning it ignores file names).
   # This works most of the time, but will not catch directories with a '.' in the name.
@@ -51,16 +49,16 @@ ErrorDocument 500 /error.html
   RewriteRule (.*/[^?.]+[^?/])$ /$1/ [redirect=301,last]
 
   # /thumb/ THUMBS display mode.
-  RewriteRule ^thumb/([^?]+)$ /jcdsee.cgi?pic=/$1&display_mode=THUMBS [qsappend,last]
+  RewriteRule ^thumb/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=THUMBS [qsappend,last]
 
   # /pic/ and /single/ SINGLE picture.
-  RewriteRule ^(pic|single)/([^?]+)$ /jcdsee.cgi?pic=/$2&display_mode=SINGLE [qsappend,last]
+  RewriteRule ^(pic|single)/([^?]+)$ /jcdsee.cgi?pic_path=/$2&display_mode=SINGLE [qsappend,last]
 
   # /slide/ SLIDESHOW display mode.
-  RewriteRule ^slide/([^?]+)$ /jcdsee.cgi?pic=/$1&display_mode=SLIDESHOW [qsappend,last]
+  RewriteRule ^slide/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=SLIDESHOW [qsappend,last]
 
   # /list/ LIST display mode, this one handles pictures, does not add trailing slash.
-  RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic=/$1&display_mode=LIST [qsappend,last]
+  RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=LIST [qsappend,last]
 
   # /jcdsee/ DIRECTORY: Prevent file listing here.
   RewriteRule ^(jcdsee/)$ / [redirect=301,last]
