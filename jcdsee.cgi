@@ -119,32 +119,45 @@ $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 
 # CURRENT URL FROM PARAM -OR- PATH
 
+# Deprecated old params: 'cur_url' and 'pic'.
 if (param('cur_url') || param('pic')) {
-  $STATE{'is_deprecated_param'} = 1;  
+  $STATE{'is_deprecated_param'} = 1;
+
+  if (param('cur_url')) {
+    $STATE{'web_dir'} = param('cur_url');
+    $STATE{'web_dir'} =~ s:[^/]$:$&\/:;
+    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'LIST';
+  } elsif (param('pic') && (param('pic') =~ m:(.*/)(.*):) ) {
+    # Get picture path from the pic param.
+    $STATE{'web_dir'} = $1;
+    $STATE{'pic_cur_file'} = $2;
+    $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
+  }
 }
 
-# New 'path' param to replace 'pic' and 'cur_url'.
-if (param('path') && (param('path') =~ m:(.*/)(.*):) ) {
+# New 'pic_path' param to replace 'pic' and 'cur_url'.
+# Will override others if specified.
+if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
-  $STATE{'pic_cur_file'} = $2;
-  $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
+  if ($2) {
+    $STATE{'pic_cur_file'} = $2;
+    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'SINGLE';
+  } else {
+    # Default to list because we don't have a file specified.
+    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'LIST';
+  }
 }
 
-if (param('cur_url')) {
-  $STATE{'web_dir'} = param('cur_url');
-  $STATE{'web_dir'} =~ s:[^/]$:$&/:;
-  $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'LIST';
-} elsif (param('pic') && (param('pic') =~ m:(.*/)(.*):) ) {
-  #get folder url from the pic param
-  $STATE{'web_dir'} = $1;
-  $STATE{'pic_cur_file'} = $2;
-  $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
-} else {
+# Use current URI for the path.  This should probably be deprecated as it was
+# used when we soft linked the CGI script into every folder. Now we just use
+# apache mod rewrite to send as param.
+if ($STATE{'web_dir'} eq '') {
   $STATE{'web_dir'} = $ENV{REQUEST_URI};
   $STATE{'web_dir'} =~ s/%20/ /g;
   $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'LIST';
 }
+
 if (${COMMANDLINE}) {
   $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${root}${pic_root}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
   $STATE{'server_dir'} = $STATE{'web_dir'};
@@ -153,7 +166,7 @@ if (${COMMANDLINE}) {
 } elsif ($STATE{'web_dir'} =~ m:^/: && $STATE{'web_dir'} !~ m:/[.][.]: && -d $ENV{DOCUMENT_ROOT}.$STATE{'web_dir'}){ # Have to validate the directory for security reasons
   $STATE{'server_dir'} = $ENV{DOCUMENT_ROOT}.$STATE{'web_dir'};
   $STATE{'cur_dir_name'} = $STATE{'web_dir'};
-  $STATE{'cur_dir_name'} =~ s:^.*/([^/]+)/:$1:; #get last dir name from the url and remove all slashes
+  $STATE{'cur_dir_name'} =~ s:^.*/([^/]+)/:$1:; # Get last dir name from the url and remove all slashes.
 } else {
   # File not found error.
   print "HTTP/1.1 404 Not Found\n";
@@ -170,7 +183,7 @@ while ((my $key, my $value) = each(%DEFAULTS)) {
   }
 }
 
-#DISPLAY MODE SETUP & DEFAULT
+# DISPLAY MODE SETUP & DEFAULT
 if ($STATE{'display_mode'} eq 'THUMBS') {
   $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normally all will have same height
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
@@ -876,8 +889,8 @@ print '
       </rdf:RDF>
     -->
 ';
-# DEBUG ERROR INFORMATION
-if (${ERROR}) {
+# DEBUG & ERROR INFORMATION
+if (${ERROR} || $STATE{'test_mode'}) {
   ${DUMP} .=  "FILE TYPES: \n";
   foreach my $k (sort keys %file_types) {
     ${DUMP} .= "  $k = $file_types{$k}\n";
@@ -891,7 +904,7 @@ if (${ERROR}) {
     ${DUMP} .= "  $k = $STATE{$k}\n";
   }
   print "
-    <div style='margin-top:11px;width:560px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
+    <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
       <b style='font-size:10px;color:black;'>ERROR:</b><br>
       <pre>${DUMP}</pre>
     </div>";
