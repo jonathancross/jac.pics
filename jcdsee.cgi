@@ -178,7 +178,7 @@ $STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
 buildDirList();
 
 # Assign a default image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
-if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && $#image_array) { 
+if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
 
