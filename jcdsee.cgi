@@ -44,15 +44,15 @@ my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
 my ${tmp};
 my ${DUMP} = '';
 my ${ERROR} = 0;
-my ${country_code} = (${COMMANDLINE}) ? 'none' : $ENV{'HTTP_CF_IPCOUNTRY'};
 my ${root} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
 my ${pic_root} = '/pics';
-my ${assets_root} = '/jcdsee'; #folder containing assets used by this script. (icons, buttons, css, etc)
-my ${script_name} = 'jcdsee.cgi'; #Name of the stub script, we need this so we don't show it in the dir listing.
-my ${script_url} = "/${script_name}"; # The main script URL used by links.  Because we name it "index.cgi", we can just use a question mapk after folder name.  This one is always used unless user hits a folder directly.
+my ${assets_root} = '/jcdsee'; # Folder containing assets used by this script. (icons, buttons, css, etc)
+my ${script_name} = 'jcdsee.cgi'; # Name of the stub script, we need this so we don't show it in the dir listing.
+my ${database_file_name} = '.jcdsee'; # Filename used for each folder's database.
+my ${script_url} = "/${script_name}"; # The main script URL used in links.
 my ${test_url} = 'test'; # Special test mode staging url
 my ${title_char} = ' : ';
-my $amp='&amp;';
+my $amp = '&amp;';
 # XML / XSL objects
 my $XMLparser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
@@ -84,6 +84,7 @@ my %IMAGE = (
 
 # DISPLAY STATE VARS
 my %STATE = (
+  country_code      => (${COMMANDLINE}) ? 'none' : $ENV{'HTTP_CF_IPCOUNTRY'},
   database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
   web_dir           => '', # The path from the webserver document root.
@@ -125,12 +126,12 @@ if (param('cur_url') || param('pic')) {
   if (param('cur_url')) {
     $STATE{'web_dir'} = param('cur_url');
     $STATE{'web_dir'} =~ s:[^/]$:$&\/:;
-    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'LIST';
+    $STATE{'display_mode'} ||= 'LIST';
   } elsif (param('pic') && (param('pic') =~ m:(.*/)(.*):) ) {
     # Get picture path from the pic param.
     $STATE{'web_dir'} = $1;
     $STATE{'pic_cur_file'} = $2;
-    $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'SINGLE';
+    $STATE{'display_mode'} ||= 'SINGLE';
   }
 }
 
@@ -139,13 +140,9 @@ if (param('cur_url') || param('pic')) {
 if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
-  # TODO: If there are any images in this dir, use first file per issue #17.
+  # Leave display_mode as-is so we can define below based on # of images found, etc.
   if ($2) {
     $STATE{'pic_cur_file'} = $2;
-    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'SINGLE';
-  } else {
-    # Default to list because we don't have a file specified.
-    $STATE{'display_mode'} = ($STATE{'display_mode'}) ? $STATE{'display_mode'} : 'LIST';
   }
 }
 
@@ -155,7 +152,7 @@ if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
 if ($STATE{'web_dir'} eq '') {
   $STATE{'web_dir'} = $ENV{REQUEST_URI};
   $STATE{'web_dir'} =~ s/%20/ /g;
-  $STATE{'display_mode'} = ($STATE{'display_mode'})? $STATE{'display_mode'} : 'LIST';
+  $STATE{'display_mode'} ||= $DEFAULTS{'display_mode'};
 }
 
 if (${COMMANDLINE}) {
@@ -174,12 +171,16 @@ if (${COMMANDLINE}) {
   #die; #die "404 Not Found\nYour requested folder $STATE{'web_dir'} is not found\n";
 }
 
-$STATE{'database_file'} = $STATE{'server_dir'}.'.jcdsee'; # TODO: Put into STATE.
+$STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
 
 # Build the list of files.
 # TODO: Move this earlier, but need to refactor so $STATE{'server_dir'} is defined earlier.
 buildDirList();
 
+# Assign a default image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
+if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && $#image_array) { 
+  $STATE{'pic_cur_file'} = $image_array[0];
+}
 
 $STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title of the page
 
@@ -220,8 +221,7 @@ my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
 # Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
 #   buildDirList()
 sub buildDirList {
-  my @database_raw = 'null';
-  my @dir_list_raw = 'null';
+  my (@database_raw, @dir_list_raw);
   # TODO: Add param that allows to "refresh" the database with items newly added to the folder.
   if (! -e $STATE{'database_file'}) {
     opendir(DIR, $STATE{'server_dir'}) or die "Cant open this directory: \"$STATE{'server_dir'}\".";
@@ -241,8 +241,8 @@ sub buildDirList {
   @database_raw = <DATA>;
   close(DATA);
   # PROCESS THE LIST
-  my ${i} = 0; # TODO: Rename to img_count
-  my ${j} = 0; # TODO: Rename to file_count
+  my ${img_count} = 0;
+  my ${file_count} = 0;
   # Fill file info arrays from data.
   foreach my ${line} (@database_raw){
     chop(${line});
@@ -251,10 +251,10 @@ sub buildDirList {
     if (${file_name} ne '') {
       if ( ${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
         # Picture
-        $image_array[${i}] = ${file_name};
-        $image_hash{${file_name}} = ${i};
+        $image_array[${img_count}] = ${file_name};
+        $image_hash{${file_name}} = ${img_count};
         $file_types{${file_name}} = 'pic';
-        ${i}++;
+        ${img_count}++;
       } elsif ( -d "$STATE{'server_dir'}${file_name}") {
         # Folder
         $file_types{${file_name}} = 'folder';
@@ -271,9 +271,9 @@ sub buildDirList {
         # Unknown file
         $file_types{${file_name}} = 'unknown';
       }
-      $dir_list[${j}] = ${file_name};
+      $dir_list[${file_count}] = ${file_name};
       $file_descriptions{${file_name}} = ${description};
-      ${j}++;
+      ${file_count}++;
     }
   }
 }
@@ -281,8 +281,7 @@ sub buildDirList {
 # Creates a thumbnail image.
 #   createImageThumbnail("source", "destination thumb")
 sub createImageThumbnail {
-  my ${image_source} = $_[0];
-  my ${image_thumb} = $_[1];
+  my ($image_source, $image_thumb) = @_;
   my ${image_obj} = Image::Magick->new;
   ${tmp} = ${image_obj}->Read(${image_source}); warn ${tmp} if ${tmp};
   ${tmp} = ${image_obj}->Flatten(); # for PSD files
@@ -299,11 +298,9 @@ sub createImageThumbnail {
 }
 
 # Returns an <img> tag. Will create thumbs if necessary.
-#   getImageTag("file name without path","prefix for image")
+#   getImageTag("file name without path", "prefix for image")
 sub getImageTag {
-  my (${image_obj},${border},${alt});
-  my ${image_name} = $_[0];
-  my ${image_prefix} = $_[1];
+  my ($image_name, $image_prefix) = @_;
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
   my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
   my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; #Image url for browser
@@ -316,16 +313,16 @@ sub getImageTag {
     createImageThumbnail(${image_source}, ${image_thumb});
   }
   $image_thumb_url = escapeURL($image_thumb_url);
-  $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}) : '';
+  my $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}) : '';
   return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
 
 # Returns a SEO title for the current page which is reverse of path.
-#   getCurrentPageTitle("url")
+#   getCurrentPageTitle("path")
 sub getCurrentPageTitle {
-  my $path = $_[0];
-  $path =~ s#${pic_root}|/$##g; # Delete pic root and trailing slash
-  $path =~ s#/# : #g;# Replace all slashes with colon
+  my ($path) = @_;
+  $path =~ s@${pic_root}|/$@@g; # Delete pic root and trailing slash.
+  $path =~ s@/@ : @g; # Replace all slashes with colon.
   if ($STATE{'display_mode'} eq 'SINGLE') {
     $path .= ${title_char}.getNiceFilename($STATE{'pic_cur_file'});
   }
@@ -338,7 +335,7 @@ sub getCurrentPageTitle {
 # Returns a string representing a filename with date prefix removed + dash, underscore replaced with space.
 #   getNiceFilename("filename")
 sub getNiceFilename {
-  my $fn = $_[0];
+  my ($fn) = @_;
   $fn = removeDatePrefix($fn);
   $fn = removeNumberPrefix($fn);
   $fn = removeFileExtension($fn);
@@ -350,15 +347,15 @@ sub getNiceFilename {
 # Returns a string representing a filename with date prefix removed.
 #   removeDatePrefix("filename")
 sub removeDatePrefix {
-  my $fn = $_[0];
-  $fn =~ s#(^| )\d\d\d\d-\d\d-\d\d_#\1#g; # Delete date prefixes
+  my ($fn) = @_;
+  $fn =~ s@(^| )\d\d\d\d-\d\d-\d\d_@\1@g; # Delete date prefixes
   return $fn;
 }
 
 # Returns a string representing a filename with numbered prefix removed.
 #   removeNumberPrefix("filename")
 sub removeNumberPrefix {
-  my $fn = $_[0];
+  my ($fn) = @_;
   $fn =~ s:^\d+_(.+):\1:g; # Delete number prefixes when there is a filename
   return $fn;
 }
@@ -366,7 +363,7 @@ sub removeNumberPrefix {
 # Returns a string representing a filename with the file extension removed.
 #   removeFileExtension("filename")
 sub removeFileExtension {
-  my $fn = $_[0];
+  my ($fn) = @_;
   $fn =~ s#[.][A-Za-z]{3}$##g; # Delete 3-letter file extensions
   return $fn;
 }
@@ -374,7 +371,7 @@ sub removeFileExtension {
 # Returns a piece of data from the sitemap XML database based on the "item" (pageDescription|pageDate|pageSize).
 #   getSitemapData("databaseItem")
 sub getSitemapData {
-  my $item=$_[0];
+  my ($item) = @_;
   my $results = $stylesheet->transform($sitemap, NAME => "'$item'", VALUE => "'$STATE{'web_dir_encoded'}'");
   my $string = $stylesheet->output_string($results);
   chomp($string);
@@ -384,15 +381,14 @@ sub getSitemapData {
 # Returns an html formatted string representing the filename passed in.
 #   getTitle("file name to be parsed")
 sub getTitle {
-  #remove numbered prefix, extension and convert  _  into spaces.
-  my ${file_name} = $_[0];
+  my ($file_name) = @_;
   my ${strip_date} = ($STATE{'display_mode'} =~ /^THUMBS|SINGLE|SLIDESHOW$/) ? 1 : 0;
   my ${file_name_html} = '<span class="file-name-container">';
   if (${strip_date}) {
     ${file_name_html} .= getNiceFilename(${file_name});
-  } elsif (${file_name} =~ /^([0-9]{4}[-][0-9]{2}[-][0-9]{2})[_-]?(.*)/) { #DATED
+  } elsif (${file_name} =~ /^([0-9]{4}[-][0-9]{2}[-][0-9]{2})[_-]?(.*)/) { # DATED
     ${file_name_html} .= "<span class='file-date'>${1}</span> <span class='file-name file-name-dated'>${2}</span>";
-  } elsif (${file_name} =~ /^[0-9]+[_-](.+)/) { #NUMBERED
+  } elsif (${file_name} =~ /^[0-9]+[_-](.+)/) { # NUMBERED
     ${file_name_html} .= "<span class='file-name file-name-numbered'>${1}</span>";
   } else {
     ${file_name_html} .= "<span class='file-name'>${file_name}</span>";
@@ -403,7 +399,7 @@ sub getTitle {
 #   stripHTML returns a string with HTMl tags removed and quotes encoded (used by alt tags)
 #   stripHTML("string")
 sub stripHTML {
-  my ${string} = $_[0];
+  my ($string) = @_;
   ${string} =~ s/<[^>]+>//g;
   ${string} =~ s/"/&quot;/g; # quotes: "
   ${string} =~ s/'/&#39;/g; # apos: '
@@ -411,16 +407,17 @@ sub stripHTML {
 }
 
 #   escapeURL returns a URL with spaces escaped.
-#   escapeURL('URL')
+#   escapeURL('url')
 sub escapeURL {
-  my $URL = $_[0];
-  $URL =~ s: :%20:g;
-  return $URL;
+  my ($url) = @_;
+  $url =~ s: :%20:g;
+  return $url;
 }
 
 #   getHREF Builds a custom HREF given the object you want to link to.
 #   getHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
 sub getHREF {
+  my ($action, $value) = @_;
 
   # display_mode
   #   dir          = norm
@@ -429,8 +426,6 @@ sub getHREF {
   # ---------------------------------------
   # *norm = use if not default.
 
-  my ${action} = $_[0];
-  my ${value} = $_[1];
   my ${HREF};
   # my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'web_dir'} ;
   # BASE SCRIPT NAME
@@ -468,9 +463,11 @@ sub getHREF {
 # Functions for file type booleans
 #   isFileType("file name", "type")
 sub isFileType {
-  return ($file_types{$_[0]} eq $_[1]) ? 1 : 0;
+  my ($name, $type) = @_;
+  return ($file_types{$name} eq $type) ? 1 : 0;
 }
 
+# Returns an html formatted list of depth path elements.
 #   getDepthPath()
 sub getDepthPath {
   my @directories = split('/', $STATE{'web_dir'});
@@ -506,7 +503,7 @@ sub getDepthPath {
 #   getIcon returns a linked image tag representing the file provided by $file_name
 #   getIcon("name of file")
 sub getIcon {
-  my ${file_name} = $_[0];
+  my ($file_name) = @_;
   my ${link_content};
   my ${icon_file};
   my ${class};
@@ -532,17 +529,13 @@ sub getIcon {
 }
 
 #   getLinkTag returns an <a> tag containing appropriate href based on the type of file, state, etc.
-#   getLinkTag("name of file","link content","file description","CSS class name")
+#   getLinkTag("name of file", "link content", "file description", "CSS class name")
 sub getLinkTag {
-  my ${file_name} =    $_[0];
-  my ${link_content} = $_[1];
-  my ${desc} =         $_[2];
-  my ${class} =        $_[3];
+  my ($file_name, $link_content, $desc, $class) = @_;
   my ${link_tag};
-  #This is a bit annoying, see if google picks up the site
   if (! "${desc}") {
     ${desc} = ${file_name};
-    ${desc} .= ($file_descriptions{${file_name}} ne "")? " - ".stripHTML($file_descriptions{${file_name}}) : "";
+    ${desc} .= ($file_descriptions{${file_name}} ne '') ? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
   }
   if (isFileType(${file_name},'folder')) {
     #Folder
@@ -559,13 +552,11 @@ sub getLinkTag {
 
 # Returns one of the nav buttons which change the mode.
 # TODO: do this in javascript?
-#   getNavButton("mode","value","text description")
+#   getNavButton("mode", "value", "text description")
 sub getNavButton {
-  my ${mode}=${_[0]};
-  my ${value}=${_[1]};
-  my ${desc}=${_[2]};
+  my ($mode, $value, $desc) = @_;
   my ${toggle} = (${value} eq $STATE{'display_mode'}) ? 'on' : 'off';
-  my ${icon_modifier} = lc(${value}); #Lowercase
+  my ${icon_modifier} = lc(${value}); # Lowercase
   my ${href} = getHREF(${mode} , ${value});
   my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
   my ${linked_img} = "<a href='${href}' rel='nofollow' title='${desc}' id='button-${icon_modifier}'>${img}</a>";
@@ -607,7 +598,7 @@ sub commandLineMakeThumbs {
 # Convert bytes into nice number for humans.
 #   getFormattedFileSize(bytes)
 sub getFormattedFileSize {
-  my $bytes = $_[0];
+  my ($bytes) = @_;
   my ${file_size};
   if (${bytes} > 10000000) {
     ${file_size} = int(${bytes} / 1048576) . '&nbsp;MB';
@@ -897,28 +888,27 @@ print '
           <requires rdf:resource="http://web.resource.org/cc/ShareAlike"/>
         </License>
       </rdf:RDF>
-    -->
-';
-# DEBUG & ERROR INFORMATION
-if (${ERROR} || $STATE{'test_mode'}) {
-  ${DUMP} .=  "FILE TYPES: \n";
-  foreach my $k (sort keys %file_types) {
-    ${DUMP} .= "  $k = $file_types{$k}\n";
-  }
-  ${DUMP} .=  "\nIMAGES: \n";
-  foreach my $k (sort keys %image_hash) {
-    ${DUMP} .= "  $k = $image_hash{$k}\n";
-  }
-  ${DUMP} .=  "\nSTATE: \n";
-  foreach my $k (sort keys %STATE) {
-    ${DUMP} .= "  $k = $STATE{$k}\n";
-  }
-  print "
-    <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
-      <b style='font-size:10px;color:black;'>ERROR:</b><br>
-      <pre>${DUMP}</pre>
-    </div>";
-}
+    -->';
+    # DEBUG & ERROR INFORMATION
+    if (${ERROR} || $STATE{'test_mode'}) {
+      ${DUMP} .=  "FILE TYPES: \n";
+      foreach my $k (sort keys %file_types) {
+        ${DUMP} .= "  $k = $file_types{$k}\n";
+      }
+      ${DUMP} .=  "\nIMAGES: \n";
+      foreach my $k (sort keys %image_hash) {
+        ${DUMP} .= "  $k = $image_hash{$k}\n";
+      }
+      ${DUMP} .=  "\nSTATE: \n";
+      foreach my $k (sort keys %STATE) {
+        ${DUMP} .= "  $k = $STATE{$k}\n";
+      }
+      print "
+        <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
+          <b style='font-size:10px;color:black;'>ERROR:</b><br>
+          <pre>${DUMP}</pre>
+        </div>";
+    }
 
     $TIMER{'total_e'} = gettimeofday();
     $TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
@@ -931,7 +921,7 @@ if (${ERROR} || $STATE{'test_mode'}) {
       <div id="usage">
         <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
         Script executed in: '.$TIMER{'total'}.' seconds.';
-        if (${country_code}) {
+        if ($STATE{'country_code'}) {
           print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
         }
         print '<br>'
