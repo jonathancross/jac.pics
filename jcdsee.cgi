@@ -173,18 +173,17 @@ if (${COMMANDLINE}) {
 
 $STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
 
-# Build the list of files.
-# TODO: Move this earlier, but need to refactor so $STATE{'server_dir'} is defined earlier.
-buildDirList();
+# Load  / Build the list of files.
+loadFileDatabase();
 
-# Assign a default image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
+# Default to first image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
 if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
 
 $STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title of the page
 
-# FIGURE OUT IF ALL SETTINGS ARE THE DEFAULT
+# Figure out if all settings are same as the default.
 while ((my $key, my $value) = each(%DEFAULTS)) {
   if (${value} ne  $STATE{$key}) {
     $STATE{'is_default'} = 0;
@@ -192,7 +191,7 @@ while ((my $key, my $value) = each(%DEFAULTS)) {
   }
 }
 
-# DISPLAY MODE SETUP & DEFAULT
+# Display mode setup & defaults.
 if ($STATE{'display_mode'} eq 'THUMBS') {
   $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normally all will have same height
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
@@ -219,28 +218,18 @@ my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
 
 
 # Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
-#   buildDirList()
-sub buildDirList {
+#   loadFileDatabase()
+sub loadFileDatabase {
   my (@database_raw, @dir_list_raw);
-  # TODO: Add param that allows to "refresh" the database with items newly added to the folder.
+  # Create the database if it doesn't exist yet.
   if (! -e $STATE{'database_file'}) {
-    opendir(DIR, $STATE{'server_dir'}) or die "Cant open this directory: \"$STATE{'server_dir'}\".";
-    @dir_list_raw = readdir DIR;
-    closedir(DIR);
-    open(DATA, ">>$STATE{'database_file'}") or die "Cant open file: \"$STATE{'database_file'}\".";
-    # Filter the list to remove thumbnail images, hidden files and the stub script.
-    foreach my ${line} (sort @dir_list_raw) {
-      # Filter out current script name and / or dot files.
-      if (${line} !~ /^[.]|${script_name}/) {
-        print DATA "${line}|\n";
-      }
-    }
-    close(DATA);
+    createDatabase();
   }
+  # Now that we have a database for sure, load in the data.
   open(DATA, $STATE{'database_file'}) or die "Content-type: html/text\n\nCant open file: \"$STATE{'database_file'}\".";
   @database_raw = <DATA>;
   close(DATA);
-  # PROCESS THE LIST
+  # Process the database contents.
   my ${img_count} = 0;
   my ${file_count} = 0;
   # Fill file info arrays from data.
@@ -249,13 +238,13 @@ sub buildDirList {
     # TODO: Allow first line to contain meta data?
     my($file_name, $description) = split(/[|]/, $line);
     if (${file_name} ne '') {
-      if ( ${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
+      if (${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
         # Picture
         $image_array[${img_count}] = ${file_name};
         $image_hash{${file_name}} = ${img_count};
         $file_types{${file_name}} = 'pic';
         ${img_count}++;
-      } elsif ( -d "$STATE{'server_dir'}${file_name}") {
+      } elsif (-d "$STATE{'server_dir'}${file_name}") {
         # Folder
         $file_types{${file_name}} = 'folder';
       } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
@@ -276,6 +265,24 @@ sub buildDirList {
       ${file_count}++;
     }
   }
+}
+
+# Creates the .jcdsee database file if it doesn't exist yet.
+# TODO: Allow database updates with items newly added to the folder.
+#   createDatabase()
+sub createDatabase {
+  opendir(DIR, $STATE{'server_dir'}) or die "Cant open this directory: \"$STATE{'server_dir'}\".";
+  my @dir_list_raw = readdir DIR;
+  closedir(DIR);
+  open(DATA, ">>$STATE{'database_file'}") or die "Cant open file: \"$STATE{'database_file'}\".";
+  # Write filtered list out to the .jcdsee database file.
+  foreach my ${line} (sort @dir_list_raw) {
+    # Exclude thumbnail images, hidden files and the jcdsee script itself.
+    if (${line} !~ /^[.]|${script_name}/) {
+      print DATA "${line}|\n";
+    }
+  }
+  close(DATA);
 }
 
 # Creates a thumbnail image.
@@ -379,24 +386,24 @@ sub getSitemapData {
 }
 
 # Returns an html formatted string representing the filename passed in.
-#   getTitle("file name to be parsed")
-sub getTitle {
+#   getParsedFileName("file name to be parsed")
+sub getParsedFileName {
   my ($file_name) = @_;
   my ${strip_date} = ($STATE{'display_mode'} =~ /^THUMBS|SINGLE|SLIDESHOW$/) ? 1 : 0;
-  my ${file_name_html} = '<span class="file-name-container">';
+  my ${file_name_parsed} = '<span class="file-name-container">';
   if (${strip_date}) {
-    ${file_name_html} .= getNiceFilename(${file_name});
+    ${file_name_parsed} .= getNiceFilename(${file_name});
   } elsif (${file_name} =~ /^([0-9]{4}[-][0-9]{2}[-][0-9]{2})[_-]?(.*)/) { # DATED
-    ${file_name_html} .= "<span class='file-date'>${1}</span> <span class='file-name file-name-dated'>${2}</span>";
+    ${file_name_parsed} .= "<span class='file-date'>${1}</span> <span class='file-name file-name-dated'>${2}</span>";
   } elsif (${file_name} =~ /^[0-9]+[_-](.+)/) { # NUMBERED
-    ${file_name_html} .= "<span class='file-name file-name-numbered'>${1}</span>";
+    ${file_name_parsed} .= "<span class='file-name file-name-numbered'>${1}</span>";
   } else {
-    ${file_name_html} .= "<span class='file-name'>${file_name}</span>";
+    ${file_name_parsed} .= "<span class='file-name'>${file_name}</span>";
   }
-  return ${file_name_html} .= '</span>';
+  return ${file_name_parsed} .= '</span>';
 }
 
-#   stripHTML returns a string with HTMl tags removed and quotes encoded (used by alt tags)
+# Returns a string with HTMl tags removed and quotes encoded (used by alt tags)
 #   stripHTML("string")
 sub stripHTML {
   my ($string) = @_;
@@ -406,7 +413,7 @@ sub stripHTML {
   return ${string};
 }
 
-#   escapeURL returns a URL with spaces escaped.
+# Returns a URL with spaces escaped.
 #   escapeURL('url')
 sub escapeURL {
   my ($url) = @_;
@@ -414,7 +421,7 @@ sub escapeURL {
   return $url;
 }
 
-#   getHREF Builds a custom HREF given the object you want to link to.
+# Builds a custom HREF given the object you want to link to.
 #   getHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
 sub getHREF {
   my ($action, $value) = @_;
@@ -460,7 +467,7 @@ sub getHREF {
   return escapeURL($HREF);
 }
 
-# Functions for file type booleans
+# Returns true if file matches type specified.
 #   isFileType("file name", "type")
 sub isFileType {
   my ($name, $type) = @_;
@@ -500,7 +507,7 @@ sub getDepthPath {
   return $depth_path;
 }
 
-#   getIcon returns a linked image tag representing the file provided by $file_name
+# Returns a linked image tag representing the file provided by $file_name
 #   getIcon("name of file")
 sub getIcon {
   my ($file_name) = @_;
@@ -528,7 +535,7 @@ sub getIcon {
   return getLinkTag(${file_name},${link_content},${desc},${class});
 }
 
-#   getLinkTag returns an <a> tag containing appropriate href based on the type of file, state, etc.
+# Returns an <a> tag containing appropriate href based on the type of file, state, etc.
 #   getLinkTag("name of file", "link content", "file description", "CSS class name")
 sub getLinkTag {
   my ($file_name, $link_content, $desc, $class) = @_;
@@ -652,7 +659,7 @@ sub dumpDirList {
           <td class='col-description'>";
             #date isn't really used, but maybe in future?
             #my ${date} = "${day}-${month}-${year} ${hour}:${minute}";
-            print getLinkTag(${file_name},getTitle(${file_name}), '', 'simple');
+            print getLinkTag(${file_name}, getParsedFileName(${file_name}), '', 'simple');
             if ($file_descriptions{${file_name}}) {
               print "<span class='file-description'>$file_descriptions{${file_name}}</span>";
             }
@@ -664,7 +671,7 @@ sub dumpDirList {
         # TODO: Use list just like slideshow.
         print '<table class="picture-icon-container" cellpadding="0" cellspacing="1"><tr><td valign="middle" align="center">';
         print getIcon(${file_name});
-        print '</td></tr><tr><td valign="top" class="picture-icon-file-name" align="center">'.getTitle(${file_name}).'</td></tr></table>';
+        print '</td></tr><tr><td valign="top" class="picture-icon-file-name" align="center">'.getParsedFileName(${file_name}).'</td></tr></table>';
       }
     }
     if ($STATE{'display_mode'} eq 'THUMBS') {
@@ -681,7 +688,7 @@ sub dumpDirList {
 
       print '
       <h3>
-        <strong>'.getTitle(${file_name}).'</strong>';
+        <strong>'.getParsedFileName(${file_name}).'</strong>';
 
         if ($file_descriptions{${file_name}}) {
           print "
@@ -734,7 +741,7 @@ sub dumpDirList {
         print '
         <li>
           <a href="'.$STATE{'web_dir'}.${file_name}.'" class="filename" data-selected="'.${is_selected}.'" data-file-type="'.${file_type}.'" data-size="'.${file_size}.'">'
-          .getTitle(${file_name})
+          .getParsedFileName(${file_name})
           .'</a>
           <div>'.$file_descriptions{$file_name}.'</div>
         </li>
@@ -749,7 +756,7 @@ sub dumpDirList {
 }
 
 
-# This function figures out the page context, settings, etc. based on the current url.
+# Determines the page context, settings, etc. based on the current url.
 #   calculateImageListState()
 sub calculateImageListState {
   if (@image_array > 0) {
@@ -797,8 +804,7 @@ if (${COMMANDLINE}) {
   exit 0;
 }
 
-# RENDER HTML ==================================================================================================
-# RENDER HEAD
+# RENDER HTML HEAD #############################################################
 print "Content-type: text/html\n\n";
 print '<!DOCTYPE html>
 <html class="jcd">
@@ -854,9 +860,9 @@ print '
           print '
           <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
         }
-        #CALL THE LOOP THAT RENDERS THE FILE LIST
+        # Render the file list.
         dumpDirList();
-        #FINISH TABLE FOR LIST
+        # Finish table for LIST mode.
         if ($STATE{'display_mode'} eq 'LIST') {
           print '
           </table>
@@ -889,7 +895,7 @@ print '
         </License>
       </rdf:RDF>
     -->';
-    # DEBUG & ERROR INFORMATION
+    # Debug & error information.
     if (${ERROR} || $STATE{'test_mode'}) {
       ${DUMP} .=  "FILE TYPES: \n";
       foreach my $k (sort keys %file_types) {
