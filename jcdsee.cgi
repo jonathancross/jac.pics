@@ -41,7 +41,6 @@ if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
 # GLOBAL VARIABLES #############################################################
 # DIRECTORY LIST ARRAYS
 my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
-my ${tmp};
 my ${DUMP} = '';
 my ${ERROR} = 0;
 my ${root} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
@@ -113,6 +112,7 @@ my %DEFAULTS = (
   display_mode      => 'LIST',
   test_mode         => 0,
 );
+
 
 # LOAD / SET PARAMS & DEFAULTS
 $STATE{'display_mode'} = param('display_mode');
@@ -290,17 +290,17 @@ sub createDatabase {
 sub createImageThumbnail {
   my ($image_source, $image_thumb) = @_;
   my ${image_obj} = Image::Magick->new;
-  ${tmp} = ${image_obj}->Read(${image_source}); warn ${tmp} if ${tmp};
-  ${tmp} = ${image_obj}->Flatten(); # for PSD files
-  # Resize to make large thumbnailes same height except in extremly wide images.  Small thumbs resize proportionally
-  ${tmp} = ${image_obj}->Thumbnail(geometry=>"$IMAGE{'max_width'}x$IMAGE{'max_height'}", filter=>'Lanczos');
+  my ${img_status} = ${image_obj}->Read(${image_source}); warn ${img_status} if ${img_status};
+  ${img_status} = ${image_obj}->Flatten(); # for PSD files
+  # Resize to make large thumbnails same height except in extremely wide images.  Small thumbs resize proportionally
+  ${img_status} = ${image_obj}->Thumbnail(geometry=>"$IMAGE{'max_width'}x$IMAGE{'max_height'}", filter=>'Lanczos');
   # Cannot remove profile if $COMMANDLINE
-  #${tmp} = ${image_obj}->Profile(name=>undef); warn ${tmp} if ${tmp};
+  #${img_status} = ${image_obj}->Profile(name=>undef); warn ${img_status} if ${img_status};
   # Set JPEG compression level for thumb
-  ${tmp} = ${image_obj}->Set(compression=>"JPEG");
-  ${tmp} = ${image_obj}->Set(quality=>$IMAGE_GLOBAL{'thumb_quality'});
-  ${tmp} = ${image_obj}->Set(type=>"Optimize");
-  ${tmp} = ${image_obj}->Write(${image_thumb}); warn ${tmp} if ${tmp};
+  ${img_status} = ${image_obj}->Set(compression=>'JPEG');
+  ${img_status} = ${image_obj}->Set(quality=>$IMAGE_GLOBAL{'thumb_quality'});
+  ${img_status} = ${image_obj}->Set(type=>'Optimize');
+  ${img_status} = ${image_obj}->Write(${image_thumb}); warn ${img_status} if ${img_status};
   @${image_obj} = (); # Clear memory
 }
 
@@ -624,9 +624,9 @@ sub getFormattedFileSize {
 }
 
 
-# Dump out the html formatted dir list - main loop
-# TODO: Rename to getFiles()
-sub dumpDirList {
+# Prints out the html-formatted list of files for the page content.
+#   printFileListHTML()
+sub printFileListHTML {
   #my(@time_info,@month_list);
   #my(${year},${month},${minute},${day},${hour},${file_size},${is_dir});
   my ${file_name};
@@ -683,8 +683,10 @@ sub dumpDirList {
     #Make sure large thumbs exist
     ${file_name} = $STATE{'pic_cur_file'};
     if (${file_name}) {
-      ${tmp} = getImageTag($STATE{'pic_previous_file'},$IMAGE_GLOBAL{'prefix_large'});
-      ${tmp} = getImageTag($STATE{'pic_next_file'},$IMAGE_GLOBAL{'prefix_large'});
+      my ${previous_thumb} = "$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}";
+      my ${next_thumb} = "$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}";
+      my ${img_status} = getImageTag($STATE{'pic_previous_file'}, $IMAGE_GLOBAL{'prefix_large'});
+      ${img_status} = getImageTag($STATE{'pic_next_file'}, $IMAGE_GLOBAL{'prefix_large'});
 
       print '
       <h3>
@@ -699,14 +701,26 @@ sub dumpDirList {
       print "
       </h3>
 
-      <a class='picture-link previous' title='Previous image' href='".getHREF('pic',$STATE{'pic_previous_file'})."'>
-        <img src='$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'web_dir'}$STATE{'pic_previous_file'}' alt='' id='PREVIOUS'>
+      <a class='picture-link previous'
+         title='Previous image'
+         href='".getHREF('pic', $STATE{'pic_previous_file'})."'>
+        <img src='${previous_thumb}'
+             data-src='$STATE{'web_dir'}$STATE{'pic_previous_file'}'
+             alt=''
+             id='PREVIOUS'>
       </a>
-      <a class='picture-link large-picture-wrapper' href='".getHREF('display_mode','SLIDESHOW')."' title='Slideshow...'>"
-        .getImageTag(${file_name},'')."
+      <a class='picture-link large-picture-wrapper'
+         href='".getHREF('display_mode', 'SLIDESHOW')."'
+         title='Slideshow...'>"
+        .getImageTag(${file_name}, '')."
       </a>
-      <a class='picture-link next' title='Next image' href='".getHREF('pic',$STATE{'pic_next_file'})."'>
-        <img src='$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_next_file'}$IMAGE_GLOBAL{'thumb_ext'}' data-src='$STATE{'web_dir'}$STATE{'pic_next_file'}' alt='' id='NEXT'>
+      <a class='picture-link next'
+         title='Next image'
+         href='".getHREF('pic', $STATE{'pic_next_file'})."'>
+        <img src='${next_thumb}'
+             data-src='$STATE{'web_dir'}$STATE{'pic_next_file'}'
+             alt=''
+             id='NEXT'>
       </a>
       ";
     }
@@ -736,16 +750,20 @@ sub dumpDirList {
 
         my $is_selected = ($STATE{'pic_cur_file'} eq $file_name) ? '1' : '0';
         my $file_type = $file_types{${file_name}};
+        my $parsed_file_name = getParsedFileName(${file_name});
 
         # TODO: data-width and data-height
-        print '
+        print "
         <li>
-          <a href="'.$STATE{'web_dir'}.${file_name}.'" class="filename" data-selected="'.${is_selected}.'" data-file-type="'.${file_type}.'" data-size="'.${file_size}.'">'
-          .getParsedFileName(${file_name})
-          .'</a>
-          <div>'.$file_descriptions{$file_name}.'</div>
+          <a href='$STATE{'web_dir'}${file_name}'
+             class='filename'
+             data-selected='${is_selected}'
+             data-file-type='${file_type}'
+             data-size='${file_size}'
+             >${parsed_file_name}</a>
+          <div>$file_descriptions{$file_name}</div>
         </li>
-        ';
+        ";
       }
 
       print '
@@ -860,8 +878,7 @@ print '
           print '
           <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
         }
-        # Render the file list.
-        dumpDirList();
+        printFileListHTML();
         # Finish table for LIST mode.
         if ($STATE{'display_mode'} eq 'LIST') {
           print '
