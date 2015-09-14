@@ -86,8 +86,9 @@ my %STATE = (
   country_code      => (${COMMANDLINE}) ? 'none' : $ENV{'HTTP_CF_IPCOUNTRY'},
   database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
-  web_dir           => '', # The path from the webserver document root.
-  web_dir_encoded   => '', # The path from the webserver document root. (URL encoded)
+  web_dir           => '', # The directory path from the webserver document root.
+  web_dir_encoded   => '', # The directory path from the webserver document root. (URL encoded)
+  web_full_path_clean => '', # Full web path to the current image if available or web_dir.
   is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
   title             => 'Jonathan Cross', # Document title base
   cur_dir_name      => '', # Will have only the name of the current directory (no slashes)
@@ -111,6 +112,12 @@ my %STATE = (
 my %DEFAULTS = (
   display_mode      => 'LIST',
   test_mode         => 0,
+);
+my %LEGACY_MODES = (
+  LIST      => 'list',
+  THUMBS    => 'thumb',
+  SINGLE    => 'single',
+  SLIDESHOW => 'slide'
 );
 
 
@@ -180,6 +187,8 @@ loadFileDatabase();
 if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
+
+$STATE{'web_full_path_clean'} = $STATE{'web_dir'}.$STATE{'pic_cur_file'};
 
 $STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title of the page
 
@@ -319,7 +328,7 @@ sub getImageTag {
     my ${image_source} = $STATE{'server_dir'}.${image_name};
     createImageThumbnail(${image_source}, ${image_thumb});
   }
-  $image_thumb_url = escapeURL($image_thumb_url);
+  $image_thumb_url = urlEscapeSpaces($image_thumb_url);
   my $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}) : '';
   return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
@@ -414,16 +423,30 @@ sub stripHTML {
 }
 
 # Returns a URL with spaces escaped.
-#   escapeURL('url')
-sub escapeURL {
+#   urlEscapeSpaces('url')
+sub urlEscapeSpaces {
   my ($url) = @_;
   $url =~ s: :%20:g;
   return $url;
 }
 
+
+# Returns the new display mode name that corresponds to the legacy mode name.
+# Will just return the mode if it is not legacy.
+# TODO: Cleanup after we have 301 reddirects in place for the old urls and Google has a chance to reindex the site.
+#   convertFromLegacyDisplayMode('legacy-mode')
+sub convertFromLegacyDisplayMode {
+  my ($mode) = @_;
+  my $legacyMode = $LEGACY_MODES{$mode};
+  if ($legacyMode) {
+    return $legacyMode;
+  }
+  return $mode;
+}
+
 # Builds a custom HREF given the object you want to link to.
-#   getHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
-sub getHREF {
+#   OLDgetHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
+sub OLDgetHREF {
   my ($action, $value) = @_;
 
   # display_mode
@@ -435,9 +458,8 @@ sub getHREF {
 
   my ${HREF};
   # my $local_path = (${action} eq 'dir') ? ${value} : $STATE{'web_dir'} ;
-  # BASE SCRIPT NAME
   if (${action} eq 'dir') {
-    # Special case for dir when we can dump display_mode setting
+    # Special case for dir: we can ignore display_mode setting.
     ${HREF} = "${value}";
     return ${HREF};
   } elsif (${action} eq 'dispaly_mode' && ${value} eq $DEFAULTS{'display_mode'}) {
@@ -451,7 +473,7 @@ sub getHREF {
   if (${action} eq 'pic') {
     ${HREF} .= "pic=$STATE{'web_dir'}${value}";
   } elsif (${action} eq 'display_mode') {
-    ${HREF} .= "pic=$STATE{'web_dir'}$STATE{'pic_cur_file'}";
+    ${HREF} .= "pic=$STATE{'web_full_path_clean'}";
   } elsif (${action} eq 'dir') {
     ${HREF} .= "cur_url=${value}";
   }
@@ -464,7 +486,19 @@ sub getHREF {
     }
   }
 
-  return escapeURL($HREF);
+  return urlEscapeSpaces($HREF);
+}
+
+# Builds a custom HREF given the object you want to link to.
+#   getHREF("path (file or folder)", "display_mode")
+sub getHREF {
+  my ($path, $display_mode) = @_;
+  $path ||= $STATE{'web_full_path_clean'};
+  $path =~ s:^/::; # Remove leading slash to normalize.
+  $display_mode ||= $STATE{'display_mode'};
+  $display_mode = convertFromLegacyDisplayMode($display_mode);
+  my ${href} = "/${display_mode}/${path}";
+  return urlEscapeSpaces(${href});
 }
 
 # Returns true if file matches type specified.
@@ -487,7 +521,9 @@ sub getDepthPath {
       if (${1} ne '') {
         my $itemTitle = getNiceFilename(${path});
         $depth_path .= '
-      <li><a href="'.getHREF('dir',${1}).'">'.${itemTitle}.'</a></li>';
+      <li><a href="'.getHREF($1).'"
+             data-old-href="'.OLDgetHREF('dir', $1).'"
+             >'.${itemTitle}.'</a></li>';
       }
     } else {
       # Not sure what this is for...
@@ -540,19 +576,31 @@ sub getIcon {
 sub getLinkTag {
   my ($file_name, $link_content, $desc, $class) = @_;
   my ${link_tag};
-  if (! "${desc}") {
+  if (! ${desc}) {
     ${desc} = ${file_name};
     ${desc} .= ($file_descriptions{${file_name}} ne '') ? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
   }
+  my $full_path = "$STATE{'web_dir'}${file_name}";
   if (isFileType(${file_name},'folder')) {
     #Folder
-    ${link_tag} = "<a href=\"".getHREF('dir',"$STATE{'web_dir'}${file_name}")."\" class=\"${class}\" title=\"${desc}\">${link_content}</a>\n";
-  } elsif (isFileType(${file_name},'pic')) {
+    ${link_tag} = "<a href=\"".getHREF(${full_path})."\"
+                      data-old-href=\"".OLDgetHREF('dir', ${full_path})."\"
+                      class=\"${class}\"
+                      title=\"${desc}\"
+                      >${link_content}</a>\n";
+  } elsif (isFileType(${file_name}, 'pic')) {
     #Image
-    ${link_tag} = "<a href='".getHREF('pic',${file_name})."' class='${class}' title='${desc}'>".${link_content}.'</a>';
+    ${link_tag} = "<a href='".getHREF(${full_path}, 'single')."'
+                      data-old-href='".OLDgetHREF('pic', ${full_path})."'
+                      class='${class}'
+                      title='${desc}'
+                      >".${link_content}.'</a>';
   } else {
     # Music, text or other.  Just link to the file
-    ${link_tag} = "<a href='$STATE{'web_dir'}${file_name}' class='${class}' title='${desc}'>${link_content}</a>\n";
+    ${link_tag} = "<a href='${full_path}'
+                      class='${class}'
+                      title='${desc}'
+                      >${link_content}</a>\n";
   }
   return ${link_tag};
 }
@@ -562,11 +610,15 @@ sub getLinkTag {
 #   getNavButton("mode", "value", "text description")
 sub getNavButton {
   my ($mode, $value, $desc) = @_;
-  my ${toggle} = (${value} eq $STATE{'display_mode'}) ? 'on' : 'off';
   my ${icon_modifier} = lc(${value}); # Lowercase
-  my ${href} = getHREF(${mode} , ${value});
+  # need to link to $STATE{'pic_cur_file'}
+  my ${href} = getHREF('', $value);
   my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
-  my ${linked_img} = "<a href='${href}' rel='nofollow' title='${desc}' id='button-${icon_modifier}'>${img}</a>";
+  my ${linked_img} = "<a href='${href}'
+                         data-old-href='".OLDgetHREF(${mode}, ${value})."'
+                         rel='nofollow'
+                         id='button-${icon_modifier}'
+                         >${img}</a>";
 
   if ($STATE{'display_mode'} eq ${value}) {
     return ${img};
@@ -638,7 +690,7 @@ sub printFileListHTML {
       ${file_size} = '';
       @file_info = stat $STATE{'server_dir'}.${file_name};
       #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
-      # Not used anymoer... ${is_dir} = S_ISDIR(${file_info[2]});
+      # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
       if ($STATE{'display_mode'} eq 'LIST') {
         #@time_info = localtime ${file_info[9]};
         #EXTRACT FILE INFO FROM ARRAY AND PAD
@@ -703,20 +755,25 @@ sub printFileListHTML {
 
       <a class='picture-link previous'
          title='Previous image'
-         href='".getHREF('pic', $STATE{'pic_previous_file'})."'>
+         href='".getHREF($STATE{'web_dir'}.$STATE{'pic_previous_file'})."'
+         data-old-href='".OLDgetHREF('pic', $STATE{'pic_previous_file'})."'
+         >
         <img src='${previous_thumb}'
              data-src='$STATE{'web_dir'}$STATE{'pic_previous_file'}'
              alt=''
              id='PREVIOUS'>
       </a>
       <a class='picture-link large-picture-wrapper'
-         href='".getHREF('display_mode', 'SLIDESHOW')."'
+         href='".getHREF('', 'slide')."'
+         data-old-href='".OLDgetHREF('display_mode', 'SLIDESHOW')."'
          title='Slideshow...'>"
         .getImageTag(${file_name}, '')."
       </a>
       <a class='picture-link next'
          title='Next image'
-         href='".getHREF('pic', $STATE{'pic_next_file'})."'>
+         href='".getHREF($STATE{'web_dir'}.$STATE{'pic_next_file'})."'
+         data-old-href='".OLDgetHREF('pic', $STATE{'pic_next_file'})."'
+         >
         <img src='${next_thumb}'
              data-src='$STATE{'web_dir'}$STATE{'pic_next_file'}'
              alt=''
@@ -868,7 +925,7 @@ print '
           <noscript>
             <h1>JavaScript is disabled</h1>
             <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
-            <meta http-equiv="refresh" content="10; url='.getHREF('display_mode', 'SINGLE').'">
+            <meta http-equiv="refresh" content="10; url='.getHREF('', 'single').'" data-old-href="'.OLDgetHREF('display_mode', 'SINGLE').'">
           </noscript>
           ';
         }
