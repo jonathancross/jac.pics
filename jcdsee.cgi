@@ -444,6 +444,15 @@ sub convertFromLegacyDisplayMode {
   return $mode;
 }
 
+# Returns true if the given display_mode corresponds to the current display_mod.
+# Also supports legacy mode names.
+#   isMode('display-mode')
+sub isMode {
+  my ($mode) = @_;
+  $mode = convertFromLegacyDisplayMode($mode);
+  return ($mode eq $STATE{'display_mode'});
+}
+
 # Builds a custom HREF given the object you want to link to.
 #   OLDgetHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
 sub OLDgetHREF {
