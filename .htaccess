@@ -26,7 +26,6 @@ ErrorDocument 500 /error.html
 
 # Clean URLs
 # TODO:
-#   #17 Allow folder in SLIDESHOW and SINGLE modes
 #   #18 Rename display modes
 #       Will then be able combine last 4 rules into one.
 <IfModule mod_rewrite.c>
@@ -34,8 +33,21 @@ ErrorDocument 500 /error.html
   RewriteBase /
 
   # Skip all rules if normal file request.
+  # We need this first condition to exclude urls with a non-empty query string.
+  RewriteCond %{QUERY_STRING} !.
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule . - [last]
+
+  # Force 301 on legacy params.
+  # Redirect `pic` to single:
+  RewriteCond %{QUERY_STRING} pic=([^&]+)
+  RewriteRule . /single%1? [redirect=301,last]
+  # Redirect `cur_url` to folder:
+  RewriteCond %{QUERY_STRING} cur_url=([^&]+)
+  RewriteRule . %1? [redirect=301,last]
+
+  # RewriteRule cur_url=([^&]+) $1 [redirect=301,last]
+  # RewriteRule ^(.+)$ /single$1 [redirect=301,last]
 
   # DIRECTORY: Normalize directories to have trailing slash: /
   RewriteCond %{REQUEST_FILENAME} -d
@@ -61,6 +73,6 @@ ErrorDocument 500 /error.html
   RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=LIST [qsappend,last]
 
   # /jcdsee/ DIRECTORY: Prevent file listing here.
-  RewriteRule ^(jcdsee/)$ / [redirect=301,last]
+  RewriteRule ^jcdsee/$ / [redirect=301,last]
 
 </IfModule>
