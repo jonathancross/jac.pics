@@ -41,10 +41,10 @@ ErrorDocument 500 /error.html
   # Force 301 on legacy params.
   # Redirect `pic` to single:
   RewriteCond %{QUERY_STRING} pic=([^&]+)
-  RewriteRule . /single%1? [redirect=301,last]
+  RewriteRule ^jcdsee\.cgi /single%1? [redirect=301,last]
   # Redirect `cur_url` to folder:
   RewriteCond %{QUERY_STRING} cur_url=([^&]+)
-  RewriteRule . %1? [redirect=301,last]
+  RewriteRule ^jcdsee\.cgi %1? [redirect=301,last]
 
   # RewriteRule cur_url=([^&]+) $1 [redirect=301,last]
   # RewriteRule ^(.+)$ /single$1 [redirect=301,last]
