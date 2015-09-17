@@ -5,18 +5,6 @@ my $VERSION = '2.0.1';
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
 #  • https://github.com/jonathancross/pics.jonathancross.com
-#
-# WISHLIST / FIXES / TODOs:
-#  - Simplify this script and move view settings into browser.
-#  - Load and cache all file info just once.
-#  - Inline player for video & audio. html5 video?
-#  - Nonlinear slideshow with thumbs, next and previous.
-#    Then merge "single" mode with "slideshow".
-#  - PSD icons: complex to flatten...
-#  - Convert databases to JSON.
-#  - Allow in-browser editing of descriptions.
-#  - Non-destructive folder "refresh" when files are added or removed.
-#
 ################################################################################
 
 use strict;
