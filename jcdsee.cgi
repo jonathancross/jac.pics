@@ -858,7 +858,7 @@ sub calculateImageListState {
     $STATE{'pic_next_file'}        = ${image_array[ $STATE{'pic_next_idx'} ]};
   } elsif ($STATE{'pic_cur_file'}) {
     # ERROR: Tried to access a picture in a folder that has no pictures at all.
-    $STATE{'error_msg'} = 'Picture not found.';
+    $STATE{'error_msg'} = 'Picture "'.$STATE{'pic_cur_file'}.'" was not found.';
   }
 
   # Would be ideal if we didn't un-encode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
