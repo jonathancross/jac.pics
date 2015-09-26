@@ -70,8 +70,8 @@ my %IMAGE = (
 
 # DISPLAY STATE VARS
 my %STATE = (
-  error_msg          => '', # Error message indicating app is in an error state.
-  country_code      => $ENV{'HTTP_CF_IPCOUNTRY'} || 'none',
+  error_msg         => '', # Error message indicating app is in an error state.
+  country_code      => $ENV{'HTTP_CF_IPCOUNTRY'},
   database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
   web_dir           => '', # The directory path from the webserver document root.
@@ -116,18 +116,12 @@ $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 # CURRENT URL FROM PARAM -OR- PATH
 
 # Deprecated old params: 'cur_url' and 'pic'.
+# TODO: Remove all this code in a month or two.
 if (param('cur_url') || param('pic')) {
   $STATE{'is_deprecated_param'} = 1;
-  if (param('cur_url')) {
-    $STATE{'web_dir'} = param('cur_url');
-    $STATE{'web_dir'} =~ s:[^/]$:$&\/:;
-    $STATE{'display_mode'} ||= 'LIST';
-  } elsif (param('pic') && (param('pic') =~ m:(.*/)(.*):) ) {
-    # Get picture path from the pic param.
-    $STATE{'web_dir'} = $1;
-    $STATE{'pic_cur_file'} = $2;
-    $STATE{'display_mode'} ||= 'SINGLE';
-  }
+  # ERROR: there should be no way to send these params anymore (see .htaccess)
+  #        but just put this here in case.
+  $STATE{'error_msg'} = 'This file or folder is now gone.';
 }
 
 # New 'pic_path' param to replace 'pic' and 'cur_url'.
@@ -135,6 +129,8 @@ if (param('cur_url') || param('pic')) {
 if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
+  # Old code would add trailing slash if needed, but I think unnecessary now.
+  # $STATE{'web_dir'} =~ s:[^/]$:$&\/:;
   # Leave display_mode as-is so we can define below based on # of images found, etc.
   if ($2) {
     $STATE{'pic_cur_file'} = $2;
@@ -366,7 +362,7 @@ sub removeNumberPrefix {
 #   removeFileExtension("filename")
 sub removeFileExtension {
   my ($fn) = @_;
-  $fn =~ s#[.][A-Za-z]{3}$##g; # Delete 3-letter file extensions
+  $fn =~ s:[.][A-Za-z]{3}$::g; # Delete 3-letter file extensions
   return $fn;
 }
 
@@ -419,7 +415,7 @@ sub urlEscapeSpaces {
 
 # Returns the new display mode name that corresponds to the legacy mode name.
 # Will just return the mode if it is not legacy.
-# TODO: Cleanup after we have 301 reddirects in place for the old urls and Google has a chance to reindex the site.
+# TODO: Cleanup after we have 301 redirects in place for the old URLs and Google has a chance to reindex the site.
 #   convertFromLegacyDisplayMode('legacy-mode')
 sub convertFromLegacyDisplayMode {
   my ($mode) = @_;
@@ -440,6 +436,7 @@ sub isMode {
 }
 
 # Builds a custom HREF given the object you want to link to.
+
 #   OLDgetHREF(action[pic|dir|display_mode],  value[pic=url|dir=folder_name|display_mode])
 sub OLDgetHREF {
   my ($action, $value) = @_;
@@ -466,11 +463,11 @@ sub OLDgetHREF {
   }
   # SET URL PARAM
   if (${action} eq 'pic') {
-    ${HREF} .= "pic=$STATE{'web_dir'}${value}";
+    ${HREF} .= "pic_path=$STATE{'web_dir'}${value}";
   } elsif (${action} eq 'display_mode') {
-    ${HREF} .= "pic=$STATE{'web_full_path_clean'}";
+    ${HREF} .= "pic_path=$STATE{'web_full_path_clean'}";
   } elsif (${action} eq 'dir') {
-    ${HREF} .= "cur_url=${value}";
+    ${HREF} .= "pic_path=${value}";
   }
   # DISPLAY MODE PARAM
   if (${action} ne 'pic' && ${action} ne 'dir') { #for 'pic' and 'dir' we have pre-defined display modes so they are excluded here
@@ -546,10 +543,10 @@ sub getIcon {
   my ${icon_file};
   my ${class};
   my ${desc} = ${file_name};
-  ${desc} .= ($file_descriptions{${file_name}} ne "")? " - ".stripHTML($file_descriptions{${file_name}}) : "";
-  if (isFileType(${file_name},'pic')) {
+  ${desc} .= ($file_descriptions{${file_name}} ne '')? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
+  if (isFileType(${file_name}, 'pic')) {
     #Image icon
-    ${class} = ($STATE{'pic_cur_file'} eq ${file_name})? "current_pic" : "pic" ;
+    ${class} = ($STATE{'pic_cur_file'} eq ${file_name}) ? 'current_pic' : 'pic' ;
     ${link_content} = getImageTag(${file_name},$STATE{'prefix_cur'});
   } else {
     #we can create and upload a static thumbnail icon for any filetype... will replace default question mark
@@ -862,7 +859,7 @@ sub calculateImageListState {
   }
 
   # Would be ideal if we didn't un-encode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
-  # Problem is that there are several ways to get the 'url' (cur_url or directly from path if no mod_re-write)
+  # Problem is that there are several ways to get the URL (pic_path param or directly from path if no mod_rewrite)
   $STATE{'web_dir_encoded'} = $STATE{'web_dir'};
   $STATE{'web_dir_encoded'} =~ s/ /%20/g;
   $STATE{'page_description'} = stripHTML(getSitemapData('pageDescription'));
@@ -1030,7 +1027,7 @@ sub printHtmlContent {
           <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
           Script executed in: '.$TIMER{'total'}.' seconds.';
           if ($STATE{'country_code'}) {
-            print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
+            print " Your Location: $STATE{'country_code'}";
           }
           print '<br>'
           .getSitemapData('pageDate')
