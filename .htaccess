@@ -39,6 +39,8 @@ ErrorDocument 500 /error.html
   RewriteRule . - [last]
 
   # Force 301 on legacy params.
+  # Consider just marking as gone:
+  # RewriteRule ^jcdsee\.cgi - [gone,last]
   # Redirect `pic` to single:
   RewriteCond %{QUERY_STRING} pic=([^&]+)
   RewriteRule ^jcdsee\.cgi /single%1? [redirect=301,last]

@@ -30,7 +30,6 @@ if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
 # DIRECTORY LIST ARRAYS
 my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
 my ${DUMP} = '';
-my ${ERROR} = 0;
 my ${root} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
 my ${pic_root} = '/pics';
 my ${assets_root} = '/jcdsee'; # Folder containing assets used by this script. (icons, buttons, css, etc)
@@ -71,7 +70,8 @@ my %IMAGE = (
 
 # DISPLAY STATE VARS
 my %STATE = (
-  country_code      => (${COMMANDLINE}) ? 'none' : $ENV{'HTTP_CF_IPCOUNTRY'},
+  error_msg          => '', # Error message indicating app is in an error state.
+  country_code      => $ENV{'HTTP_CF_IPCOUNTRY'} || 'none',
   database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
   web_dir           => '', # The directory path from the webserver document root.
@@ -160,10 +160,8 @@ if (${COMMANDLINE}) {
   $STATE{'cur_dir_name'} = $STATE{'web_dir'};
   $STATE{'cur_dir_name'} =~ s:^.*/([^/]+)/:$1:; # Get last dir name from the url and remove all slashes.
 } else {
-  # File not found error.
-  print "HTTP/1.1 404 Not Found\n";
-  print "Content-type: text/html\n\n";
-  #die; #die "404 Not Found\nYour requested folder $STATE{'web_dir'} is not found\n";
+  # ERROR
+  $STATE{'error_msg'} = 'Directory not found.';
 }
 
 $STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
@@ -834,14 +832,13 @@ sub calculateImageListState {
   if (@image_array > 0) {
     $STATE{'pic_last_idx'}         = $#{image_array};
     $STATE{'pic_array_length'}     = $STATE{'pic_last_idx'} + 1;
-    if ($STATE{'pic_cur_file'}){
-      if ( "$image_hash{ $STATE{'pic_cur_file'} }" ne '' ){
-        $STATE{'pic_cur_idx'} = $image_hash{ $STATE{'pic_cur_file'} };
-      } else {
-        $ERROR = 1;
-        $DUMP .= "DID NOT FIND '$STATE{'pic_cur_file'}' IN THE LIST!<br>";
-      }
+    if ($STATE{'pic_cur_file'} && $image_hash{ $STATE{'pic_cur_file'} }) {
+      $STATE{'pic_cur_idx'} = $image_hash{ $STATE{'pic_cur_file'} };
+    } else {
+      # ERROR: Picture requested was not found.
+      $STATE{'error_msg'} = 'Picture not found.';
     }
+
     $STATE{'pic_next_idx'}         = $STATE{'pic_cur_idx'} + 1;
     $STATE{'pic_previous_idx'}     = $STATE{'pic_cur_idx'} - 1;
     # This chunk will just loop the image array around if it is out of bounds.
@@ -858,7 +855,11 @@ sub calculateImageListState {
     $STATE{'pic_cur_file'}         = ${image_array[ $STATE{'pic_cur_idx'} ]};
     $STATE{'pic_previous_file'}    = ${image_array[ $STATE{'pic_previous_idx'} ]};
     $STATE{'pic_next_file'}        = ${image_array[ $STATE{'pic_next_idx'} ]};
-   }
+  } elsif ($STATE{'pic_cur_file'}) {
+    # ERROR: Tried to access a picture in a folder that has no pictures at all.
+    $STATE{'error_msg'} = 'Picture not found.';
+  }
+
   # Would be ideal if we didn't un-encode then re-encode the url_encoded.  In many cases, $ENV{REQUEST_URI} has what we need!
   # Problem is that there are several ways to get the 'url' (cur_url or directly from path if no mod_re-write)
   $STATE{'web_dir_encoded'} = $STATE{'web_dir'};
@@ -876,139 +877,170 @@ if (${COMMANDLINE}) {
   exit 0;
 }
 
-# RENDER HTML HEAD #############################################################
-print "Content-type: text/html\n\n";
-print '<!DOCTYPE html>
-<html class="jcd">
-  <head>
-    <script>
-      (function(H){H.className=H.className.replace(/\bjcd\b/,"jcd-js")})(document.documentElement)
-    </script>
-    <meta charset="utf-8">
-    <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
-    <title>'.$STATE{'title'}.'</title>
-    <meta name="description" content="'.$STATE{'page_description'}.'">
-    <link href="'.${assets_root}.'/jcdsee.css" rel="stylesheet" type="text/css">
-    <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
-';
-
-if ($STATE{'test_mode'}) {
-  # Make it pink if in test mode.
-  print "<style type='text/css'> body {outline: 1px solid red;background-color: pink;} </style>";
+if (printHtmlHead()) {
+  printHtmlContent();
 }
 
-print '
-  </head>
-  <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
+# RENDER HTML HEAD #############################################################
 
-    <div id="nav">
-      <ul id="depth-path">'
-        .getDepthPath().'
-      </ul>
-      <div id="mode-buttons">'
-        .getNavButton("display_mode","LIST","LIST MODE")
-        .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
-        .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
-        .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
-        .'
-      </div>
-    </div>
-
-    <div id="content">
-      <div>';
-        # Show warning if trying to access slideshow without JS.
-        if ($STATE{'display_mode'} eq 'SLIDESHOW') {
-          print '
-          <noscript>
-            <h1>JavaScript is disabled</h1>
-            <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
-            <meta http-equiv="refresh" content="10; url='.getHREF('', 'single').'" data-old-href="'.OLDgetHREF('display_mode', 'SINGLE').'">
-          </noscript>
-          ';
-        }
-
-        # TODO: Use slideshow list instead of this table.
-        if ($STATE{'display_mode'} eq 'LIST') {
-          print '
-          <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
-        }
-        printFileListHTML();
-        # Finish table for LIST mode.
-        if ($STATE{'display_mode'} eq 'LIST') {
-          print '
-          </table>
-          ';
-        }
-
-        print '
-        <!-- close #content div -->
-      </div>
-    </div>
-    <!--
-      <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <Work rdf:about="">
-          <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.5/" />
-          <dc:title>Photography by Jonathan Cross</dc:title>
-          <dc:description>Various photos from around the world.</dc:description>
-          <dc:creator><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:creator>
-          <dc:rights><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:rights>
-          <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-          <dc:source rdf:resource="http://pics.jonathancross.com" />
-        </Work>
-        <License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.5/">
-          <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
-          <permits rdf:resource="http://web.resource.org/cc/Distribution"/>
-          <requires rdf:resource="http://web.resource.org/cc/Notice"/>
-          <requires rdf:resource="http://web.resource.org/cc/Attribution"/>
-          <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse"/>
-          <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
-          <requires rdf:resource="http://web.resource.org/cc/ShareAlike"/>
-        </License>
-      </rdf:RDF>
-    -->';
-    # Debug & error information.
-    if (${ERROR} || $STATE{'test_mode'}) {
-      ${DUMP} .=  "FILE TYPES: \n";
-      foreach my $k (sort keys %file_types) {
-        ${DUMP} .= "  $k = $file_types{$k}\n";
-      }
-      ${DUMP} .=  "\nIMAGES: \n";
-      foreach my $k (sort keys %image_hash) {
-        ${DUMP} .= "  $k = $image_hash{$k}\n";
-      }
-      ${DUMP} .=  "\nSTATE: \n";
-      foreach my $k (sort keys %STATE) {
-        ${DUMP} .= "  $k = $STATE{$k}\n";
-      }
-      print "
-        <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
-          <b style='font-size:10px;color:black;'>ERROR:</b><br>
-          <pre>${DUMP}</pre>
-        </div>";
+# Prints out the http header for the HTML page.  If the app is in an error,
+# state, then a full doc will be rendered and false returned.
+#   printHtmlHead()
+sub printHtmlHead {
+  if ($STATE{'error_msg'}) {
+    print header(-status => 404, -charset=>'utf-8');
+    if (! $STATE{'test_mode'}) {
+      # Redirect to home page.
+      print '<!DOCTYPE html>
+        <html class="jcd"><head>
+        <meta charset="utf-8">
+        <title>Error: '.$STATE{'error_msg'}.'</title>
+        <meta http-equiv="refresh" content="0; url=/" />
+        </head></html>';
+      exit 0;
     }
+  } else {
+    print "Content-type: text/html\n\n";
+  }
+  return 1;
+}
 
-    $TIMER{'total_e'} = gettimeofday();
-    $TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
+# Prints out content of the page.
+#   printHtmlContent()
+sub printHtmlContent {
+  print '<!DOCTYPE html>
+  <html class="jcd">
+    <head>
+      <script>
+        (function(H){H.className=H.className.replace(/\bjcd\b/,"jcd-js")})(document.documentElement)
+      </script>
+      <meta charset="utf-8">
+      <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
+      <title>'.$STATE{'title'}.'</title>
+      <meta name="description" content="'.$STATE{'page_description'}.'">
+      <link href="'.${assets_root}.'/jcdsee.css" rel="stylesheet" type="text/css">
+      <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
+  ';
 
-    print '
-    <div id="footer">
-      <a id="copyleft" rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
-        <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
-      </a>
-      <div id="usage">
-        <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
-        Script executed in: '.$TIMER{'total'}.' seconds.';
-        if ($STATE{'country_code'}) {
-          print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
-        }
-        print '<br>'
-        .getSitemapData('pageDate')
-        .getSitemapData('pageSize')
-        .'
+  if ($STATE{'test_mode'}) {
+    # Make it pink if in test mode.
+    print "<style type='text/css'> body {outline: 1px solid red;background-color: pink;} </style>";
+  }
+
+  print '
+    </head>
+    <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
+
+      <div id="nav">
+        <ul id="depth-path">'
+          .getDepthPath().'
+        </ul>
+        <div id="mode-buttons">'
+          .getNavButton("display_mode","LIST","LIST MODE")
+          .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
+          .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
+          .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
+          .'
+        </div>
       </div>
-    </div>
 
-    <script src="'.${assets_root}.'/jcdsee.js"></script>
-  </body>
-</html>
-';
+      <div id="content">
+        <div>';
+          # Show warning if trying to access slideshow without JS.
+          if ($STATE{'display_mode'} eq 'SLIDESHOW') {
+            print '
+            <noscript>
+              <h1>JavaScript is disabled</h1>
+              <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
+              <meta http-equiv="refresh" content="10; url='.getHREF('', 'single').'" data-old-href="'.OLDgetHREF('display_mode', 'SINGLE').'">
+            </noscript>
+            ';
+          }
+
+          # TODO: Use slideshow list instead of this table.
+          if ($STATE{'display_mode'} eq 'LIST') {
+            print '
+            <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
+          }
+          printFileListHTML();
+          # Finish table for LIST mode.
+          if ($STATE{'display_mode'} eq 'LIST') {
+            print '
+            </table>
+            ';
+          }
+
+
+          print '
+          <!-- close #content div -->
+        </div>
+      </div>
+      <!--
+        <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <Work rdf:about="">
+            <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.5/" />
+            <dc:title>Photography by Jonathan Cross</dc:title>
+            <dc:description>Various photos from around the world.</dc:description>
+            <dc:creator><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:creator>
+            <dc:rights><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:rights>
+            <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+            <dc:source rdf:resource="http://pics.jonathancross.com" />
+          </Work>
+          <License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.5/">
+            <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
+            <permits rdf:resource="http://web.resource.org/cc/Distribution"/>
+            <requires rdf:resource="http://web.resource.org/cc/Notice"/>
+            <requires rdf:resource="http://web.resource.org/cc/Attribution"/>
+            <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse"/>
+            <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
+            <requires rdf:resource="http://web.resource.org/cc/ShareAlike"/>
+          </License>
+        </rdf:RDF>
+      -->';
+      # Debug & error information.
+      if ($STATE{'error_msg'} && $STATE{'test_mode'}) {
+        ${DUMP} .=  "FILE TYPES: \n";
+        foreach my $k (sort keys %file_types) {
+          ${DUMP} .= "  $k = $file_types{$k}\n";
+        }
+        ${DUMP} .=  "\nIMAGES: \n";
+        foreach my $k (sort keys %image_hash) {
+          ${DUMP} .= "  $k = $image_hash{$k}\n";
+        }
+        ${DUMP} .=  "\nSTATE: \n";
+        foreach my $k (sort keys %STATE) {
+          ${DUMP} .= "  $k = $STATE{$k}\n";
+        }
+        print "
+          <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
+            <b style='font-size:10px;color:black;'>ERROR:</b><br>
+            <pre>${DUMP}</pre>
+          </div>";
+      }
+
+      $TIMER{'total_e'} = gettimeofday();
+      $TIMER{'total'} = sprintf("%.3f", ($TIMER{'total_e'} - $TIMER{'total_s'}));
+
+      print '
+      <div id="footer">
+        <a id="copyleft" rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+          <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
+        </a>
+        <div id="usage">
+          <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
+          Script executed in: '.$TIMER{'total'}.' seconds.';
+          if ($STATE{'country_code'}) {
+            print " Geo: $ENV{'HTTP_CF_IPCOUNTRY'}";
+          }
+          print '<br>'
+          .getSitemapData('pageDate')
+          .getSitemapData('pageSize')
+          .'
+        </div>
+      </div>
+
+      <script src="'.${assets_root}.'/jcdsee.js"></script>
+    </body>
+  </html>
+  ';
+} # End printContent
