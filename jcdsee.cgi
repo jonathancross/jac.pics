@@ -573,7 +573,7 @@ sub getLinkTag {
     ${desc} .= ($file_descriptions{${file_name}} ne '') ? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
   }
   my $full_path = "$STATE{'web_dir'}${file_name}";
-  if (isFileType(${file_name},'folder')) {
+  if (isFileType(${file_name}, 'folder')) {
     #Folder
     ${link_tag} = "<a href=\"".getHREF(${full_path})."\"
                       data-old-href=\"".OLDgetHREF('dir', ${full_path})."\"
@@ -603,7 +603,6 @@ sub getLinkTag {
 sub getNavButton {
   my ($mode, $value, $desc) = @_;
   my ${icon_modifier} = lc(${value}); # Lowercase
-  # need to link to $STATE{'pic_cur_file'}
   my ${href} = getHREF('', $value);
   my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
   my ${linked_img} = "<a href='${href}'
@@ -966,7 +965,6 @@ sub printHtmlContent {
             </table>
             ';
           }
-
 
           print '
           <!-- close #content div -->
