@@ -20,12 +20,12 @@ var jcd = {};
  */
 jcd.SlideShow = function(config) {
   /**
-   * @type {!jcd.ImageManager} 
+   * @type {!jcd.ImageManager}
    */
   this.imageManager = config.imageManager;
 
   /**
-   * @enum {Element} 
+   * @enum {Element}
    * @private
    */
   this.contentContainer_ = config.contentContainer;
@@ -37,7 +37,7 @@ jcd.SlideShow = function(config) {
   this.counterEl_;
 
   /**
-   * @private {Object} reference to DOM nodes used in slideshow. 
+   * @private {Object} reference to DOM nodes used in slideshow.
    */
   this.nodes_;
 
@@ -341,7 +341,7 @@ jcd.SlideShow.prototype.play = function(isStale) {
     this.next();
   } else {
     // Load current selected image.
-    this.loadImage(this.imageManager.getSelectedImage());    
+    this.loadImage(this.imageManager.getSelectedImage());
   }
   window.clearTimeout(this.timer_);
   this.timer_ = 0;
@@ -779,9 +779,9 @@ jcd.Page.prototype.elementIds_ = {
  */
 jcd.Page.prototype.displayModes_ = {
   LIST: 'list',
-  THUMBS: 'thumbs',
+  THUMB: 'thumb',
   SINGLE: 'single',
-  SLIDESHOW: 'slideshow'
+  SLIDE: 'slide'
 };
 
 
@@ -855,7 +855,7 @@ jcd.Page.prototype.init_ = function() {
   this.displayMode_ = this.getDisplayMode();
   // console.log('DEBUG: Page display mode: ' + this.displayMode_);
 
-  if ((this.displayMode_ == this.displayModes_.SLIDESHOW) && this.fileListContainer_) {
+  if ((this.displayMode_ == this.displayModes_.SLIDE) && this.fileListContainer_) {
     var fileList = new jcd.FileList(this.fileListContainer_);
     var slideShow = new jcd.SlideShow({
       'imageManager': fileList.imageManager,

@@ -80,7 +80,7 @@ my %STATE = (
   is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
   title             => 'Jonathan Cross', # Document title base
   cur_dir_name      => '', # Will have only the name of the current directory (no slashes)
-  display_mode      => '', # Display mode (SINGLE|LIST|THUMBS|SLIDESHOW) Default=LIST
+  display_mode      => '', # Display mode (single|list|thumb|slide) Default=list
   test_mode         => 0,  # Test mode (0 or 1) Default=0
   page_description  => '', # Description of current page (from xml database)
   prefix_cur        => '', # Will hold the current prefix (prefix_small or prefix_large)
@@ -98,7 +98,7 @@ my %STATE = (
   pic_next_file     => '',
 );
 my %DEFAULTS = (
-  display_mode      => 'LIST',
+  display_mode      => 'list',
   test_mode         => 0,
 );
 my %LEGACY_MODES = (
@@ -110,7 +110,7 @@ my %LEGACY_MODES = (
 
 
 # LOAD / SET PARAMS & DEFAULTS
-$STATE{'display_mode'} = param('display_mode');
+$STATE{'display_mode'} = convertFromLegacyDisplayMode(param('display_mode'));
 $STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
 
 # CURRENT URL FROM PARAM -OR- PATH
@@ -165,7 +165,7 @@ $STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
 # Load  / Build the list of files.
 loadFileDatabase();
 
-# Default to first image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
+# Default to first image if possible for single and slide. Fixes issue #17.
 if (! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
@@ -183,17 +183,17 @@ while ((my $key, my $value) = each(%DEFAULTS)) {
 }
 
 # Display mode setup & defaults.
-if ($STATE{'display_mode'} eq 'THUMBS') {
+if (isMode('thumb')) {
   $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normally all will have same height
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_large'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
-} elsif ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && $STATE{'pic_cur_file'}) { # Only allow SINGLE|SLIDESHOW if there is 1 or more images.
+} elsif ($STATE{'display_mode'} =~ /^single|slide$/ && $STATE{'pic_cur_file'}) { # Only allow single|slide if there is 1 or more images.
   # Do not prefix image name, use full-size image
   $STATE{'prefix_cur'} = '';
   $STATE{'thumb_ext_cur'} = '';
 } else {
-  $STATE{'display_mode'} = 'LIST';
+  $STATE{'display_mode'} = 'list';
   $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_small'}; #max dimension of small thumbnail
   $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_small'}; #max dimension of small thumbnail
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_small'};
@@ -311,7 +311,7 @@ sub getImageTag {
     createImageThumbnail(${image_source}, ${image_thumb});
   }
   $image_thumb_url = urlEscapeSpaces($image_thumb_url);
-  my $alt = ($STATE{'display_mode'} eq 'THUMBS') ? stripHTML($file_descriptions{${image_name}}) : '';
+  my $alt = (isMode('thumb')) ? stripHTML($file_descriptions{${image_name}}) : '';
   return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
 
@@ -321,7 +321,7 @@ sub getCurrentPageTitle {
   my ($path) = @_;
   $path =~ s@${pic_root}|/$@@g; # Delete pic root and trailing slash.
   $path =~ s@/@ : @g; # Replace all slashes with colon.
-  if ($STATE{'display_mode'} eq 'SINGLE') {
+  if (isMode('single')) {
     $path .= ${title_char}.getNiceFilename($STATE{'pic_cur_file'});
   }
   $path = join($title_char, reverse(split($title_char, $path)));  # Split the path elements, then reassemble in reverse
@@ -380,7 +380,7 @@ sub getSitemapData {
 #   getParsedFileName("file name to be parsed")
 sub getParsedFileName {
   my ($file_name) = @_;
-  my ${strip_date} = ($STATE{'display_mode'} =~ /^THUMBS|SINGLE|SLIDESHOW$/) ? 1 : 0;
+  my ${strip_date} = ($STATE{'display_mode'} =~ /^thumb|single|slide$/) ? 1 : 0;
   my ${file_name_parsed} = '<span class="file-name-container">';
   if (${strip_date}) {
     ${file_name_parsed} .= getNiceFilename(${file_name});
@@ -426,12 +426,10 @@ sub convertFromLegacyDisplayMode {
   return $mode;
 }
 
-# Returns true if the given display_mode corresponds to the current display_mod.
-# Also supports legacy mode names.
+# Returns true if the given display_mode equals the current display_mode.
 #   isMode('display-mode')
 sub isMode {
   my ($mode) = @_;
-  $mode = convertFromLegacyDisplayMode($mode);
   return ($mode eq $STATE{'display_mode'});
 }
 
@@ -527,7 +525,7 @@ sub getDepthPath {
   $depth_path .= '<li class="depth-path-header"><h1>'.getNiceFilename($last_directory).'</h1></li>';
 
   # Append the collection description:
-  # Consider replacing with current picture name + desc for SINGLE mode here.
+  # Consider replacing with current picture name + desc for single mode here.
   if ("$STATE{'page_description'}") {
     $depth_path .= '<li class="depth-path-header"><h2>'.$STATE{'page_description'}.'</h2></li>';
   }
@@ -670,19 +668,19 @@ sub getFormattedFileSize {
 # Prints out the html-formatted list of files for the page content.
 #   printFileListHTML()
 sub printFileListHTML {
-  #my(@time_info,@month_list);
-  #my(${year},${month},${minute},${day},${hour},${file_size},${is_dir});
+  # my(@time_info,@month_list);
+  # my(${year},${month},${minute},${day},${hour},${file_size},${is_dir});
   my ${file_name};
   my @file_info;
   my ${file_size};
-  #LIST AND THUMBNAIL DISPLAY MODES
-  if ($STATE{'display_mode'} =~ /^(LIST|THUMBS)$/) {
+  # list and thumbnail display modes
+  if ($STATE{'display_mode'} =~ /^(list|thumb)$/) {
     foreach ${file_name} (@dir_list) {
       ${file_size} = '';
       @file_info = stat $STATE{'server_dir'}.${file_name};
-      #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
+      # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
       # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
-      if ($STATE{'display_mode'} eq 'LIST') {
+      if (isMode('list')) {
         #@time_info = localtime ${file_info[9]};
         #EXTRACT FILE INFO FROM ARRAY AND PAD
         #${year} = ${time_info[5]} + 1900;
@@ -696,12 +694,12 @@ sub printFileListHTML {
         print "
         <tr>
           <td class='col-picture'>";
-            #GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
+            # GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
             print getIcon(${file_name});
             print "</td>
           <td class='col-description'>";
-            #date isn't really used, but maybe in future?
-            #my ${date} = "${day}-${month}-${year} ${hour}:${minute}";
+            # Date isn't really used, but maybe in future?
+            # my ${date} = "${day}-${month}-${year} ${hour}:${minute}";
             print getLinkTag(${file_name}, getParsedFileName(${file_name}), '', 'simple');
             if ($file_descriptions{${file_name}}) {
               print "<span class='file-description'>$file_descriptions{${file_name}}</span>";
@@ -709,21 +707,20 @@ sub printFileListHTML {
           print "</td>
           <td class='col-size'>${file_size}&nbsp;&nbsp;</td>
         </tr>";
-      } elsif ($STATE{'display_mode'} eq 'THUMBS') {
-        #GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
+      } elsif (isMode('thumb')) {
+        # GET THE APPROPRIATE ICON FOR THE FILE, FOLDER, IMAGE, ETC.
         # TODO: Use list just like slideshow.
         print '<table class="picture-icon-container" cellpadding="0" cellspacing="1"><tr><td valign="middle" align="center">';
         print getIcon(${file_name});
         print '</td></tr><tr><td valign="top" class="picture-icon-file-name" align="center">'.getParsedFileName(${file_name}).'</td></tr></table>';
       }
     }
-    if ($STATE{'display_mode'} eq 'THUMBS') {
+    if (isMode('thumb')) {
       print '<div>&nbsp;</div>';
     }
 
-  } elsif ($STATE{'display_mode'} eq 'SINGLE') {
-    #SINGLE IMAGE MODE
-    #Make sure large thumbs exist
+  } elsif (isMode('single')) {
+    # Make sure large thumbs exist for single image mode.
     ${file_name} = $STATE{'pic_cur_file'};
     if (${file_name}) {
       my ${previous_thumb} = "$STATE{'web_dir'}$IMAGE_GLOBAL{'prefix_large'}$STATE{'pic_previous_file'}$IMAGE_GLOBAL{'thumb_ext'}";
@@ -756,7 +753,7 @@ sub printFileListHTML {
       </a>
       <a class='picture-link large-picture-wrapper'
          href='".getHREF('', 'slide')."'
-         data-old-href='".OLDgetHREF('display_mode', 'SLIDESHOW')."'
+         data-old-href='".OLDgetHREF('display_mode', 'slide')."'
          title='Slideshow...'>"
         .getImageTag(${file_name}, '')."
       </a>
@@ -772,9 +769,9 @@ sub printFileListHTML {
       </a>
       ";
     }
-  } elsif ($STATE{'display_mode'} eq 'SLIDESHOW') {
+  } elsif (isMode('slide')) {
     # SLIDESHOW IMAGE MODE
-    # TODO: Use this for LIST|THUMBS|SLIDESHOW ########################################################################
+    # TODO: Use this for list|thumb|slide ########################################################################
     print '<ul id="files">';
     # Make sure large thumbs exist
     ${file_name} = $STATE{'pic_cur_file'};
@@ -932,10 +929,10 @@ sub printHtmlContent {
           .getDepthPath().'
         </ul>
         <div id="mode-buttons">'
-          .getNavButton("display_mode","LIST","LIST MODE")
-          .getNavButton("display_mode","THUMBS","THUMBNAIL IMAGE MODE")
-          .getNavButton("display_mode","SINGLE","SINGLE IMAGE MODE")
-          .getNavButton("display_mode","SLIDESHOW","SLIDESHOW DISPLAY MODE")
+          .getNavButton('display_mode', 'list',   'List display mode')
+          .getNavButton('display_mode', 'thumb',  'Thumbnail image mode')
+          .getNavButton('display_mode', 'single', 'Single image display mode')
+          .getNavButton('display_mode', 'slide',  'Slideshow display mode')
           .'
         </div>
       </div>
@@ -943,24 +940,24 @@ sub printHtmlContent {
       <div id="content">
         <div>';
           # Show warning if trying to access slideshow without JS.
-          if ($STATE{'display_mode'} eq 'SLIDESHOW') {
+          if (isMode('slide')) {
             print '
             <noscript>
               <h1>JavaScript is disabled</h1>
               <h2>Sorry, the slideshow function requires JavaScript. Please choose a different display mode from the top-right corner or wait and this page will be redirected in 10 seconds.</h2>
-              <meta http-equiv="refresh" content="10; url='.getHREF('', 'single').'" data-old-href="'.OLDgetHREF('display_mode', 'SINGLE').'">
+              <meta http-equiv="refresh" content="10; url='.getHREF('', 'single').'" data-old-href="'.OLDgetHREF('display_mode', 'single').'">
             </noscript>
             ';
           }
 
           # TODO: Use slideshow list instead of this table.
-          if ($STATE{'display_mode'} eq 'LIST') {
+          if (isMode('list')) {
             print '
             <table id="file_list" cellpadding="4" cellspacing="0" border="0">';
           }
           printFileListHTML();
-          # Finish table for LIST mode.
-          if ($STATE{'display_mode'} eq 'LIST') {
+          # Finish table for list mode.
+          if (isMode('list')) {
             print '
             </table>
             ';

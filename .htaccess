@@ -62,17 +62,11 @@ ErrorDocument 500 /error.html
   # Would be better to use some RewriteBase magic to test for dir or file like above.
   RewriteRule (.*/[^?.]+[^?/])$ /$1/ [redirect=301,last]
 
-  # /thumb/ THUMBS display mode.
-  RewriteRule ^thumb/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=THUMBS [qsappend,last]
+  # Standard display modes
+  RewriteRule ^(single|thumb|slide|list)/([^?]+)$ /jcdsee.cgi?pic_path=/$2&display_mode=$1 [qsappend,last]
 
-  # /pic/ and /single/ SINGLE picture.
-  RewriteRule ^(pic|single)/([^?]+)$ /jcdsee.cgi?pic_path=/$2&display_mode=SINGLE [qsappend,last]
-
-  # /slide/ SLIDESHOW display mode.
-  RewriteRule ^slide/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=SLIDESHOW [qsappend,last]
-
-  # /list/ LIST display mode, this one handles pictures, does not add trailing slash.
-  RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=LIST [qsappend,last]
+  # /list/ list display mode, this one handles pictures, does not add trailing slash.
+  RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=list [qsappend,last]
 
   # /jcdsee/ DIRECTORY: Prevent file listing here.
   RewriteRule ^jcdsee/$ / [redirect=301,last]
