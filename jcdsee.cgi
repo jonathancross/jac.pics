@@ -170,7 +170,7 @@ $STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
 loadFileDatabase();
 
 # Default to first image if possible for SINGLE and SLIDESHOW. Fixes issue #17.
-if ($STATE{'display_mode'} =~ /^SINGLE|SLIDESHOW$/ && ! $STATE{'pic_cur_file'} && @image_array) {
+if (! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
 
@@ -832,11 +832,12 @@ sub calculateImageListState {
   if (@image_array > 0) {
     $STATE{'pic_last_idx'}         = $#{image_array};
     $STATE{'pic_array_length'}     = $STATE{'pic_last_idx'} + 1;
-    if ($STATE{'pic_cur_file'} && $image_hash{ $STATE{'pic_cur_file'} }) {
-      $STATE{'pic_cur_idx'} = $image_hash{ $STATE{'pic_cur_file'} };
+    my $cur_idx = $image_hash{ $STATE{'pic_cur_file'} };
+    if ($STATE{'pic_cur_file'} && $cur_idx ne '') {
+      $STATE{'pic_cur_idx'} = $cur_idx;
     } else {
-      # ERROR: Picture requested was not found.
-      $STATE{'error_msg'} = 'Picture not found.';
+      # ERROR: Requested picture was not found.
+      $STATE{'error_msg'} = 'Picture "'.$STATE{'pic_cur_file'}.'" was not found.';
     }
 
     $STATE{'pic_next_idx'}         = $STATE{'pic_cur_idx'} + 1;
@@ -877,9 +878,9 @@ if (${COMMANDLINE}) {
   exit 0;
 }
 
-if (printHtmlHead()) {
-  printHtmlContent();
-}
+printHtmlHead();
+printHtmlContent();
+
 
 # RENDER HTML HEAD #############################################################
 
@@ -902,7 +903,6 @@ sub printHtmlHead {
   } else {
     print "Content-type: text/html\n\n";
   }
-  return 1;
 }
 
 # Prints out content of the page.
