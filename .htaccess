@@ -25,9 +25,6 @@ ErrorDocument 404 /error.html
 ErrorDocument 500 /error.html
 
 # Clean URLs
-# TODO:
-#   #18 Rename display modes
-#       Will then be able combine last 4 rules into one.
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
