@@ -48,9 +48,6 @@ ErrorDocument 500 /error.html
   RewriteCond %{QUERY_STRING} cur_url=([^&]+)
   RewriteRule ^jcdsee\.cgi %1? [redirect=301,last]
 
-  # RewriteRule cur_url=([^&]+) $1 [redirect=301,last]
-  # RewriteRule ^(.+)$ /single$1 [redirect=301,last]
-
   # DIRECTORY: Normalize directories to have trailing slash: /
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ([^/])$ /$1/
@@ -62,11 +59,8 @@ ErrorDocument 500 /error.html
   # Would be better to use some RewriteBase magic to test for dir or file like above.
   RewriteRule (.*/[^?.]+[^?/])$ /$1/ [redirect=301,last]
 
-  # Standard display modes
+  # Display modes
   RewriteRule ^(single|thumb|slide|list)/([^?]+)$ /jcdsee.cgi?pic_path=/$2&display_mode=$1 [qsappend,last]
-
-  # /list/ list display mode, this one handles pictures, does not add trailing slash.
-  RewriteRule ^list/([^?]+)$ /jcdsee.cgi?pic_path=/$1&display_mode=list [qsappend,last]
 
   # /jcdsee/ DIRECTORY: Prevent file listing here.
   RewriteRule ^jcdsee/$ / [redirect=301,last]
