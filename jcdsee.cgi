@@ -8,6 +8,7 @@ my $VERSION = '2.0.1';
 ################################################################################
 
 use strict;
+use warnings;
 use Image::Magick;
 use CGI ':standard';
 use CGI::Carp 'fatalsToBrowser';
@@ -19,7 +20,7 @@ use XML::LibXML;
 my %TIMER;
 $TIMER{'total_s'} = gettimeofday();
 
-# Allow command line execution / debugging
+# Command line execution / debugging.
 my ${COMMANDLINE} = 0;
 if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
   ${COMMANDLINE} = 1;
@@ -29,26 +30,16 @@ if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
 # GLOBAL VARIABLES #############################################################
 # DIRECTORY LIST ARRAYS
 my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
-my ${DUMP} = '';
-my ${root} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
-my ${pic_root} = '/pics';
-my ${assets_root} = '/jcdsee'; # Folder containing assets used by this script. (icons, buttons, css, etc)
-my ${script_name} = 'jcdsee.cgi'; # Name of the stub script, we need this so we don't show it in the dir listing.
-my ${database_file_name} = '.jcdsee'; # Filename used for each folder's database.
-my ${script_url} = "/${script_name}"; # The main script URL used in links.
-my ${test_url} = 'test'; # Special test mode staging url
-my ${title_char} = ' : ';
-my $amp = '&amp;';
-# XML / XSL objects
-my $XMLparser = XML::LibXML->new();
-my $xslt = XML::LibXSLT->new();
-my $xml_sitemap_file = "${root}/sitemap.xml";
-my $xsl_file = "${root}${assets_root}/jcdsee.xsl";
-if (! -f $xml_sitemap_file) { return "lost XML: $xml_sitemap_file"; }
-if (! -f $xsl_file) { return "lost xsl: $xsl_file"; }
-my $sitemap = $XMLparser->parse_file($xml_sitemap_file);
-my $style_doc = $XMLparser->parse_file($xsl_file);
-my $stylesheet = $xslt->parse_stylesheet($style_doc);
+my ${ROOT} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
+my ${PICS} = '/pics';
+my ${ASSETS} = '/jcdsee'; # Folder containing assets used by this script. (icons, buttons, css, etc)
+my ${JCDSEE_SCRIPT} = 'jcdsee.cgi'; # Name of the stub script, we need this so we don't show it in the dir listing.
+my ${DATABASE_FILENAME} = '.jcdsee'; # Filename used for each folder's database.
+my ${TEST_SUBDOMAIN_STRING} = 'test'; # Special test mode staging url
+my ${TITLE_SEPERATOR} = ' : ';
+my $XML_SITEMAP_FILE = "${ROOT}/sitemap.xml";
+my $XSL_SITEMAP_FILE = "${ROOT}${ASSETS}/jcdsee.xsl";
+my %SITEMAP_DATA = getSitemapData();
 
 # CONSTANTS FOR IMAGE PROCESSING
 my %IMAGE_GLOBAL = (
@@ -111,7 +102,7 @@ my %LEGACY_MODES = (
 
 # LOAD / SET PARAMS & DEFAULTS
 $STATE{'display_mode'} = convertFromLegacyDisplayMode(param('display_mode'));
-$STATE{'test_mode'} = ( $ENV{SERVER_NAME} =~ /^$test_url/ ) ? 1 : 0;
+$STATE{'test_mode'} = ($ENV{SERVER_NAME} =~ /^${TEST_SUBDOMAIN_STRING}/) ? 1 : 0;
 
 # CURRENT URL FROM PARAM -OR- PATH
 
@@ -124,8 +115,7 @@ if (param('cur_url') || param('pic')) {
   $STATE{'error_msg'} = 'This file or folder is now gone.';
 }
 
-# New 'pic_path' param to replace 'pic' and 'cur_url'.
-# Will override others if specified.
+# Path to the fodler or a paicture in a folder.
 if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
@@ -147,7 +137,7 @@ if ($STATE{'web_dir'} eq '') {
 }
 
 if (${COMMANDLINE}) {
-  $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${root}${pic_root}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
+  $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${ROOT}${PICS}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
   $STATE{'server_dir'} = $STATE{'web_dir'};
   $STATE{'display_mode'} = ${ARGV[2]};
   $STATE{'pic_cur_idx'} = int(${ARGV[3]});
@@ -160,7 +150,7 @@ if (${COMMANDLINE}) {
   $STATE{'error_msg'} = 'Directory not found.';
 }
 
-$STATE{'database_file'} = $STATE{'server_dir'}.${database_file_name};
+$STATE{'database_file'} = $STATE{'server_dir'}.${DATABASE_FILENAME};
 
 # Load  / Build the list of files.
 loadFileDatabase();
@@ -200,12 +190,13 @@ if (isMode('thumb')) {
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
 }
 
-# CONVIENIENCE VARIABLES
-my ${icon_unknown} = "${assets_root}/icon_unknown$STATE{'prefix_cur'}png";
-my ${icon_folder} = "${assets_root}/icon_folder$STATE{'prefix_cur'}png";
-my ${icon_music} = "${assets_root}/icon_music$STATE{'prefix_cur'}png";
-my ${icon_doc} = "${assets_root}/icon_doc$STATE{'prefix_cur'}png";
-my ${icon_copyleft} = "${assets_root}/icon_copyleft.png";
+my %ICON = (
+  unknown => "${ASSETS}/icon_unknown$STATE{'prefix_cur'}png",
+  folder => "${ASSETS}/icon_folder$STATE{'prefix_cur'}png",
+  music => "${ASSETS}/icon_music$STATE{'prefix_cur'}png",
+  doc => "${ASSETS}/icon_doc$STATE{'prefix_cur'}png",
+  copyleft => "${ASSETS}/icon_copyleft.png",
+);
 
 
 # Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
@@ -269,7 +260,7 @@ sub createDatabase {
   # Write filtered list out to the .jcdsee database file.
   foreach my ${line} (sort @dir_list_raw) {
     # Exclude thumbnail images, hidden files and the jcdsee script itself.
-    if (${line} !~ /^[.]|${script_name}/) {
+    if (${line} !~ /^[.]|${JCDSEE_SCRIPT}/) {
       print DATA "${line}|\n";
     }
   }
@@ -315,16 +306,21 @@ sub getImageTag {
   return "<img src='${image_thumb_url}' class='picture-icon' alt='${alt}'>";
 }
 
-# Returns a SEO title for the current page which is reverse of path.
+# Returns a clean SEO title for the current page which is reverse of path.
+# Examples:
+#  • /pics/2005/India/Sikkim/                   => Sikkim : India : 2005
+#  • /pics/2005/India/Sikkim/        05_Nina_hat.jpg OR
+#  • /pics/2005/India/Sikkim/2005-12-25_Nina_hat.jpg
+#                                    => Nina hat : Sikkim : India : 2005
 #   getCurrentPageTitle("path")
 sub getCurrentPageTitle {
   my ($path) = @_;
-  $path =~ s@${pic_root}|/$@@g; # Delete pic root and trailing slash.
-  $path =~ s@/@ : @g; # Replace all slashes with colon.
+  $path =~ s@${PICS}|/$@@g; # Delete "/pics" root and trailing slash.
+  $path =~ s@/@${TITLE_SEPERATOR}@g; # Replace all slashes with colon.
   if (isMode('single')) {
-    $path .= ${title_char}.getNiceFilename($STATE{'pic_cur_file'});
+    $path .= ${TITLE_SEPERATOR}.getNiceFilename($STATE{'pic_cur_file'});
   }
-  $path = join($title_char, reverse(split($title_char, $path)));  # Split the path elements, then reassemble in reverse
+  $path = join($TITLE_SEPERATOR, reverse(split($TITLE_SEPERATOR, $path)));  # Split the path elements, then reassemble in reverse
   $path .= $STATE{'title'};
   $path = getNiceFilename($path);
   return $path;
@@ -337,8 +333,8 @@ sub getNiceFilename {
   $fn = removeDatePrefix($fn);
   $fn = removeNumberPrefix($fn);
   $fn = removeFileExtension($fn);
-  $fn =~ s#[._-]# #g;
-  $fn =~ s#([[:lower:]])([[:upper:]\d])#\1 \2#g; # space out wiki words
+  $fn =~ s@[._-]@ @g;
+  $fn =~ s@([[:lower:]])([[:upper:]\d])@\1 \2@g; # Space out camelCase words.
   return $fn;
 }
 
@@ -366,12 +362,32 @@ sub removeFileExtension {
   return $fn;
 }
 
-# Returns a piece of data from the sitemap XML database based on the "item" (pageDescription|pageDate|pageSize).
-#   getSitemapData("databaseItem")
+# Returns a hash containing out parsed XML and XSL for the sitemap.
+#   getSitemapData
 sub getSitemapData {
+  my $XMLparser = XML::LibXML->new();
+  my $xslt = XML::LibXSLT->new();
+  (-f $XML_SITEMAP_FILE) or return "Lost XML: $XML_SITEMAP_FILE";
+  (-f $XSL_SITEMAP_FILE) or return "Lost XSL: $XSL_SITEMAP_FILE";
+
+  my %sitemapParsed = (
+    xml => $XMLparser->parse_file($XML_SITEMAP_FILE),
+    xsl => $xslt->parse_stylesheet($XMLparser->parse_file($XSL_SITEMAP_FILE)) # Is there not a parse_stylesheet_file method?
+  );
+  return %sitemapParsed;
+}
+
+# Returns a single string data item from the sitemap XML database.
+# Item can be one of these three types: pageDescription|pageDate|pageSize
+#   getSitemapDataItem("databaseItem")
+sub getSitemapDataItem {
   my ($item) = @_;
-  my $results = $stylesheet->transform($sitemap, NAME => "'$item'", VALUE => "'$STATE{'web_dir_encoded'}'");
-  my $string = $stylesheet->output_string($results);
+  my $results = $SITEMAP_DATA{'xsl'}->transform(
+    $SITEMAP_DATA{'xml'},
+    NAME => "'$item'",
+    VALUE => "'$STATE{'web_dir_encoded'}'"
+  );
+  my $string = $SITEMAP_DATA{'xsl'}->output_string($results);
   chomp($string);
   return $string;
 }
@@ -394,7 +410,7 @@ sub getParsedFileName {
   return ${file_name_parsed} .= '</span>';
 }
 
-# Returns a string with HTMl tags removed and quotes encoded (used by alt tags)
+# Returns a string with HTMl tags removed and quotes encoded (used by alt tags).
 #   stripHTML("string")
 sub stripHTML {
   my ($string) = @_;
@@ -457,7 +473,7 @@ sub OLDgetHREF {
     ${HREF} = "$STATE{'web_dir'}";
     return ${HREF};
   } else {
-    ${HREF} = "${script_url}?";
+    ${HREF} = "/${JCDSEE_SCRIPT}?";
   }
   # SET URL PARAM
   if (${action} eq 'pic') {
@@ -470,9 +486,9 @@ sub OLDgetHREF {
   # DISPLAY MODE PARAM
   if (${action} ne 'pic' && ${action} ne 'dir') { #for 'pic' and 'dir' we have pre-defined display modes so they are excluded here
     if (${action} eq 'display_mode') {
-      ${HREF} .= "${amp}display_mode=${value}";
+      ${HREF} .= "&amp;display_mode=${value}";
     } else {
-      ${HREF} .= "${amp}display_mode=$STATE{'display_mode'}"; #persist the display mode
+      ${HREF} .= "&amp;display_mode=$STATE{'display_mode'}"; #persist the display mode
     }
   }
 
@@ -534,31 +550,51 @@ sub getDepthPath {
 }
 
 # Returns a linked image tag representing the file provided by $file_name
-#   getIcon("name of file")
+#   getIcon("file name")
 sub getIcon {
   my ($file_name) = @_;
   my ${link_content};
-  my ${icon_file};
   my ${class};
   my ${desc} = ${file_name};
-  ${desc} .= ($file_descriptions{${file_name}} ne '')? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
+  ${desc} .= ($file_descriptions{${file_name}})? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
   if (isFileType(${file_name}, 'pic')) {
-    #Image icon
-    ${class} = ($STATE{'pic_cur_file'} eq ${file_name}) ? 'current_pic' : 'pic' ;
-    ${link_content} = getImageTag(${file_name},$STATE{'prefix_cur'});
+    # Image icon.
+    my ${class} = ($STATE{'pic_cur_file'} eq ${file_name}) ? 'current_pic' : 'pic' ;
+    ${link_content} = getImageTag(${file_name}, $STATE{'prefix_cur'});
   } else {
-    #we can create and upload a static thumbnail icon for any filetype... will replace default question mark
-    my ${static_thumbnail_path} = $STATE{'server_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
-    #Use built-in icon
-         if (isFileType(${file_name},'folder')) { ${icon_file} = ${icon_folder};
-    } elsif (isFileType(${file_name},'doc')) {    ${icon_file} = ${icon_doc};
-    } elsif (isFileType(${file_name},'music')) {  ${icon_file} = ${icon_music};
-    } elsif (-e ${static_thumbnail_path}) {       ${icon_file} = $STATE{'web_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
-    } else {                                      ${icon_file} = ${icon_unknown};
-    }
+    # Static icon file or built-in icon.
+    my ${icon_file} = getStaticIcon(${file_name});
     ${link_content} = "<img src=\"${icon_file}\" alt=\"${desc}\">";
   }
   return getLinkTag(${file_name},${link_content},${desc},${class});
+}
+
+# Returns the path of a static icon for $file_name.
+#   getStaticIcon("file name")
+sub getStaticIcon {
+  my ($file_name) = @_;
+  my ${icon_file};
+  # We can create and upload a static thumbnail icon for any filetype... will replace default question mark
+  my ${static_thumbnail_path} = $STATE{'server_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  # Use built-in icon
+       if (isFileType(${file_name}, 'folder')) { ${icon_file} = $ICON{'folder'};
+  } elsif (isFileType(${file_name}, 'doc')) {    ${icon_file} = $ICON{'doc'};
+  } elsif (isFileType(${file_name}, 'music')) {  ${icon_file} = $ICON{'music'};
+  } elsif (-e ${static_thumbnail_path}) {        ${icon_file} = $STATE{'web_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  } else {                                       ${icon_file} = $ICON{'unknown'};
+  }
+  # Could do this in loop, but it checks filesystem for static version of every icon!
+  # foreach my ${type} ('folder', 'doc', 'music', 'unknown') {
+  #   if (isFileType(${file_name}, ${type})) {
+  #     ${icon_file} = $ICON{$type};
+  #     last;
+  #   }
+  # }
+  # # Found static image icon?  Then use it instead:
+  # if (-e ${static_thumbnail_path}) {
+  #   ${icon_file} = $STATE{'web_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  # }
+  return ${icon_file};
 }
 
 # Returns an <a> tag containing appropriate href based on the type of file, state, etc.
@@ -602,7 +638,7 @@ sub getNavButton {
   my ($mode, $value, $desc) = @_;
   my ${icon_modifier} = lc(${value}); # Lowercase
   my ${href} = getHREF('', $value);
-  my ${img} = "<img src='${assets_root}/icon_button_${icon_modifier}.png' alt='${desc}'>";
+  my ${img} = "<img src='${ASSETS}/icon_button_${icon_modifier}.png' alt='${desc}'>";
   my ${linked_img} = "<a href='${href}'
                          data-old-href='".OLDgetHREF(${mode}, ${value})."'
                          rel='nofollow'
@@ -858,7 +894,7 @@ sub calculateImageListState {
   # Problem is that there are several ways to get the URL (pic_path param or directly from path if no mod_rewrite)
   $STATE{'web_dir_encoded'} = $STATE{'web_dir'};
   $STATE{'web_dir_encoded'} =~ s/ /%20/g;
-  $STATE{'page_description'} = stripHTML(getSitemapData('pageDescription'));
+  $STATE{'page_description'} = stripHTML(getSitemapDataItem('pageDescription'));
 }
 
 # GET READY TO PARTY!
@@ -911,7 +947,7 @@ sub printHtmlContent {
       <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
       <title>'.$STATE{'title'}.'</title>
       <meta name="description" content="'.$STATE{'page_description'}.'">
-      <link href="'.${assets_root}.'/jcdsee.css" rel="stylesheet" type="text/css">
+      <link href="'.${ASSETS}.'/jcdsee.css" rel="stylesheet" type="text/css">
       <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
   ';
 
@@ -922,7 +958,7 @@ sub printHtmlContent {
 
   print '
     </head>
-    <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${assets_root}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
+    <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${ASSETS}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
 
       <div id="nav">
         <ul id="depth-path">'
@@ -991,22 +1027,23 @@ sub printHtmlContent {
       -->';
       # Debug & error information.
       if ($STATE{'error_msg'} && $STATE{'test_mode'}) {
-        ${DUMP} .=  "FILE TYPES: \n";
+        my ${debug_info_window} = '';
+        ${debug_info_window} .=  "FILE TYPES: \n";
         foreach my $k (sort keys %file_types) {
-          ${DUMP} .= "  $k = $file_types{$k}\n";
+          ${debug_info_window} .= "  $k = $file_types{$k}\n";
         }
-        ${DUMP} .=  "\nIMAGES: \n";
+        ${debug_info_window} .=  "\nIMAGES: \n";
         foreach my $k (sort keys %image_hash) {
-          ${DUMP} .= "  $k = $image_hash{$k}\n";
+          ${debug_info_window} .= "  $k = $image_hash{$k}\n";
         }
-        ${DUMP} .=  "\nSTATE: \n";
+        ${debug_info_window} .=  "\nSTATE: \n";
         foreach my $k (sort keys %STATE) {
-          ${DUMP} .= "  $k = $STATE{$k}\n";
+          ${debug_info_window} .= "  $k = $STATE{$k}\n";
         }
         print "
           <div style='margin-top:11px;border:2px solid red;background-color:#f99;font-size:9px;font-family:verdana,sans-serif;color:#a00;'>
             <b style='font-size:10px;color:black;'>ERROR:</b><br>
-            <pre>${DUMP}</pre>
+            <pre>${debug_info_window}</pre>
           </div>";
       }
 
@@ -1016,7 +1053,7 @@ sub printHtmlContent {
       print '
       <div id="footer">
         <a id="copyleft" rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
-          <img alt="Creative Commons License" src="'.${icon_copyleft}.'">
+          <img alt="Creative Commons License" src="'.$ICON{'copyleft'}.'">
         </a>
         <div id="usage">
           <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
@@ -1025,13 +1062,13 @@ sub printHtmlContent {
             print " Your Location: $STATE{'country_code'}";
           }
           print '<br>'
-          .getSitemapData('pageDate')
-          .getSitemapData('pageSize')
+          .getSitemapDataItem('pageDate')
+          .getSitemapDataItem('pageSize')
           .'
         </div>
       </div>
 
-      <script src="'.${assets_root}.'/jcdsee.js"></script>
+      <script src="'.${ASSETS}.'/jcdsee.js"></script>
     </body>
   </html>
   ';
