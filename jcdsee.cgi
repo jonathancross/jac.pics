@@ -55,19 +55,22 @@ my %IMAGE_GLOBAL = (
 
 # VARS FOR CURRENT IMAGE PROCESSING STATE, PERHAPS SHOULD BE MOVED TO %STATE ?
 my %IMAGE = (
-  max_width         => 0,      #Max width placeholder
-  max_height        => 0       #Max height placeholder
+  max_width         => 0,      # Max width placeholder
+  max_height        => 0       # Max height placeholder
 );
 
 # DISPLAY STATE VARS
 my %STATE = (
+  protocol          => 'http://', # TODO: generate this.
+  server_name       => $ENV{SERVER_NAME},
   error_msg         => '', # Error message indicating app is in an error state.
   country_code      => $ENV{'HTTP_CF_IPCOUNTRY'},
   database_file     => '', # Full server path to the .jcdsee database file.
   server_dir        => '', # Full server path to the folder being listed.
   web_dir           => '', # The directory path from the webserver document root.
   web_dir_encoded   => '', # The directory path from the webserver document root. (URL encoded)
-  web_full_path_clean => '', # Full web path to the current image if available or web_dir.
+  web_full_path_clean => '', # Full web path to the current image (or default image if available) or web_dir.  Does not include display_mode.
+  canonical_url     => '', # Full URL, escaped with display_mode.
   is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
   title             => 'Jonathan Cross', # Document title base
   cur_dir_name      => '', # Will have only the name of the current directory (no slashes)
@@ -115,7 +118,7 @@ if (param('cur_url') || param('pic')) {
   $STATE{'error_msg'} = 'This file or folder is now gone.';
 }
 
-# Path to the fodler or a paicture in a folder.
+# Path to the folder or a picture in a folder.
 if (param('pic_path') && (param('pic_path') =~ m:(.*/)(.*):) ) {
   $STATE{'is_deprecated_param'} = 0;
   $STATE{'web_dir'} = $1;
@@ -137,7 +140,7 @@ if ($STATE{'web_dir'} eq '') {
 }
 
 if (${COMMANDLINE}) {
-  $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${ROOT}${PICS}"; # HAVE DIR DEFAULT TO "." FOR COMMANDLINE DEBUGGING
+  $STATE{'web_dir'} = (${ARGV[1]}) ? ${ARGV[1]} : "${ROOT}${PICS}"; # have dir default to "." for commandline debugging
   $STATE{'server_dir'} = $STATE{'web_dir'};
   $STATE{'display_mode'} = ${ARGV[2]};
   $STATE{'pic_cur_idx'} = int(${ARGV[3]});
@@ -155,7 +158,7 @@ $STATE{'database_file'} = $STATE{'server_dir'}.${DATABASE_FILENAME};
 # Load  / Build the list of files.
 loadFileDatabase();
 
-# Default to first image if possible for single and slide. Fixes issue #17.
+# Default pic_cur_file to first image if one exists. Fixes issue #17.
 if (! $STATE{'pic_cur_file'} && @image_array) {
   $STATE{'pic_cur_file'} = $image_array[0];
 }
@@ -174,21 +177,23 @@ while ((my $key, my $value) = each(%DEFAULTS)) {
 
 # Display mode setup & defaults.
 if (isMode('thumb')) {
-  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; #max height of large thumbnail, normally all will have same height
-  $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; #max width of large thumbnail, normally never get this wide
+  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_large'}; # max height of large thumbnail, normally all will have same height
+  $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_large'}; # max width of large thumbnail, normally never get this wide
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_large'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
-} elsif ($STATE{'display_mode'} =~ /^single|slide$/ && $STATE{'pic_cur_file'}) { # Only allow single|slide if there is 1 or more images.
+} elsif (isMode('single|slide') && $STATE{'pic_cur_file'}) { # Only allow single|slide if there is 1 or more images.
   # Do not prefix image name, use full-size image
   $STATE{'prefix_cur'} = '';
   $STATE{'thumb_ext_cur'} = '';
 } else {
   $STATE{'display_mode'} = 'list';
-  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_small'}; #max dimension of small thumbnail
-  $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_small'}; #max dimension of small thumbnail
+  $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_small'}; # max dimension of small thumbnail
+  $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_small'}; # max dimension of small thumbnail
   $STATE{'prefix_cur'} = $IMAGE_GLOBAL{'prefix_small'};
   $STATE{'thumb_ext_cur'} = $IMAGE_GLOBAL{'thumb_ext'};
 }
+
+$STATE{'canonical_url'} = $STATE{'protocol'}.$STATE{'server_name'}.getHREF(); # Easiet way to get current escaped url.
 
 my %ICON = (
   unknown => "${ASSETS}/icon_unknown$STATE{'prefix_cur'}png",
@@ -232,7 +237,7 @@ sub loadFileDatabase {
       } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
         # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
         $file_types{${file_name}} = 'music';
-      #} elsif (${file_name} =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
+      # } elsif (${file_name} =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
       # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
       # $file_types{${file_name}} = 'video';
       } elsif (${file_name} =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
@@ -277,7 +282,7 @@ sub createImageThumbnail {
   # Resize to make large thumbnails same height except in extremely wide images.  Small thumbs resize proportionally
   ${img_status} = ${image_obj}->Thumbnail(geometry=>"$IMAGE{'max_width'}x$IMAGE{'max_height'}", filter=>'Lanczos');
   # Cannot remove profile if $COMMANDLINE
-  #${img_status} = ${image_obj}->Profile(name=>undef); warn ${img_status} if ${img_status};
+  # ${img_status} = ${image_obj}->Profile(name=>undef); warn ${img_status} if ${img_status};
   # Set JPEG compression level for thumb
   ${img_status} = ${image_obj}->Set(compression=>'JPEG');
   ${img_status} = ${image_obj}->Set(quality=>$IMAGE_GLOBAL{'thumb_quality'});
@@ -291,8 +296,8 @@ sub createImageThumbnail {
 sub getImageTag {
   my ($image_name, $image_prefix) = @_;
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
-  my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
-  my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; #Image url for browser
+  my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+  my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; # Image url for browser
   # Make a Thumbnail if necessary
   # Datestamp isn't really important so i'm removing test to speed up display in 99% of cases
   # if ( ! (-e ${image_thumb}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb}))[9])) ) {
@@ -362,7 +367,7 @@ sub removeFileExtension {
   return $fn;
 }
 
-# Returns a hash containing out parsed XML and XSL for the sitemap.
+# Returns a hash containing the parsed XML and XSL used for the sitemap data.
 #   getSitemapData
 sub getSitemapData {
   my $XMLparser = XML::LibXML->new();
@@ -370,11 +375,11 @@ sub getSitemapData {
   (-f $XML_SITEMAP_FILE) or return "Lost XML: $XML_SITEMAP_FILE";
   (-f $XSL_SITEMAP_FILE) or return "Lost XSL: $XSL_SITEMAP_FILE";
 
-  my %sitemapParsed = (
+  my %sitemapData = (
     xml => $XMLparser->parse_file($XML_SITEMAP_FILE),
     xsl => $xslt->parse_stylesheet($XMLparser->parse_file($XSL_SITEMAP_FILE)) # Is there not a parse_stylesheet_file method?
   );
-  return %sitemapParsed;
+  return %sitemapData;
 }
 
 # Returns a single string data item from the sitemap XML database.
@@ -396,7 +401,7 @@ sub getSitemapDataItem {
 #   getParsedFileName("file name to be parsed")
 sub getParsedFileName {
   my ($file_name) = @_;
-  my ${strip_date} = ($STATE{'display_mode'} =~ /^thumb|single|slide$/) ? 1 : 0;
+  my ${strip_date} = isMode('thumb|single|slide');
   my ${file_name_parsed} = '<span class="file-name-container">';
   if (${strip_date}) {
     ${file_name_parsed} .= getNiceFilename(${file_name});
@@ -446,7 +451,8 @@ sub convertFromLegacyDisplayMode {
 #   isMode('display-mode')
 sub isMode {
   my ($mode) = @_;
-  return ($mode eq $STATE{'display_mode'});
+  $mode = qr/$mode/;
+  return ($STATE{'display_mode'} =~ /^$mode$/);
 }
 
 # Builds a custom HREF given the object you want to link to.
@@ -484,11 +490,11 @@ sub OLDgetHREF {
     ${HREF} .= "pic_path=${value}";
   }
   # DISPLAY MODE PARAM
-  if (${action} ne 'pic' && ${action} ne 'dir') { #for 'pic' and 'dir' we have pre-defined display modes so they are excluded here
+  if (${action} ne 'pic' && ${action} ne 'dir') { # for 'pic' and 'dir' we have pre-defined display modes so they are excluded here
     if (${action} eq 'display_mode') {
       ${HREF} .= "&amp;display_mode=${value}";
     } else {
-      ${HREF} .= "&amp;display_mode=$STATE{'display_mode'}"; #persist the display mode
+      ${HREF} .= "&amp;display_mode=$STATE{'display_mode'}"; # persist the display mode
     }
   }
 
@@ -608,14 +614,14 @@ sub getLinkTag {
   }
   my $full_path = "$STATE{'web_dir'}${file_name}";
   if (isFileType(${file_name}, 'folder')) {
-    #Folder
+    # Folder
     ${link_tag} = "<a href=\"".getHREF(${full_path})."\"
                       data-old-href=\"".OLDgetHREF('dir', ${full_path})."\"
                       class=\"${class}\"
                       title=\"${desc}\"
                       >${link_content}</a>\n";
   } elsif (isFileType(${file_name}, 'pic')) {
-    #Image
+    # Image
     ${link_tag} = "<a href='".getHREF(${full_path}, 'single')."'
                       data-old-href='".OLDgetHREF('pic', ${full_path})."'
                       class='${class}'
@@ -645,7 +651,7 @@ sub getNavButton {
                          id='button-${icon_modifier}'
                          >${img}</a>";
 
-  if ($STATE{'display_mode'} eq ${value}) {
+  if (isMode($value)) {
     return ${img};
   } else {
     return ${linked_img};
@@ -710,20 +716,20 @@ sub printFileListHTML {
   my @file_info;
   my ${file_size};
   # list and thumbnail display modes
-  if ($STATE{'display_mode'} =~ /^(list|thumb)$/) {
+  if (isMode('list|thumb')) {
     foreach ${file_name} (@dir_list) {
       ${file_size} = '';
       @file_info = stat $STATE{'server_dir'}.${file_name};
       # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
       # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
       if (isMode('list')) {
-        #@time_info = localtime ${file_info[9]};
-        #EXTRACT FILE INFO FROM ARRAY AND PAD
-        #${year} = ${time_info[5]} + 1900;
-        #${month} = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) [(${time_info[4]})];
-        #${minute} = (${time_info[1]} < 10) ? "0".${time_info[1]} : ${time_info[1]};
-        #${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
-        #${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
+        # @time_info = localtime ${file_info[9]};
+        # EXTRACT FILE INFO FROM ARRAY AND PAD
+        # ${year} = ${time_info[5]} + 1900;
+        # ${month} = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) [(${time_info[4]})];
+        # ${minute} = (${time_info[1]} < 10) ? "0".${time_info[1]} : ${time_info[1]};
+        # ${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
+        # ${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
         if ( ! isFileType(${file_name},'folder')) {
           ${file_size} = getFormattedFileSize(${file_info[7]});
         }
@@ -815,16 +821,16 @@ sub printFileListHTML {
       foreach ${file_name} (@dir_list) {
         ${file_size} = '';
         @file_info = stat $STATE{'server_dir'}.${file_name};
-        #ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
+        # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
         # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
 
-        #@time_info = localtime ${file_info[9]};
-        #EXTRACT FILE INFO FROM ARRAY AND PAD
-        #${year} = ${time_info[5]} + 1900;
-        #${month} = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) [(${time_info[4]})];
-        #${minute} = (${time_info[1]} < 10) ? "0".${time_info[1]} : ${time_info[1]};
-        #${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
-        #${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
+        # @time_info = localtime ${file_info[9]};
+        # EXTRACT FILE INFO FROM ARRAY AND PAD
+        # ${year} = ${time_info[5]} + 1900;
+        # ${month} = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) [(${time_info[4]})];
+        # ${minute} = (${time_info[1]} < 10) ? "0".${time_info[1]} : ${time_info[1]};
+        # ${day} = (${time_info[3]} < 10) ? "0".${time_info[3]} : ${time_info[3]};
+        # ${hour} = (${time_info[2]} < 10) ? "0".${time_info[2]} : ${time_info[2]};
         if ( ! isFileType(${file_name}, 'folder')) {
           ${file_size} = getFormattedFileSize(${file_info[7]});
         }
@@ -947,6 +953,7 @@ sub printHtmlContent {
       <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
       <title>'.$STATE{'title'}.'</title>
       <meta name="description" content="'.$STATE{'page_description'}.'">
+      <link rel="canonical" href="'.$STATE{'canonical_url'}.'" />
       <link href="'.${ASSETS}.'/jcdsee.css" rel="stylesheet" type="text/css">
       <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
   ';
@@ -956,9 +963,20 @@ sub printHtmlContent {
     print "<style type='text/css'> body {outline: 1px solid red;background-color: pink;} </style>";
   }
 
+  # Social media tags.  TODO: Make image configurable.
   print '
+      <meta property="og:title" content="'.$STATE{'title'}.'" />
+      <meta property="og:url" content="'.$STATE{'canonical_url'}.'">
+      <meta property="og:description" content="'.$STATE{'page_description'}.'">';
+      if ($STATE{'pic_cur_file'}) {
+        print '
+        <meta property="og:image" content="'.$STATE{'protocol'}.$STATE{'server_name'}.urlEscapeSpaces($STATE{'web_full_path_clean'}).'" />
+        <meta property="og:image:type" content="image/jpeg" />';
+      }
+      print '
+      <meta property="fb:admins" content="3994" />
     </head>
-    <body id="mode-'.lc($STATE{'display_mode'}).'" data-adminurl="'.${ASSETS}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
+    <body id="mode-'.$STATE{'display_mode'}.'" data-adminurl="'.${ASSETS}.'/admin/index.cgi?display_url&cur_url='.$STATE{'web_dir'}.'">
 
       <div id="nav">
         <ul id="depth-path">'
