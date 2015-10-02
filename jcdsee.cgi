@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-my $VERSION = '2.0.1';
+my $VERSION = '2.1.0';
 #
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
@@ -371,13 +371,13 @@ sub removeFileExtension {
 #   getSitemapData
 sub getSitemapData {
   my $XMLparser = XML::LibXML->new();
-  my $xslt = XML::LibXSLT->new();
+  my $XSLparser = XML::LibXSLT->new();
   (-f $XML_SITEMAP_FILE) or return "Lost XML: $XML_SITEMAP_FILE";
   (-f $XSL_SITEMAP_FILE) or return "Lost XSL: $XSL_SITEMAP_FILE";
 
   my %sitemapData = (
     xml => $XMLparser->parse_file($XML_SITEMAP_FILE),
-    xsl => $xslt->parse_stylesheet($XMLparser->parse_file($XSL_SITEMAP_FILE)) # Is there not a parse_stylesheet_file method?
+    xsl => $XSLparser->parse_stylesheet_file($XSL_SITEMAP_FILE)
   );
   return %sitemapData;
 }
@@ -392,7 +392,7 @@ sub getSitemapDataItem {
     NAME => "'$item'",
     VALUE => "'$STATE{'web_dir_encoded'}'"
   );
-  my $string = $SITEMAP_DATA{'xsl'}->output_string($results);
+  my $string = $SITEMAP_DATA{'xsl'}->output_as_chars($results);
   chomp($string);
   return $string;
 }
