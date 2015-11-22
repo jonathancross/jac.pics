@@ -11,18 +11,20 @@ JCDSee creates an HTML directory listing of any folders it finds so that they ca
   have an icon unless you provide one manually.
 * Will generate & cache thumbnail icons of any jpeg, gif or png files it finds.
 * Four image display modes: `list`, `thumb`, `single` and `slide`.
-* Properly handles slow connections with pre-caching.
+* Fast: Properly handles slow Internet connections via pre-caching images.
 * Allows owner to add description of each file / folder.
 * Supports dating / numbering of files and folders.
+* Internationalized: supports UTF-8 file / folder names, URLs and descriptions.  See [example of 20+ languages](http://pics.jonathancross.com/list/pics/Other/Language-Cards/) on one page.
 * Progressively enhanced: can be used without JavaScript.
 * Private: No login, cookies, etc. required.
 * Accessible: Can be used with screen readers, keyboard navigation, etc.
 
 #### Requirements
-* Requires a system running Perl with [these modules](jcdsee.cgi#L12) installed.
-* You will also need an [xml sitemap of all folders as seen here](sitemap.xml).  This can be generated, but I have not published my code for this yet.
+* Perl with [these modules](jcdsee.cgi#L12) installed.
+* An [xml sitemap](https://en.wikipedia.org/wiki/Sitemaps) of all folders on your site. See [example sitemap here](sitemap.xml).  This can be generated with various free tools, but I have not published my code yet.
+* [Apache mod_rewrite](https://httpd.apache.org/docs/current/mod/mod_rewrite.html) for clean urls.
 
-#### URLs
+#### URLs:
 JCDSee supports clean URLs via `mod_rewrite` (see [.htaccess](.htaccess#L27)).
 If you link to a folder, that folder will be loaded in `list` mode by default.
 * `http://pics.jonathancross.com/pics/1976/`
@@ -33,7 +35,7 @@ You can also specify one of four display modes (`list|thumb|single|slide`) as th
 * <code>http:<span></span>//pics.jonathancross.com/**single**/pics/1976/cat.jpg</code> - Single image display.
 * <code>http:<span></span>//pics.jonathancross.com/**slide**/pics/1976/cat.jpg</code> - Begin slideshow starting with "cat.jpg".
 
-#### Database structure
+#### Database structure:
 JCDSee generates a very basic flat-file database in each folder named `.jcdsee`.  This file is a pipe-delineated file with this format:
 
     filename.jpg|Optional HTML description of the file.  
