@@ -26,10 +26,6 @@
       <head>  
         <title>Sitemap for: <xsl:value-of select="$simpleWebsiteURL"/>.</title>
         <link href="jcdsee/jcdsee.css" type="text/css" rel="stylesheet"/>
-        <!--
-        <script src="jcdsee/prototype.js" type="text/javascript"></script>
-        <script src="jcdsee/scriptaculous/scriptaculous.js" type="text/javascript"></script>
-        -->
         <xsl:comment><![CDATA[[if lt IE 8]>  <script src='jcdsee/IE8/IE8.js' type='text/javascript'></script>  <![endif]]]></xsl:comment>
         <style type="text/css">
           body {font-family:arial,helvetica,sans-serif;margin: 15px;padding-top: 0;}
@@ -118,7 +114,6 @@
       function tabAnimation(height,isShrink,animTimerInit) {
         if (isShrink) {
           if (height &gt;= shrinkHeight) {
-            //alert('shrinking height='+height)
             curTab.style.height=height+"px"
             height-=animStep;
             setTimeout("tabAnimation("+height+","+isShrink+",animTimer)", animTimerInit);
@@ -129,7 +124,6 @@
             height+=animStep;
             setTimeout("tabAnimation("+height+","+isShrink+",animTimer)", animTimerInit);
           }else{
-            //alert('finished expanding. height='+height)
             curTab.className="l openTab";
             buttonImg.src=buttonImgClose.src;
           }

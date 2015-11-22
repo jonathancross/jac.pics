@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-my $VERSION = '2.1.0';
+my $VERSION = '2.1.1';
 #
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
@@ -61,35 +61,37 @@ my %IMAGE = (
 
 # DISPLAY STATE VARS
 my %STATE = (
-  protocol          => 'http://', # TODO: generate this.
-  server_name       => $ENV{SERVER_NAME},
-  error_msg         => '', # Error message indicating app is in an error state.
-  country_code      => $ENV{'HTTP_CF_IPCOUNTRY'},
-  database_file     => '', # Full server path to the .jcdsee database file.
-  server_dir        => '', # Full server path to the folder being listed.
-  web_dir           => '', # The directory path from the webserver document root.
-  web_dir_encoded   => '', # The directory path from the webserver document root. (URL encoded)
-  web_full_path_clean => '', # Full web path to the current image (or default image if available) or web_dir.  Does not include display_mode.
   canonical_url     => '', # Full URL, escaped with display_mode.
-  is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
-  title             => 'Jonathan Cross', # Document title base
+  country_code      => $ENV{'HTTP_CF_IPCOUNTRY'},
   cur_dir_name      => '', # Will have only the name of the current directory (no slashes)
+  database_file     => '', # Full server path to the .jcdsee database file.
   display_mode      => '', # Display mode (single|list|thumb|slide) Default=list
-  test_mode         => 0,  # Test mode (0 or 1) Default=0
-  page_description  => '', # Description of current page (from xml database)
-  prefix_cur        => '', # Will hold the current prefix (prefix_small or prefix_large)
-  thumb_ext_cur     => '', # Will hold the current extension (thumbnail pics are always jpg for example)
+  error_msg         => '', # Error message indicating app is in an error state.
+  go_param          => '', # Sanitized `go` param - will be a url identifier
+  go_redirect_url   => '', # Url matching `go_param` from sitemap (if found).
   is_default        => 1,  # A boolean to tell us if all the display settings are at default.
-  # VARS below used for current position in photo list
-  pic_last_idx      => 0,
+  is_deprecated_param => 0,  # Identifies requests using 'cur_url' or 'pic' params which are deprecated.
+  page_description  => '', # Description of current page (from xml database)
+  # pic_* used for current position in photo list
   pic_array_length  => 0,
-  pic_cur_idx       => 0,
-  pic_next_idx      => 0,
-  pic_previous_idx  => 0,
-  pic_cur_number    => 0,
-  pic_previous_file => '',
   pic_cur_file      => '', # Filename of the currently selected image.
+  pic_cur_idx       => 0,
+  pic_cur_number    => 0,
+  pic_last_idx      => 0,
   pic_next_file     => '',
+  pic_next_idx      => 0,
+  pic_previous_file => '',
+  pic_previous_idx  => 0,
+  prefix_cur        => '', # Will hold the current prefix (prefix_small or prefix_large)
+  protocol          => 'http://', # TODO: generate this.
+  server_dir        => '', # Full server path to the folder being listed.
+  server_name       => $ENV{SERVER_NAME},
+  test_mode         => 0,  # Test mode (0 or 1) Default=0
+  thumb_ext_cur     => '', # Will hold the current extension (thumbnail pics are always jpg for example)
+  title             => 'Jonathan Cross', # Document title base
+  web_dir           => '', # Directory path from the document root eg: /pics/foo bar/
+  web_dir_encoded   => '', # URL encoded version of `web_dir`, eg:     /pics/foo%20bar/
+  web_full_path_clean => '' # Full web path to the current image (or default image if available) or web_dir.  Does not include display_mode.
 );
 my %DEFAULTS = (
   display_mode      => 'list',
@@ -102,6 +104,13 @@ my %LEGACY_MODES = (
   SLIDESHOW => 'slide'
 );
 
+# Ignore `go` param that contain odd chars.
+#if (param('go') =~ m:^([A-Za-z0-9_.-])$:) {
+if (param('go') =~ m:^([A-Za-z0-9/_.-]+)$:) {
+  $STATE{'go_param'} = $1;
+  $STATE{'go_redirect_url'} = getSitemapGoUrl($STATE{'go_param'});
+  # TODO: Redirect to $STATE{'go_redirect_url'}
+}
 
 # LOAD / SET PARAMS & DEFAULTS
 $STATE{'display_mode'} = convertFromLegacyDisplayMode(param('display_mode'));
@@ -320,7 +329,7 @@ sub getImageTag {
 #   getCurrentPageTitle("path")
 sub getCurrentPageTitle {
   my ($path) = @_;
-  $path =~ s@${PICS}|/$@@g; # Delete "/pics" root and trailing slash.
+  $path =~ s@${PICS}|\/$@@g; # Delete "/pics" root and trailing slash.
   $path =~ s@/@${TITLE_SEPERATOR}@g; # Replace all slashes with colon.
   if (isMode('single')) {
     $path .= ${TITLE_SEPERATOR}.getNiceFilename($STATE{'pic_cur_file'});
@@ -368,7 +377,7 @@ sub removeFileExtension {
 }
 
 # Returns a hash containing the parsed XML and XSL used for the sitemap data.
-#   getSitemapData
+#   getSitemapData()
 sub getSitemapData {
   my $XMLparser = XML::LibXML->new();
   my $XSLparser = XML::LibXSLT->new();
@@ -384,17 +393,30 @@ sub getSitemapData {
 
 # Returns a single string data item from the sitemap XML database.
 # Item can be one of these three types: pageDescription|pageDate|pageSize
-#   getSitemapDataItem("databaseItem")
+#   getSitemapDataItem("databaseItem", "url/fragment")
 sub getSitemapDataItem {
-  my ($item) = @_;
+  my ($item, $url) = @_;
+  $url = $url || $STATE{'web_dir_encoded'};
   my $results = $SITEMAP_DATA{'xsl'}->transform(
     $SITEMAP_DATA{'xml'},
-    NAME => "'$item'",
-    VALUE => "'$STATE{'web_dir_encoded'}'"
+    DATA_ITEM => "'$item'",
+    URL => "'$url'"
   );
   my $string = $SITEMAP_DATA{'xsl'}->output_as_chars($results);
   chomp($string);
   return $string;
+}
+
+# Returns a url from the sitemap XML database if found.  Url which most closely
+# matches the go_param will be selected.
+# TODO: Document selection process.
+#   getSitemapGoUrl("goParam")
+sub getSitemapGoUrl {
+  my ($goParam) = @_;
+  # Just grab first item for now.  Later update to get most relevant.
+  my @urls = split('\n', getSitemapDataItem('urlFragment', $goParam));
+  # my @html_files = grep { /\.html$/ } @files;
+  return ${urls[0]};
 }
 
 # Returns an html formatted string representing the filename passed in.
@@ -919,8 +941,9 @@ printHtmlContent();
 
 # RENDER HTML HEAD #############################################################
 
-# Prints out the http header for the HTML page.  If the app is in an error,
-# state, then a full doc will be rendered and false returned.
+# Prints out the http header for the HTML page.  If the app is in an error state
+# then 404 will be sent and user redirected to home page and jcdsee will exit.
+# On the test server, html page will be rendered for debugging.
 #   printHtmlHead()
 sub printHtmlHead {
   if ($STATE{'error_msg'}) {
@@ -936,6 +959,7 @@ sub printHtmlHead {
       exit 0;
     }
   } else {
+
     print "Content-type: text/html\n\n";
   }
 }
