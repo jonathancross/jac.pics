@@ -178,7 +178,7 @@ $STATE{'title'} = getCurrentPageTitle($STATE{'web_dir'}); # Figure out the title
 
 # Figure out if all settings are same as the default.
 while ((my $key, my $value) = each(%DEFAULTS)) {
-  if (${value} ne  $STATE{$key}) {
+  if (${value} ne $STATE{$key}) {
     $STATE{'is_default'} = 0;
     last;
   }
@@ -392,8 +392,10 @@ sub getSitemapData {
 }
 
 # Returns a single string data item from the sitemap XML database.
-# Item can be one of these three types: pageDescription|pageDate|pageSize
-#   getSitemapDataItem("databaseItem", "url/fragment")
+# Data item can be one of these three types: pageDescription|pageDate|pageSize
+# or urlFragment.  If type is 'urlFragment', you must send the fragment as the
+# second parameter to this function.
+#   getSitemapDataItem("databaseItem", "urlFragment"?)
 sub getSitemapDataItem {
   my ($item, $url) = @_;
   $url = $url || $STATE{'web_dir_encoded'};
@@ -409,14 +411,15 @@ sub getSitemapDataItem {
 
 # Returns a url from the sitemap XML database if found.  Url which most closely
 # matches the go_param will be selected.
-# TODO: Document selection process.
 #   getSitemapGoUrl("goParam")
 sub getSitemapGoUrl {
   my ($goParam) = @_;
-  # Just grab first item for now.  Later update to get most relevant.
+  # my $goParamRegex = qr{.+/[^/]*$goParam[^/]*/$};
   my @urls = split('\n', getSitemapDataItem('urlFragment', $goParam));
-  # my @html_files = grep { /\.html$/ } @files;
-  return ${urls[0]};
+  # Filter out best match per last segment.
+  my ($bestUrl) = grep { m@.+/[^/]*$goParam[^/]*/$@ } @urls;
+  # Return best or first if none is best.
+  return $bestUrl || ${urls[0]};
 }
 
 # Returns an html formatted string representing the filename passed in.
