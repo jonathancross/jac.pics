@@ -289,14 +289,14 @@
       <img alt="Creative Commons License" src="/jcdsee/icon_copyleft.png">
     </a>
     <div id="usage">
-      <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2.0.1</a>
+      <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee 2.1.1</a>
       <div>
         Page last modified on
         <!--#config timefmt="%Y-%m-%d"-->
         <!--#flastmod virtual="/index.shtml" -->
       </div>
       <div>
-        JavaScript is 
+        JavaScript is
         <script>document.write('ENABLED');</script>
         <noscript>DISABLED</noscript>
       </div>

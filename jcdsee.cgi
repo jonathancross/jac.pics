@@ -961,8 +961,11 @@ sub printHtmlHead {
         </head></html>';
       exit 0;
     }
+  } elsif ($STATE{'go_redirect_url'}) {
+    # Redirect to the url identified by go param.
+    print "Location: $STATE{'go_redirect_url'}\n\n";
+    exit 0;
   } else {
-
     print "Content-type: text/html\n\n";
   }
 }
