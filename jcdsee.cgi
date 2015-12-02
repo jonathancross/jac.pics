@@ -109,7 +109,6 @@ my %LEGACY_MODES = (
 if (param('go') =~ m:^([A-Za-z0-9/_.-]+)$:) {
   $STATE{'go_param'} = $1;
   $STATE{'go_redirect_url'} = getSitemapGoUrl($STATE{'go_param'});
-  # TODO: Redirect to $STATE{'go_redirect_url'}
 }
 
 # LOAD / SET PARAMS & DEFAULTS
@@ -947,6 +946,7 @@ printHtmlContent();
 # Prints out the http header for the HTML page.  If the app is in an error state
 # then 404 will be sent and user redirected to home page and jcdsee will exit.
 # On the test server, html page will be rendered for debugging.
+# Finally, if a `go_redirect_url` is present, then the user will be redirected.
 #   printHtmlHead()
 sub printHtmlHead {
   if ($STATE{'error_msg'}) {
@@ -959,12 +959,12 @@ sub printHtmlHead {
         <title>Error: '.$STATE{'error_msg'}.'</title>
         <meta http-equiv="refresh" content="0; url=/" />
         </head></html>';
-      exit 0;
+      exit;
     }
   } elsif ($STATE{'go_redirect_url'}) {
-    # Redirect to the url identified by go param.
-    print "Location: $STATE{'go_redirect_url'}\n\n";
-    exit 0;
+    # Redirect to URL which best matches the go param.
+    print redirect(-status => 302, -url => $STATE{'go_redirect_url'});
+    exit;
   } else {
     print "Content-type: text/html\n\n";
   }
