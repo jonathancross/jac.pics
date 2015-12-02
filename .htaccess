@@ -25,6 +25,7 @@ ErrorDocument 404 /error.html
 ErrorDocument 500 /error.html
 
 # Clean URLs
+# TODO: I think RewriteRule never contains query string, so [^?]+ could be just .+.
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
@@ -44,6 +45,9 @@ ErrorDocument 500 /error.html
   # Redirect `cur_url` to folder:
   RewriteCond %{QUERY_STRING} cur_url=([^&]+)
   RewriteRule ^jcdsee\.cgi %1? [redirect=301,last]
+
+  # Short 'go' URL redirect.  See #29.
+  RewriteRule ^go/(.+)$ /jcdsee.cgi?go=$1 [last]
 
   # DIRECTORY: Normalize directories to have trailing slash: /
   RewriteCond %{REQUEST_FILENAME} -d

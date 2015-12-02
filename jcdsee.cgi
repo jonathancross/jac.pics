@@ -109,6 +109,9 @@ my %LEGACY_MODES = (
 if (param('go') =~ m:^([A-Za-z0-9/_.-]+)$:) {
   $STATE{'go_param'} = $1;
   $STATE{'go_redirect_url'} = getSitemapGoUrl($STATE{'go_param'});
+  # Redirect to URL identified by the `go` param.
+  print redirect(-status => 302, -url => $STATE{'go_redirect_url'});
+  exit;
 }
 
 # LOAD / SET PARAMS & DEFAULTS
@@ -417,8 +420,8 @@ sub getSitemapGoUrl {
   my @urls = split('\n', getSitemapDataItem('urlFragment', $goParam));
   # Filter out best match per last segment.
   my ($bestUrl) = grep { m@.+/[^/]*$goParam[^/]*/$@ } @urls;
-  # Return best or first if none is best.
-  return $bestUrl || ${urls[0]};
+  # Return best or first or home page.
+  return $bestUrl || ${urls[0]} || '/';
 }
 
 # Returns an html formatted string representing the filename passed in.
@@ -946,7 +949,6 @@ printHtmlContent();
 # Prints out the http header for the HTML page.  If the app is in an error state
 # then 404 will be sent and user redirected to home page and jcdsee will exit.
 # On the test server, html page will be rendered for debugging.
-# Finally, if a `go_redirect_url` is present, then the user will be redirected.
 #   printHtmlHead()
 sub printHtmlHead {
   if ($STATE{'error_msg'}) {
@@ -961,10 +963,6 @@ sub printHtmlHead {
         </head></html>';
       exit;
     }
-  } elsif ($STATE{'go_redirect_url'}) {
-    # Redirect to URL which best matches the go param.
-    print redirect(-status => 302, -url => $STATE{'go_redirect_url'});
-    exit;
   } else {
     print "Content-type: text/html\n\n";
   }
