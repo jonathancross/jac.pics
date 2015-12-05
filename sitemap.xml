@@ -1,55 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
-<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-08-13" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<!-- Built: "2015-08-13" -->
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-12-04" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<!-- Built: "2015-12-04" -->
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/</loc>
-    <lastmod>2015-08-13</lastmod>
     <priority>1.0</priority>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-10-03_Delhi.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-10-08_Earthquake_OldDelhi_TajMahal.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-10-14_Rishikesh.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-10-23_Bardia_Pokhara.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-11-22_Annapurna_Circuit_1.html</loc>
     <lastmod>2010-11-29</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-11-29_Annapurna_Circuit_2.html</loc>
     <lastmod>2010-11-29</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2005/2005-12-11_Kathmandu_Valley.html</loc>
     <lastmod>2011-01-21</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2006/2006-04-26_India/2006-01-01_Rockin_Kolkata_2006.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/2006/2006-04-26_India/2006-01-03_Darjeeling_Sikkim.html</loc>
     <lastmod>2008-03-03</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/Other/Graphic/2000-12-09_Chernobyl_Propaganda/Chernobyl-Propaganda.html</loc>
     <lastmod>2007-12-17</lastmod>
   </url>
-  <url jcd:imgs="0" jcd:dsize="1.2G">
+  <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/pics/</loc>
-    <lastmod>2015-08-13</lastmod>
+    <lastmod>2015-12-03</lastmod>
     <jcd:desc>Archive of travel stories and photos.</jcd:desc>
   </url>
   <url jcd:imgs="5" jcd:dsize="540K">
@@ -394,7 +393,7 @@
   </url>
   <url jcd:imgs="20" jcd:dsize="848K">
     <loc>http://pics.jonathancross.com/pics/2005/2005-01-14_Cambodia/2005-01-14_Phnom_Penh/</loc>
-    <lastmod>2007-07-07</lastmod>
+    <lastmod>2015-09-16</lastmod>
     <jcd:desc>Photos from the 7 days I spent in the Capital of Cambodia.  Pretty rough place, but I got into it after a while.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="6.9M">
@@ -544,7 +543,7 @@
   </url>
   <url jcd:imgs="64" jcd:dsize="5.9M">
     <loc>http://pics.jonathancross.com/pics/2005/2005-12-11_Nepal/2005-11-19_Nepal_Annapurna/</loc>
-    <lastmod>2012-09-04</lastmod>
+    <lastmod>2015-09-16</lastmod>
     <jcd:desc>3.5 week adventure trekking through the Himalayas!</jcd:desc>
   </url>
   <url jcd:imgs="24" jcd:dsize="2.4M">
@@ -552,7 +551,7 @@
     <lastmod>2009-04-16</lastmod>
     <jcd:desc>A few weeks exploring the Kathmandu Valley including a volunteer position in Bhaktapur.</jcd:desc>
   </url>
-  <url jcd:imgs="1" jcd:dsize="73M">
+  <url jcd:imgs="1" jcd:dsize="79M">
     <loc>http://pics.jonathancross.com/pics/2006/</loc>
     <lastmod>2008-08-06</lastmod>
     <jcd:desc>14 months in South Asia: India, Nepal, Bangladesh, Sri Lanka, Malaysia, Singapore, Indonesia, Bangkok and Myanmar. Also Zürich.</jcd:desc>
@@ -562,9 +561,9 @@
     <lastmod>2007-07-07</lastmod>
     <jcd:desc>Architectural pics of the National Assembly building designed by <jcd:a href="http://en.wikipedia.org/wiki/Louis_Khan" target="_blank">Louis I. Khan</jcd:a> in Dhaka, Bangladesh.</jcd:desc>
   </url>
-  <url jcd:imgs="56" jcd:dsize="2.7M">
+  <url jcd:imgs="63" jcd:dsize="9.0M">
     <loc>http://pics.jonathancross.com/pics/2006/2006-01-24_Bangladesh/</loc>
-    <lastmod>2013-10-16</lastmod>
+    <lastmod>2015-09-12</lastmod>
     <jcd:desc>Photos from my travels around the country of Bangladesh.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="44M">
@@ -594,7 +593,7 @@
   </url>
   <url jcd:imgs="41" jcd:dsize="1.9M">
     <loc>http://pics.jonathancross.com/pics/2006/2006-04-26_India/2006-03-27_Rajasthan_Mumbai/</loc>
-    <lastmod>2012-04-13</lastmod>
+    <lastmod>2015-10-23</lastmod>
     <jcd:desc>Travels through Rajasthan (Jaisalmer / camel safari, Jodhpur and Udaipur) and Mumbai (AKA Bombay) India.</jcd:desc>
   </url>
   <url jcd:imgs="20" jcd:dsize="1.7M">
@@ -649,7 +648,7 @@
   </url>
   <url jcd:imgs="30" jcd:dsize="1.9M">
     <loc>http://pics.jonathancross.com/pics/2006/2006-11-29_Switzerland/</loc>
-    <lastmod>2008-04-02</lastmod>
+    <lastmod>2015-09-16</lastmod>
     <jcd:desc>Back to the Western World: 3 weeks in Zürich, Switzerland.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="111M">
@@ -659,7 +658,7 @@
   </url>
   <url jcd:imgs="14" jcd:dsize="1.2M">
     <loc>http://pics.jonathancross.com/pics/2007/2007-01-05_USA/</loc>
-    <lastmod>2007-07-07</lastmod>
+    <lastmod>2015-09-16</lastmod>
     <jcd:desc>Back to the U.S.A. after 14 months on in Asia.</jcd:desc>
   </url>
   <url jcd:imgs="15" jcd:dsize="1.6M">
@@ -1057,14 +1056,14 @@
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
   </url>
-  <url jcd:imgs="0" jcd:dsize="14M">
+  <url jcd:imgs="0" jcd:dsize="34M">
     <loc>http://pics.jonathancross.com/pics/2015/</loc>
-    <lastmod>2015-08-13</lastmod>
-    <jcd:desc>Two months backpacking in Colombia and some time in California.</jcd:desc>
+    <lastmod>2015-12-04</lastmod>
+    <jcd:desc>Two months backpacking in Colombia, some time in California, Interrail trip through Amsterdam, then Norway and on to Germany. Also our wedding, honeymoon, a visit from my father and helping refugees in Slovenia.</jcd:desc>
   </url>
   <url jcd:imgs="104" jcd:dsize="13M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-05-22_Colombia/</loc>
-    <lastmod>2015-08-12</lastmod>
+    <lastmod>2015-08-13</lastmod>
     <jcd:desc>Two months backpacking and visiting friends in Colombia.</jcd:desc>
   </url>
   <url jcd:imgs="7" jcd:dsize="1.5M">
@@ -1072,15 +1071,45 @@
     <lastmod>2015-08-13</lastmod>
     <jcd:desc>Visiting family in California.</jcd:desc>
   </url>
+  <url jcd:imgs="33" jcd:dsize="3.6M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-08-20_Amsterdam/</loc>
+    <lastmod>2015-10-06</lastmod>
+    <jcd:desc>Couch surfing in Amsterdam.</jcd:desc>
+  </url>
+  <url jcd:imgs="32" jcd:dsize="5.1M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-09-08_Norway-Germany/</loc>
+    <lastmod>2015-10-06</lastmod>
+    <jcd:desc>Traveling up to see my cousin in Norway and then on to Germany.</jcd:desc>
+  </url>
+  <url jcd:imgs="8" jcd:dsize="1.5M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-10-08_Dad-Switzerland/</loc>
+    <lastmod>2015-12-03</lastmod>
+    <jcd:desc>My father's visit to Switzerland.</jcd:desc>
+  </url>
+  <url jcd:imgs="22" jcd:dsize="3.7M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-11-05_Wedding/</loc>
+    <lastmod>2015-12-04</lastmod>
+    <jcd:desc>Getting married!</jcd:desc>
+  </url>
+  <url jcd:imgs="14" jcd:dsize="2.9M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-11-12_Zagreb-Croatia/</loc>
+    <lastmod>2015-12-03</lastmod>
+    <jcd:desc>Honeymoon of sorts in Zagreb.</jcd:desc>
+  </url>
+  <url jcd:imgs="22" jcd:dsize="3.5M">
+    <loc>http://pics.jonathancross.com/pics/2015/2015-11-29_Dobova-Slovenia-Volunteer/</loc>
+    <lastmod>2015-12-03</lastmod>
+    <jcd:desc>Volunteering in a <jcd:a href="http://www.caritas.org/2015/11/medical-care-for-refugees-in-slovenia/" target="_blank">Caritas first-aid tent</jcd:a> setup to help refugees. Generally we were not taking pictures, but here are a few we collected.</jcd:desc>
+  </url>
   <url jcd:imgs="0" jcd:dsize="744M">
     <loc>http://pics.jonathancross.com/pics/Other/</loc>
-    <lastmod>2013-03-31</lastmod>
+    <lastmod>2015-11-17</lastmod>
     <jcd:desc>Languages, graphics, illustrations, videos and items not organized by date.</jcd:desc>
   </url>
   <url jcd:imgs="17" jcd:dsize="1.8M">
     <loc>http://pics.jonathancross.com/pics/Other/3D%20Renderings/</loc>
     <lastmod>2009-05-29</lastmod>
-    <jcd:desc>3D computer-generated graphics I created back in the 90's.</jcd:desc>
+    <jcd:desc>3D computer-generated graphics I created back in the 1990's.</jcd:desc>
   </url>
   <url jcd:imgs="14" jcd:dsize="1.8M">
     <loc>http://pics.jonathancross.com/pics/Other/Aeugstertal/</loc>
@@ -1107,10 +1136,10 @@
     <lastmod>2012-01-05</lastmod>
     <jcd:desc>Parodies of common corporate logos.</jcd:desc>
   </url>
-  <url jcd:imgs="17" jcd:dsize="4.3M">
+  <url jcd:imgs="18" jcd:dsize="4.6M">
     <loc>http://pics.jonathancross.com/pics/Other/Language-Cards/</loc>
-    <lastmod>2012-07-06</lastmod>
-    <jcd:desc>Linguistic survival kits for the 11 Asian + 8 European countries.  These were built while traveling and are likely to contain factual errors. (Should be printed at 300 dpi)</jcd:desc>
+    <lastmod>2015-11-06</lastmod>
+    <jcd:desc>Linguistic survival kits for South Asia, Europe and North Africa.  These were built while traveling based on conversations with people. They are likely to contain factual errors. (Should be printed at 300 dpi)</jcd:desc>
   </url>
   <url jcd:imgs="19" jcd:dsize="1.1M">
     <loc>http://pics.jonathancross.com/pics/Other/MiscPeople/</loc>
