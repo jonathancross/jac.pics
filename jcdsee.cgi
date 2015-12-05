@@ -419,12 +419,12 @@ sub getSitemapDataItem {
 #   getSitemapGoUrl("goParam")
 sub getSitemapGoUrl {
   my ($goParam) = @_;
-  # my $goParamRegex = qr{.+/[^/]*$goParam[^/]*/$};
-  my @urls = split('\n', getSitemapDataItem('urlFragment', $goParam));
-  # Filter out best match per last segment.
+  # Select all possible matches from xml sitemap starting from latest (reverse).
+  my @urls = reverse split('\n', getSitemapDataItem('urlFragment', $goParam));
+  # Select best match per last segment of each url.
   my ($bestUrl) = grep { m@.+/[^/]*$goParam[^/]*/$@ } @urls;
-  # Return best or first or home page.
-  return $bestUrl || ${urls[0]} || '/';
+  # Return best OR first OR the error page.
+  return $bestUrl || ${urls[0]} || '/error';
 }
 
 # Returns an html formatted string representing the filename passed in.
