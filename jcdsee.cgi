@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 #
-my $VERSION = '2.1.1';
-#
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
 #  • https://github.com/jonathancross/pics.jonathancross.com
@@ -24,8 +22,13 @@ $TIMER{'total_s'} = gettimeofday();
 my ${COMMANDLINE} = 0;
 if ( defined($ARGV[0]) && ($ARGV[0] eq 'debug') ) {
   ${COMMANDLINE} = 1;
-  print "\nDEBUG MODE - Version: $VERSION\n\n";
+  print "\nDEBUG MODE\n\n";
 }
+
+# Load software version number from external file.
+open FILE, 'VERSION';
+my $VERSION = <FILE>;
+close FILE;
 
 # GLOBAL VARIABLES #############################################################
 # DIRECTORY LIST ARRAYS
