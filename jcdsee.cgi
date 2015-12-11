@@ -107,9 +107,8 @@ my %LEGACY_MODES = (
   SLIDESHOW => 'slide'
 );
 
-# Ignore `go` param that contain odd chars.
-#if (param('go') =~ m:^([A-Za-z0-9_.-])$:) {
-if (param('go') =~ m:^([A-Za-z0-9/_.-]+)$:) {
+# Look for `go` param, but ignore if it contains odd chars.
+if (param('go') && param('go') =~ m:^([A-Za-z0-9/_.-]+)$:) {
   $STATE{'go_param'} = $1;
   $STATE{'go_redirect_url'} = getSitemapGoUrl($STATE{'go_param'});
   # Redirect to URL identified by the `go` param.
@@ -345,7 +344,10 @@ sub getCurrentPageTitle {
   return $path;
 }
 
-# Returns a string representing a filename with date prefix removed + dash, underscore replaced with space.
+# Returns a string representing a filename made pretty for humans.
+# Date prefix and file extention will be removed; dashes, underscorea and
+# dots -._ will each be replaced with a blank space.
+# Example: 2010-12-01_Texas-Man.eats_bbq.jpg => Texas Man eats bbq
 #   getNiceFilename("filename")
 sub getNiceFilename {
   my ($fn) = @_;
@@ -353,27 +355,30 @@ sub getNiceFilename {
   $fn = removeNumberPrefix($fn);
   $fn = removeFileExtension($fn);
   $fn =~ s@[._-]@ @g;
-  $fn =~ s@([[:lower:]])([[:upper:]\d])@\1 \2@g; # Space out camelCase words.
+  $fn =~ s@([[:lower:]])([[:upper:]\d])@$1 $2@g; # Space out camelCase words.
   return $fn;
 }
 
 # Returns a string representing a filename with date prefix removed.
+# Example: 2010-12-01_Texas-Man.jpg => Texas-Man.jpg
 #   removeDatePrefix("filename")
 sub removeDatePrefix {
   my ($fn) = @_;
-  $fn =~ s@(^| )\d\d\d\d-\d\d-\d\d_@\1@g; # Delete date prefixes
+  $fn =~ s@(^| )\d\d\d\d-\d\d-\d\d_@$1@g; # Delete date prefixes
   return $fn;
 }
 
 # Returns a string representing a filename with numbered prefix removed.
+# Example: 21_Texas-Man.jpg => Texas-Man.jpg
 #   removeNumberPrefix("filename")
 sub removeNumberPrefix {
   my ($fn) = @_;
-  $fn =~ s:^\d+_(.+):\1:g; # Delete number prefixes when there is a filename
+  $fn =~ s:^\d+_(.+):$1:g; # Delete number prefixes when there is a filename
   return $fn;
 }
 
 # Returns a string representing a filename with the file extension removed.
+# Example: 2010-12-01_Texas-Man.jpg => 2010-12-01_Texas-Man
 #   removeFileExtension("filename")
 sub removeFileExtension {
   my ($fn) = @_;
@@ -560,7 +565,7 @@ sub getDepthPath {
   foreach my ${path} (@directories) {
     if (${path} ne '/') {
       $STATE{'web_dir'} =~ m:(^/${path}/|^/.+/${path}/):;
-      if (${1} ne '') {
+      if ($1) {
         my $itemTitle = getNiceFilename(${path});
         $depth_path .= '
       <li><a href="'.getHREF($1).'"
@@ -585,17 +590,17 @@ sub getDepthPath {
   return $depth_path;
 }
 
-# Returns a linked image tag representing the file provided by $file_name
+# Returns a linked image tag representing the file provided by $file_name.
 #   getIcon("file name")
 sub getIcon {
   my ($file_name) = @_;
   my ${link_content};
-  my ${class};
+  my ${class} = '';
   my ${desc} = ${file_name};
   ${desc} .= ($file_descriptions{${file_name}})? ' - '.stripHTML($file_descriptions{${file_name}}) : '';
   if (isFileType(${file_name}, 'pic')) {
     # Image icon.
-    my ${class} = ($STATE{'pic_cur_file'} eq ${file_name}) ? 'current_pic' : 'pic' ;
+    ${class} = ($STATE{'pic_cur_file'} eq ${file_name}) ? 'current_pic' : 'pic' ;
     ${link_content} = getImageTag(${file_name}, $STATE{'prefix_cur'});
   } else {
     # Static icon file or built-in icon.
@@ -672,19 +677,18 @@ sub getLinkTag {
 #   getNavButton("mode", "value", "text description")
 sub getNavButton {
   my ($mode, $value, $desc) = @_;
-  my ${icon_modifier} = lc(${value}); # Lowercase
-  my ${href} = getHREF('', $value);
-  my ${img} = "<img src='${ASSETS}/icon_button_${icon_modifier}.png' alt='${desc}'>";
-  my ${linked_img} = "<a href='${href}'
-                         data-old-href='".OLDgetHREF(${mode}, ${value})."'
-                         rel='nofollow'
-                         id='button-${icon_modifier}'
-                         >${img}</a>";
-
+  my $icon_modifier = lc(${value}); # Lowercase
+  my $href = getHREF('', $value);
+  my $img = "<img src='${ASSETS}/icon_button_${icon_modifier}.png' alt='${desc}'>";
+  my $linked_img = "<a href='${href}'
+                       data-old-href='".OLDgetHREF(${mode}, ${value})."'
+                       rel='nofollow'
+                       id='button-${icon_modifier}'
+                       >${img}</a>";
   if (isMode($value)) {
-    return ${img};
+    return $img;
   } else {
-    return ${linked_img};
+    return $linked_img;
   }
 }
 
