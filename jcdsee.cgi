@@ -419,17 +419,32 @@ sub getSitemapDataItem {
   return $string;
 }
 
-# Returns a url from the sitemap XML database if found.  Url which most closely
-# matches the go_param will be selected.
+# Returns URL from the sitemap XML database which best matches the $goParam.
 #   getSitemapGoUrl("goParam")
 sub getSitemapGoUrl {
   my ($goParam) = @_;
-  # Select all possible matches from xml sitemap starting from latest (reverse).
+  # All possible matches from sitemap starting from most recent (reverse).
   my @urls = reverse split('\n', getSitemapDataItem('urlFragment', $goParam));
-  # Select best match per last segment of each url.
-  my ($bestUrl) = grep { m@.+/[^/]*$goParam[^/]*/$@ } @urls;
-  # Return best OR first OR the error page.
-  return $bestUrl || ${urls[0]} || '/error';
+
+  # Select best/first URL (case incensitive) by fuzzy matching the folder name.
+  # Exact match, usually a year.
+  # Example: pics/2015/
+  my ($perfectMatchURL) = grep { m@.+/$goParam/$@i } @urls;
+
+  # While ignoring date prefix, get matching URL suffix.
+  # Example: "india" matches pics/2006/2006-12-10_India/
+  my ($datelessURL) = grep { m@.+\d\d\d\d-\d\d-\d\d_$goParam/$@i } @urls;
+
+  # Select URL containing term anywhere in folder name.
+  # Example: "zb" matches pics/FoozBall/
+  my ($similarURL) = grep { m@.+/[^/]*$goParam[^/]*/$@i } @urls;
+
+  # Return best match first or the error page:
+  return $perfectMatchURL
+      || $datelessURL
+      || $similarURL
+      || ${urls[0]}
+      || '/error';
 }
 
 # Returns an html formatted string representing the filename passed in.
