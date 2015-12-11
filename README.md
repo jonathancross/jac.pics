@@ -14,12 +14,13 @@ JCDSee creates an HTML directory listing of any folders it finds so that they ca
 * Fast: Properly handles slow Internet connections via pre-caching images.
 * Allows owner to add description of each file / folder.
 * Supports dating / numbering of files and folders.
+* Short URLs with no configuration.
 * Internationalized: supports UTF-8 file / folder names, URLs and descriptions.  See [example of 20+ languages](http://pics.jonathancross.com/list/pics/Other/Language-Cards/) on one page.
 * Progressively enhanced: can be used without JavaScript.
 * Private: No login, cookies, etc. required.
 * Accessible: Can be used with screen readers, keyboard navigation, etc.
 
-#### Requirements
+#### Requirements:
 * Perl with [these modules](jcdsee.cgi#L12) installed.
 * An [xml sitemap](https://en.wikipedia.org/wiki/Sitemaps) of all folders on your site. See [example sitemap here](sitemap.xml).  This can be generated with various free tools, but I have not published my code yet.
 * [Apache mod_rewrite](https://httpd.apache.org/docs/current/mod/mod_rewrite.html) for clean urls.
@@ -34,6 +35,13 @@ You can also specify one of four display modes (`list|thumb|single|slide`) as th
 * <code>http:<span></span>//pics.jonathancross.com/**thumb**/pics/1976/</code> - Thumbnail mode (less words, bigger pictures).
 * <code>http:<span></span>//pics.jonathancross.com/**single**/pics/1976/cat.jpg</code> - Single image display.
 * <code>http:<span></span>//pics.jonathancross.com/**slide**/pics/1976/cat.jpg</code> - Begin slideshow starting with "cat.jpg".
+
+##### Short URLs:
+You can use the special `/go/` url to redirect to any folder in the system.  Supports fuzzy matching, no explicit definition of URLs is necessary.  See [#29](https://github.com/jonathancross/pics.jonathancross.com/issues/29) for more info.
+Examples:
+* http://jac.pics/go/india
+* http://jac.pics/go/albania
+* http://jac.pics/go/2015
 
 #### Database structure:
 JCDSee generates a very basic flat-file database in each folder named `.jcdsee`.  This file is a pipe-delineated file with this format:
