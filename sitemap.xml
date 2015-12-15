@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
-<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-12-04" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<!-- Built: "2015-12-04" -->
+<urlset xmlns:jcd="http://pics.jonathancross.com" jcd:date="2015-12-15" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<!-- Built: "2015-12-15" -->
   <url jcd:imgs="0" jcd:dsize="1.3G">
     <loc>http://pics.jonathancross.com/</loc>
     <priority>1.0</priority>
@@ -1056,9 +1056,9 @@
     <lastmod>2014-05-18</lastmod>
     <!-- NO DESCRIPTION -->
   </url>
-  <url jcd:imgs="0" jcd:dsize="34M">
+  <url jcd:imgs="0" jcd:dsize="35M">
     <loc>http://pics.jonathancross.com/pics/2015/</loc>
-    <lastmod>2015-12-04</lastmod>
+    <lastmod>2015-12-14</lastmod>
     <jcd:desc>Two months backpacking in Colombia, some time in California, Interrail trip through Amsterdam, then Norway and on to Germany. Also our wedding, honeymoon, a visit from my father and helping refugees in Slovenia.</jcd:desc>
   </url>
   <url jcd:imgs="104" jcd:dsize="13M">
@@ -1083,22 +1083,22 @@
   </url>
   <url jcd:imgs="8" jcd:dsize="1.5M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-10-08_Dad-Switzerland/</loc>
-    <lastmod>2015-12-03</lastmod>
+    <lastmod>2015-12-14</lastmod>
     <jcd:desc>My father's visit to Switzerland.</jcd:desc>
   </url>
   <url jcd:imgs="22" jcd:dsize="3.7M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-11-05_Wedding/</loc>
     <lastmod>2015-12-04</lastmod>
-    <jcd:desc>Getting married!</jcd:desc>
+    <jcd:desc>Getting married! Affoltern am Albis.</jcd:desc>
   </url>
   <url jcd:imgs="14" jcd:dsize="2.9M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-11-12_Zagreb-Croatia/</loc>
     <lastmod>2015-12-03</lastmod>
-    <jcd:desc>Honeymoon of sorts in Zagreb.</jcd:desc>
+    <jcd:desc>Honeymoon in Zagreb after our first time <jcd:a href="/pics/2015/2015-11-29_Dobova-Slovenia-Volunteer/">volunteering in Slovenia</jcd:a>.  It was a little awkward to go from refugee camp to this sunny, nice city, but it was good for us.</jcd:desc>
   </url>
-  <url jcd:imgs="22" jcd:dsize="3.5M">
+  <url jcd:imgs="23" jcd:dsize="3.8M">
     <loc>http://pics.jonathancross.com/pics/2015/2015-11-29_Dobova-Slovenia-Volunteer/</loc>
-    <lastmod>2015-12-03</lastmod>
+    <lastmod>2015-12-14</lastmod>
     <jcd:desc>Volunteering in a <jcd:a href="http://www.caritas.org/2015/11/medical-care-for-refugees-in-slovenia/" target="_blank">Caritas first-aid tent</jcd:a> setup to help refugees. Generally we were not taking pictures, but here are a few we collected.</jcd:desc>
   </url>
   <url jcd:imgs="0" jcd:dsize="744M">
