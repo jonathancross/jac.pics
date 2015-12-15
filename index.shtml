@@ -249,7 +249,7 @@
         </div>
         <div id="map-tab"
              class="jcd-tab"
-             style="background-image: url('http://chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:11111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SK|TH|TR|TW|US|VA|VN')">
+             style="background-image: url('http://chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:111111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SI|SK|TH|TR|TW|US|VA|VN')">
           <!-- Must add a '1' to url for each new country -->
         </div>
       </div>
