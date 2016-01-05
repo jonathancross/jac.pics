@@ -497,8 +497,8 @@ sub convertFromLegacyDisplayMode {
   return $mode;
 }
 
-# Returns true if the given display_mode equals the current display_mode.
-#   isMode('display-mode')
+# Returns true if the given display_mode equals the current $STATE{'display_mode'}.
+#   isMode('display_mode')
 sub isMode {
   my ($mode) = @_;
   $mode = qr/$mode/;
@@ -552,6 +552,8 @@ sub OLDgetHREF {
 }
 
 # Builds a custom HREF given the object you want to link to.
+# If you don't supply a path, it will link to current file / path.
+# If you don't supply a display mode, it will use the current mode.
 #   getHREF("path (file or folder)", "display_mode")
 sub getHREF {
   my ($path, $display_mode) = @_;
@@ -574,16 +576,17 @@ sub isFileType {
 #   getDepthPath()
 sub getDepthPath {
   my @directories = split('/', $STATE{'web_dir'});
-  my $last_directory = pop @directories;
+  my $last_directory = getNiceFilename(pop @directories);
+  my $new_display_mode = isMode('single|slide') ? $DEFAULTS{'display_mode'} : $STATE{'display_mode'};
   my $depth_path = '<li><a href="/">home</a></li>';
 
-  foreach my ${path} (@directories) {
-    if (${path} ne '/') {
-      $STATE{'web_dir'} =~ m:(^/${path}/|^/.+/${path}/):;
+  foreach my $path (@directories) {
+    if ($path ne '/') {
+      $STATE{'web_dir'} =~ m:(^/$path/|^/.+/$path/):;
       if ($1) {
-        my $itemTitle = getNiceFilename(${path});
+        my $itemTitle = getNiceFilename($path);
         $depth_path .= '
-      <li><a href="'.getHREF($1).'"
+      <li><a href="'.getHREF($1, $new_display_mode).'"
              data-old-href="'.OLDgetHREF('dir', $1).'"
              >'.${itemTitle}.'</a></li>';
       }
@@ -593,8 +596,13 @@ sub getDepthPath {
     }
   }
 
+  # Link collection head if not in list or thumb mode.
+  if (! isMode('list|thumb')) {
+    $last_directory = '<a href="'.getHREF('', $new_display_mode).'" title="Back to all files.">'.$last_directory.'</a>';
+  }
+
   # Append the collection head:
-  $depth_path .= '<li class="depth-path-header"><h1>'.getNiceFilename($last_directory).'</h1></li>';
+  $depth_path .= '<li class="depth-path-header"><h1>'.$last_directory.'</h1></li>';
 
   # Append the collection description:
   # Consider replacing with current picture name + desc for single mode here.
@@ -678,7 +686,7 @@ sub getLinkTag {
                       title='${desc}'
                       >".${link_content}.'</a>';
   } else {
-    # Music, text or other.  Just link to the file
+    # Music, text or other = just link to the file directly.
     ${link_tag} = "<a href='${full_path}'
                       class='${class}'
                       title='${desc}'
