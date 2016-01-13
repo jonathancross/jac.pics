@@ -495,7 +495,7 @@ DIV#email IMG         {padding:5px;}
   }
 
   #slideshow-buttons button,
-  #slideshow-speed {
+  #slideshow-interval {
     /* Prevent selection of text. */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -516,8 +516,8 @@ DIV#email IMG         {padding:5px;}
 
   #slideshow-buttons button:focus,
   #slideshow-buttons button:hover,
-  #slideshow-speed:focus,
-  #slideshow-speed:hover {
+  #slideshow-interval:focus,
+  #slideshow-interval:hover {
     color: #ddd;
     background-color: #555;
     border-color: #bbb;
@@ -526,12 +526,36 @@ DIV#email IMG         {padding:5px;}
     transition: all .2s ease-out;
   }
 
+  /* Styles used to draw icons for slideshow controls. */
+
+  #slideshow-buttons button:before,
+  #slideshow-interval-label {
+    font-family: 'lucida sans unicode', 'arial', sans-serif; /* Unicode arrows on Android Chrome. */
+  }
+
+  #slideshow-interval-label {
+    font-size: 7px;
+  }
+
+  #slideshow-interval-label span {
+    position: relative;
+  }
+
+  #slideshow-interval-label .interval-up-arrow {
+    right: -19px;
+    top: -6px;
+  }
+
+  #slideshow-interval-label .interval-down-arrow {
+    right: -12px;
+    top: 2px;
+  }
+
   #slideshow-buttons button:before {
     float: left;
     line-height: 1;
     padding-right: 6px;
     padding-top: 0;
-    font-family: 'lucida sans unicode', sans-serif;
   }
 
   #slideshow-buttons li.active button {
@@ -575,15 +599,16 @@ DIV#email IMG         {padding:5px;}
     border-color: #fcc;
   }
 
-  #slideshow-speed {
-    /* TODO: Add arrows per: http://stackoverflow.com/a/16553552/1117929 */
+  #slideshow-interval {
+    /*  TODO: Add arrows per: http://stackoverflow.com/a/16553552/1117929  */
     -webkit-appearance: none; /* Removes gradient from Safari. Makes Chrome respect border-radius. */
     border-radius: 3px;
     height: 24px;
+    padding-left: 16px;
     text-transform: lowercase;
   }
 
-  #slideshow-speed:focus {
+  #slideshow-interval:focus {
     background: #050;
     border: 1px solid #cfc;
     color: #cfc;

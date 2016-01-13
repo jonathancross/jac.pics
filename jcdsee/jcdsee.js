@@ -109,7 +109,7 @@ jcd.SlideShow.prototype.controlIds_ = {
   PLAY_BUTTON: 'slideshow-play',
   PAUSE_BUTTON: 'slideshow-pause',
   RESTART_BUTTON: 'slideshow-restart',
-  INTERVAL_SELECTOR: 'slideshow-speed' // TODO: Change to slideshow-interval
+  INTERVAL_SELECT: 'slideshow-interval'
 };
 
 
@@ -118,12 +118,8 @@ jcd.SlideShow.prototype.controlIds_ = {
  */
 jcd.SlideShow.prototype.init = function() {
   this.selectedInterval_ = this.intervals_.NORMAL;
-
-  // Create the DOM layout for image and text.
   this.createContentDom_();
   this.initSlideShowControls_();
-  console.log(' + SlideShow:');
-  console.dir(this);
   this.updateCounter();
   this.play(/* isStale */ false);
 };
@@ -137,6 +133,7 @@ jcd.SlideShow.prototype.initSlideShowControls_ = function() {
   var slideShowControls = document.createElement('div');
   slideShowControls.id = this.controlIds_.CONTROLS;
   slideShowControls.appendChild(this.getSlideShowButtons_());
+  slideShowControls.appendChild(this.getIntervalSelectLabel_());
   slideShowControls.appendChild(this.getIntervalSelectControl_());
   slideShowControls.appendChild(this.getCounterEl_());
   document.getElementById(this.controlIds_.NAV).appendChild(slideShowControls);
@@ -198,7 +195,7 @@ jcd.SlideShow.prototype.getSlideShowButton_ = function(buttonConfig) {
  */
 jcd.SlideShow.prototype.getIntervalSelectControl_ = function() {
   var select = document.createElement('select');
-  select.id = this.controlIds_.INTERVAL_SELECTOR;
+  select.id = this.controlIds_.INTERVAL_SELECT;
   // TODO: consider using strings instead of numbers for this.selectedInterval_.
   for (var intervalName in this.intervals_) {
     var option = document.createElement('option');
@@ -213,6 +210,21 @@ jcd.SlideShow.prototype.getIntervalSelectControl_ = function() {
   // Add change event.
   jcd.utils.addEvent(select, 'change', this.handleSelectedInterval_.bind(this));
   return select;
+};
+
+
+/**
+ * Generates the <label> element (up/down arrows) for slideshow speed control.
+ * @returns {!Element} A new <label> element with children.
+ * @private
+ */
+jcd.SlideShow.prototype.getIntervalSelectLabel_ = function() {
+  var labelEl = document.createElement('label');
+  labelEl.setAttribute('for', this.controlIds_.INTERVAL_SELECT);
+  labelEl.id = this.controlIds_.INTERVAL_SELECT + '-label';
+  // TODO: Move this to pure CSS (:before and :after or background-image), AND add text label.
+  labelEl.innerHTML = '<span class="interval-up-arrow">▲</span><span class="interval-down-arrow">▼</span>';
+  return labelEl;
 };
 
 
@@ -253,7 +265,6 @@ jcd.SlideShow.prototype.createContentDom_ = function() {
  */
 jcd.SlideShow.prototype.handleSelectedInterval_ = function(e) {
   var intervalName = e.target.options[e.target.selectedIndex].value;
-  console.log('intervalName changed to: '+ intervalName);
   this.changeInterval_(intervalName);
 };
 
@@ -279,7 +290,6 @@ jcd.SlideShow.prototype.activateButtonId = function(id) {
  * @param {!jcd.File} file Image file.
  */
 jcd.SlideShow.prototype.loadImage = function(file) {
-  console.log('Image requested: ' + file.href);
   if (this.imageManager.imageCache[file.href]) {
     this.updateUI_();
     // cache hit
@@ -302,7 +312,6 @@ jcd.SlideShow.prototype.loadImage = function(file) {
 jcd.SlideShow.prototype.changeInterval_ = function(intervalName) {
   if (this.intervals_[intervalName]) {
     this.selectedInterval_ = this.intervals_[intervalName];
-    console.log('Interval changed to: ' + this.selectedInterval_);
     this.play(/* isStale */ true);
   }
 };
@@ -335,12 +344,11 @@ jcd.SlideShow.prototype.updateUI_ = function() {
  *   speed.
  */
 jcd.SlideShow.prototype.play = function(isStale) {
-  console.log('Starting slideshow with image: ' + this.imageManager.getSelectedImage().href + '\n - isStale: ' + isStale + '\n - Interval: ' + this.selectedInterval_);
   if (isStale) {
     // Immediately advance to next image because current one is stale.
     this.next();
   } else {
-    // Load current selected image.
+    // Load selected image after a short delay.
     this.loadImage(this.imageManager.getSelectedImage());
   }
   window.clearTimeout(this.timer_);
@@ -384,7 +392,6 @@ jcd.SlideShow.prototype.previous = function() {
  * Pauses the slideshow on current image.
  */
 jcd.SlideShow.prototype.pause = function() {
-  console.log(' + PAUSE: clearing this.timer: ' + this.timer_);
   window.clearInterval(this.timer_);
   this.timer_ = 0;
   this.activateButtonId(this.controlIds_.PAUSE_BUTTON);
@@ -399,7 +406,6 @@ jcd.SlideShow.prototype.restart = function() {
   // Restarts the counter, next and prev
   this.imageManager.goToIndex(0);
   this.updateCounter();
-  console.log(' + RESTART. Setting image to first: ' + this.imageManager.getSelectedImage().href);
   window.clearInterval(this.timer_);
   this.loadImage(this.imageManager.getSelectedImage());
   // Start playing from beginning.
@@ -414,6 +420,7 @@ jcd.SlideShow.prototype.restart = function() {
  */
 jcd.SlideShow.prototype.updateCounter = function() {
   var curentNum = this.imageManager.getSelectedIndex() + 1;
+  // TOOD: Use a template.
   var counterText = 'Image ' + curentNum +' of ' + this.imageManager.length + '.';
   this.counterEl_.textContent = counterText;
 };
@@ -431,9 +438,6 @@ jcd.FileList = function(container) {
   this.files = this.getFiles(this.container);
   this.length = this.files.length;
   this.imageManager.loadImages(this.files);
-  // this.url = '/pics/2002/2002-07-20_Chicago/'; /* Get this out of the url? */
-  console.log(' + files:');
-  console.dir(this.files);
 };
 
 
@@ -576,12 +580,12 @@ jcd.FileList.prototype.getFiles = function() {
     fileData = {
       description: li.getElementsByTagName('div')[0].innerHTML,
       fileName: a.textContent,
-      height: a.getAttribute('data-height'),
+      height: jcd.utils.getDataAttr(a, 'height'),
       href: a.href,
-      isSelectedImage: a.getAttribute('data-selected'),
-      size: a.getAttribute('data-size'),
-      type: a.getAttribute('data-file-type'),
-      width: a.getAttribute('data-width')
+      isSelectedImage: jcd.utils.getDataAttr(a, 'selected'),
+      size: jcd.utils.getDataAttr(a, 'size'),
+      type: jcd.utils.getDataAttr(a, 'file-type'),
+      width: jcd.utils.getDataAttr(a, 'width')
     };
 
     files[i] = new jcd.File(fileData);
@@ -655,17 +659,6 @@ jcd.File.prototype.fileTypes_ = {
 
 
 /**
- * UNUSED: Intended to be called when an image is successfully loaded.
- * TODO: perhaps this should call a callback (eg SlideShow.updateUI_?)
- * @private
- */
-jcd.File.prototype.imageLoaded_ = function () {
-  console.log('  - loaded image: '+this.src);
-  this.loaded = true;
-};
-
-
-/**
  * Returns the validated type of a file.
  * @param {string} type Type specified in source.
  * @returns {string} A recognized file type or 'unknown'.
@@ -723,6 +716,17 @@ jcd.utils.addEvent = function(el, event, func) {
   } else {
     el['on' + event] = func;
   }
+};
+
+
+/**
+ * X-browser data attribute retrieval.
+ * @param {!Element} el Element containing the data attribute.
+ * @param {string} attr Name of the data attribute (without 'data-'' prefix).
+ * @returns {string} Value of the data attribute.
+ */
+jcd.utils.getDataAttr = function(el, attr) {
+  return el.getAttribute('data-' + attr);
 };
 
 
@@ -804,14 +808,11 @@ jcd.Page.prototype.cacheNextPrev = function() {
   // TODO: Make these IDs lowercase:
   this.nextImgEl_ = document.getElementById('NEXT');
   this.prevImgEl_ = document.getElementById('PREVIOUS');
-  var nextImgSrc = this.nextImgEl_.getAttribute('data-src'),
-      prevImgSrc = this.prevImgEl_.getAttribute('data-src');
+  var nextImgSrc = jcd.utils.getDataAttr(this.nextImgEl_, 'src'),
+                   jcd.utils.getDataAttr(prevImgSrc = this.prevImgEl_, 'src');
   if (nextImgSrc && prevImgSrc) {
     this.nextImgEl_.src = nextImgSrc;
     this.prevImgEl_.src = prevImgSrc;
-  } else {
-    // Fail quietly.
-    console.log('ERROR: Could not load "src" data attributes for next / previous.');
   }
 };
 
@@ -827,17 +828,17 @@ jcd.Page.prototype.getAdminControl_ = function() {
   adminButton.title = 'Login';
   jcd.utils.addEvent(adminButton, 'click', function() {
     // Opens link to Admin console.
-    window.open(document.body.getAttribute('data-adminurl'));
+    window.open(jcd.utils.getDataAttr(document.body, 'adminurl'));
   });
   return adminButton;
 };
 
 
 /**
- * Creates initial DOM structure of page.
+ * Shows the slideshow DOM for supported browsers.
  * @private
  */
-jcd.Page.prototype.createDom_ = function() {
+jcd.Page.prototype.showSlideshow_ = function() {
   // Hide the list of files.
   this.fileListContainer_.className += ' hide';
   this.fileListContainer_.parentNode.className += ' active';
@@ -853,8 +854,8 @@ jcd.Page.prototype.init_ = function() {
   this.fileListContainer_ = document.getElementById('files');
   this.navElement_ = document.getElementById(this.elementIds_.NAV);
   this.displayMode_ = this.getDisplayMode();
-  // console.log('DEBUG: Page display mode: ' + this.displayMode_);
 
+  // Load #files if slide mode, or cache next/previous if single mode.
   if ((this.displayMode_ == this.displayModes_.SLIDE) && this.fileListContainer_) {
     var fileList = new jcd.FileList(this.fileListContainer_);
     var slideShow = new jcd.SlideShow({
@@ -862,11 +863,9 @@ jcd.Page.prototype.init_ = function() {
       'contentContainer': this.fileListContainer_.parentNode // TODO: Better way to handle contentContainer?  Don't like how it is being passed around.
     });
     slideShow.init();
-    this.createDom_();
+    this.showSlideshow_(); // TODO: Why not move this to slideShow.init ?
   } else if (this.displayMode_ == this.displayModes_.SINGLE) {
     jcd.utils.addEvent(window, 'load', this.cacheNextPrev.bind(this));
-  } else {
-    // DEBUG: Could not find #files = will not start slideshow.
   }
 
   // Insert Admin link
