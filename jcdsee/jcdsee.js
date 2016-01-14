@@ -809,7 +809,7 @@ jcd.Page.prototype.cacheNextPrev = function() {
   this.nextImgEl_ = document.getElementById('NEXT');
   this.prevImgEl_ = document.getElementById('PREVIOUS');
   var nextImgSrc = jcd.utils.getDataAttr(this.nextImgEl_, 'src'),
-                   jcd.utils.getDataAttr(prevImgSrc = this.prevImgEl_, 'src');
+      prevImgSrc = jcd.utils.getDataAttr(prevImgSrc = this.prevImgEl_, 'src');
   if (nextImgSrc && prevImgSrc) {
     this.nextImgEl_.src = nextImgSrc;
     this.prevImgEl_.src = prevImgSrc;
