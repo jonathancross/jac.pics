@@ -482,7 +482,7 @@ DIV#email IMG         {padding:5px;}
   #slideshow-buttons {
     float: left;
     margin: 0;
-    min-width: 228px;
+    min-width: 225px;
     padding: 0;
   }
 
@@ -509,7 +509,7 @@ DIV#email IMG         {padding:5px;}
     color: #aaa;
     cursor: pointer;
     font-size: 13px;
-    padding: 2px 6px 4px;
+    padding: 2px 4px 4px;
     margin: 0;
     opacity: .85;
   }
@@ -529,7 +529,7 @@ DIV#email IMG         {padding:5px;}
   /* Styles used to draw icons for slideshow controls. */
 
   #slideshow-buttons button:before,
-  #slideshow-interval-label {
+  #slideshow-interval-label span {
     font-family: 'lucida sans unicode', 'arial', sans-serif; /* Unicode arrows on Android Chrome. */
   }
 
@@ -600,10 +600,10 @@ DIV#email IMG         {padding:5px;}
   }
 
   #slideshow-interval {
-    /*  TODO: Add arrows per: http://stackoverflow.com/a/16553552/1117929  */
     -webkit-appearance: none; /* Removes gradient from Safari. Makes Chrome respect border-radius. */
+    -moz-appearance: none;
+    appearance: none;
     border-radius: 3px;
-    height: 24px;
     padding-left: 16px;
     text-transform: lowercase;
   }
