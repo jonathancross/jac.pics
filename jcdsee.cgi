@@ -848,7 +848,7 @@ sub printFileListHTML {
         <img src='${previous_thumb}'
              data-src='$STATE{'web_dir'}$STATE{'pic_previous_file'}'
              alt=''
-             id='PREVIOUS'>
+             id='picture-prev'>
       </a>
       <a class='picture-link large-picture-wrapper'
          href='".getHREF('', 'slide')."'
@@ -864,7 +864,7 @@ sub printFileListHTML {
         <img src='${next_thumb}'
              data-src='$STATE{'web_dir'}$STATE{'pic_next_file'}'
              alt=''
-             id='NEXT'>
+             id='picture-next'>
       </a>
       ";
     }

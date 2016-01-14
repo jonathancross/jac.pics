@@ -766,13 +766,18 @@ jcd.Page = function() {
 
 
 /**
- * HTML element IDs used on every page.
+ * HTML element IDs used by Page class.
  * @enum {string}
  * @private
  */
 jcd.Page.prototype.elementIds_ = {
+  ADMIN: 'admin-button',
+  CONTENT: 'content',
+  FILES: 'files',
+  FOOTER: 'footer',
   NAV: 'nav',
-  CONTENT: 'content'
+  NEXT: 'picture-next',
+  PREV: 'picture-prev'
 };
 
 
@@ -805,9 +810,8 @@ jcd.Page.prototype.getDisplayMode = function() {
  * TODO: Fold this into slideshow code later.
  */
 jcd.Page.prototype.cacheNextPrev = function() {
-  // TODO: Make these IDs lowercase:
-  this.nextImgEl_ = document.getElementById('NEXT');
-  this.prevImgEl_ = document.getElementById('PREVIOUS');
+  this.nextImgEl_ = document.getElementById(this.elementIds_.NEXT);
+  this.prevImgEl_ = document.getElementById(this.elementIds_.PREV);
   var nextImgSrc = jcd.utils.getDataAttr(this.nextImgEl_, 'src'),
       prevImgSrc = jcd.utils.getDataAttr(prevImgSrc = this.prevImgEl_, 'src');
   if (nextImgSrc && prevImgSrc) {
@@ -824,7 +828,7 @@ jcd.Page.prototype.cacheNextPrev = function() {
  */
 jcd.Page.prototype.getAdminControl_ = function() {
   var adminButton = document.createElement('div');
-  adminButton.id = 'admin-button';
+  adminButton.id = this.elementIds_.ADMIN;
   adminButton.title = 'Login';
   jcd.utils.addEvent(adminButton, 'click', function() {
     // Opens link to Admin console.
@@ -850,8 +854,8 @@ jcd.Page.prototype.showSlideshow_ = function() {
  * @private
  */
 jcd.Page.prototype.init_ = function() {
-  this.footerEl_ = document.getElementById('footer');
-  this.fileListContainer_ = document.getElementById('files');
+  this.footerEl_ = document.getElementById(this.elementIds_.FOOTER);
+  this.fileListContainer_ = document.getElementById(this.elementIds_.FILES);
   this.navElement_ = document.getElementById(this.elementIds_.NAV);
   this.displayMode_ = this.getDisplayMode();
 
