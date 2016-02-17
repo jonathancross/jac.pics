@@ -54,11 +54,11 @@ Fancy file name support:
 * <code>El Ni**ñ**o.jpg</code> - Spaces and UTF8 characters in file names are okay.
 
 #### Warnings:
-* Do not use user-supplied images, files, etc. JCDSee is intended to be used for content you created and are sure is safe.
+* Do not host user-supplied images, files, etc. JCDSee is intended to be used for content you created and are sure is safe.
 * The software requires all files to be in a folder called "pics".
-* The system tries to prevent unauthorized access to files / folders, but needs more testing.
+* The system tries to prevent unauthorized access to files and folders, but needs more testing.
 * Does not use SQL, cookies, sessions, etc.
-* On pics.jonathancross.com I use an admin script to automate many tasks (editing database, building the sitemap, etc). This is not currently available on GitHub.
+* On pics.jonathancross.com I use an admin script to automate many tasks (editing database, building the sitemap, etc). Althought the admin script is [now available on GitHub](jcdsee/admin/index.cgi), it requires additional scripts to work properly.
 
 ### Debugging
 
