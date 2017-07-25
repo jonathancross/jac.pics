@@ -3,6 +3,12 @@
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
 #  • https://github.com/jonathancross/pics.jonathancross.com
+# TODO: Update
+#   file_descriptions
+#   dir_list
+#   file_types
+#   image_array
+#   image_hash
 ################################################################################
 
 use strict;
@@ -32,14 +38,22 @@ close FILE;
 
 # GLOBAL VARIABLES #############################################################
 # DIRECTORY LIST ARRAYS
-my(@dir_list, @image_array, %image_hash, %file_descriptions, %file_types);
+my(
+  @dir_list,          # List of files as loaded from database (not just images).
+  @image_array,       # Array of images (full path starting with /pics/)
+  %image_hash,        # Hash of each image pointing to its index in @image_array
+  %file_descriptions, # Optional html descriptions of each file.
+  %file_dirs,         # Stores the directory (path) of each file.
+  %file_dirs_encoded, # Stores the directory (path) of each file, URL encoded.
+  %file_types         # Type of the given file.
+);
 my ${ROOT} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
 my ${PICS} = '/pics';
 my ${ASSETS} = '/jcdsee'; # Folder containing assets used by this script. (icons, buttons, css, etc)
 my ${JCDSEE_SCRIPT} = 'jcdsee.cgi'; # Name of the stub script, we need this so we don't show it in the dir listing.
 my ${DATABASE_FILENAME} = '.jcdsee'; # Filename used for each folder's database.
 my ${TEST_SUBDOMAIN_STRING} = 'test'; # Special test mode staging url
-my ${TITLE_SEPERATOR} = ' : ';
+my ${TITLE_SEPARATOR} = ' : ';
 my $XML_SITEMAP_FILE = "${ROOT}/sitemap.xml";
 my $XSL_SITEMAP_FILE = "${ROOT}${ASSETS}/jcdsee.xsl";
 my %SITEMAP_DATA = getSitemapData();
@@ -94,7 +108,7 @@ my %STATE = (
   title             => 'Jonathan Cross', # Document title base
   web_dir           => '', # Directory path from the document root eg: /pics/foo bar/
   web_dir_encoded   => '', # URL encoded version of `web_dir`, eg:     /pics/foo%20bar/
-  web_full_path_clean => '' # Full web path to the current image (or default image if available) or web_dir.  Does not include display_mode.
+  web_full_path_clean => '' # Full web path to the current image eg:   /pics/foo bar/default.jpg Can also point to default image (if available) or web_dir.  Does not include display_mode.
 );
 my %DEFAULTS = (
   display_mode      => 'list',
@@ -220,50 +234,69 @@ my %ICON = (
 # Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
 #   loadFileDatabase()
 sub loadFileDatabase {
-  my (@database_raw, @dir_list_raw);
+  my (@database_raw, @dir_list_raw, $file_name);
   # Create the database if it doesn't exist yet.
   if (! -e $STATE{'database_file'}) {
     createDatabase();
   }
   # Now that we have a database for sure, load in the data.
-  open(DATA, $STATE{'database_file'}) or die "Content-type: html/text\n\nCant open file: \"$STATE{'database_file'}\".";
+  # TODO: or $STATE{'error_msg'} = "Cant open file: '$STATE{'database_file'}'." && printHtmlHead;
+  open(DATA, $STATE{'database_file'}) or die "Content-Type: text/html\n\nCant open file: \"$STATE{'database_file'}\".";
   @database_raw = <DATA>;
   close(DATA);
   # Process the database contents.
   my ${img_count} = 0;
   my ${file_count} = 0;
-  # Fill file info arrays from data.
+  # Slurp in file info.
   foreach my ${line} (@database_raw){
     chop(${line});
     # TODO: Allow first line to contain meta data?
-    my($file_name, $description) = split(/[|]/, $line);
-    if (${file_name} ne '') {
-      if (${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
-        # Picture
-        $image_array[${img_count}] = ${file_name};
-        $image_hash{${file_name}} = ${img_count};
-        $file_types{${file_name}} = 'pic';
-        ${img_count}++;
-      } elsif (-d "$STATE{'server_dir'}${file_name}") {
-        # Folder
-        $file_types{${file_name}} = 'folder';
-      } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
-        # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
-        $file_types{${file_name}} = 'music';
-      # } elsif (${file_name} =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
-      # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
-      # $file_types{${file_name}} = 'video';
-      } elsif (${file_name} =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
-        # Text Document (pdf,doc,txt,htm,html,nfo,css,js)
-        $file_types{${file_name}} = 'doc';
-      } else {
-        # Unknown file
-        $file_types{${file_name}} = 'unknown';
-      }
-      $dir_list[${file_count}] = ${file_name};
-      $file_descriptions{${file_name}} = ${description};
-      ${file_count}++;
+    my($file, $description) = split(/[|]/, $line);
+    # Skip blank lines and comment lines.
+    if ($file eq '' || $file =~ /^#/) return;
+
+    # Determine directory of each file (can now mix images from different folders).
+    # TODO: remove hardcoded 'pics'.
+    if ($file =~ @^/pics/@) {
+      # Extract file_dir is needed because we need to do lots of file name parsing.
+      ($file_dirs{$file}, $file_name) =~ m@^(.*/)(.*)@;
+    } elsif ($file =~ @^[^/]+$@) {
+      # Normal file in current folder
+      $file_name = $file;
+      $file = $STATE{'web_dir'}.$file;
+      $file_dirs{$file} = $STATE{'web_dir'};
+    } else {
+      $STATE{'error_msg'} = "Could not parse local or absolute file path: ${file}";
+      $file_name = $file;
     }
+    $file_dirs_encoded{$file} = urlEscapeSpaces($file_dirs{$file});
+
+    # Identify type of the file or folder
+    if ($file_name =~ /[.](jp[e]?g|gif|png)$/i) {
+      # Picture
+      $image_array[$img_count] = $file;
+      $image_hash{$file} = $img_count;
+      $file_types{$file} = 'pic';
+      ${img_count}++;
+    } elsif (-d ${ROOT}.${file}) {
+      # Folder
+      $file_types{$file} = 'folder';
+    } elsif ($file_name =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
+      # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
+      $file_types{$file} = 'music';
+    # } elsif ($file_name =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
+    # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
+    # $file_types{$file} = 'video';
+    } elsif ($file_name =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
+      # Text Document (pdf,doc,txt,htm,html,nfo,css,js)
+      $file_types{$file} = 'doc';
+    } else {
+      # Unknown file
+      $file_types{$file} = 'unknown';
+    }
+    $dir_list[$file_count] = $file;
+    $file_descriptions{$file} = $description;
+    $file_count++;
   }
 }
 
@@ -286,9 +319,9 @@ sub createDatabase {
 }
 
 # Creates a thumbnail image.
-#   createImageThumbnail("source", "destination thumb")
+#   createImageThumbnail("source", "destination thumb full path")
 sub createImageThumbnail {
-  my ($image_source, $image_thumb) = @_;
+  my ($image_source, $image_thumb_path) = @_;
   my ${image_obj} = Image::Magick->new;
   my ${img_status} = ${image_obj}->Read(${image_source}); warn ${img_status} if ${img_status};
   ${img_status} = ${image_obj}->Flatten(); # for PSD files
@@ -300,7 +333,7 @@ sub createImageThumbnail {
   ${img_status} = ${image_obj}->Set(compression=>'JPEG');
   ${img_status} = ${image_obj}->Set(quality=>$IMAGE_GLOBAL{'thumb_quality'});
   ${img_status} = ${image_obj}->Set(type=>'Optimize');
-  ${img_status} = ${image_obj}->Write(${image_thumb}); warn ${img_status} if ${img_status};
+  ${img_status} = ${image_obj}->Write(${image_thumb_path}); warn ${img_status} if ${img_status};
   @${image_obj} = (); # Clear memory
 }
 
@@ -309,15 +342,15 @@ sub createImageThumbnail {
 sub getImageTag {
   my ($image_name, $image_prefix) = @_;
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
-  my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
-  my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; # Image url for browser
+  my ${image_thumb_path} = ${ROOT}.$file_dirs{$image_name}.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+  my ${image_thumb_url} = $file_dirs{$image_name}.${image_thumb_name}; # Image url for browser
   # Make a Thumbnail if necessary
   # Datestamp isn't really important so i'm removing test to speed up display in 99% of cases
-  # if ( ! (-e ${image_thumb}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb}))[9])) ) {
-  if ($STATE{'prefix_cur'} && ! (-e ${image_thumb})) {
-    #Make a thumbnail of the image
-    my ${image_source} = $STATE{'server_dir'}.${image_name};
-    createImageThumbnail(${image_source}, ${image_thumb});
+  # if ( ! (-e ${image_thumb_path}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb_path}))[9])) ) {
+  if ($STATE{'prefix_cur'} && ! (-e ${image_thumb_path})) {
+    # Make a thumbnail of the image
+    my ${image_source} = $ROOT.$file_dirs{$image_name}.${image_name};
+    createImageThumbnail(${image_source}, ${image_thumb_path});
   }
   $image_thumb_url = urlEscapeSpaces($image_thumb_url);
   my $alt = (isMode('thumb')) ? stripHTML($file_descriptions{${image_name}}) : '';
@@ -334,11 +367,12 @@ sub getImageTag {
 sub getCurrentPageTitle {
   my ($path) = @_;
   $path =~ s@${PICS}|\/$@@g; # Delete "/pics" root and trailing slash.
-  $path =~ s@/@${TITLE_SEPERATOR}@g; # Replace all slashes with colon.
+  $path =~ s@/@${TITLE_SEPARATOR}@g; # Replace all slashes with colon.
   if (isMode('single')) {
-    $path .= ${TITLE_SEPERATOR}.getNiceFilename($STATE{'pic_cur_file'});
+    $path .= ${TITLE_SEPARATOR}.getNiceFilename($STATE{'pic_cur_file'});
   }
-  $path = join($TITLE_SEPERATOR, reverse(split($TITLE_SEPERATOR, $path)));  # Split the path elements, then reassemble in reverse
+  # Split the path elements, then reassemble in reverse:
+  $path = join($TITLE_SEPARATOR, reverse(split($TITLE_SEPARATOR, $path)));
   $path .= $STATE{'title'};
   $path = getNiceFilename($path);
   return $path;
@@ -426,7 +460,7 @@ sub getSitemapGoUrl {
   # All possible matches from sitemap starting from most recent (reverse).
   my @urls = reverse split('\n', getSitemapDataItem('urlFragment', $goParam));
 
-  # Select best/first URL (case incensitive) by fuzzy matching the folder name.
+  # Select best/first URL (case incensitive) which matches the folder name.
   # Exact match, usually a year.
   # Example: pics/2015/
   my ($perfectMatchURL) = grep { m@.+/$goParam/$@i } @urls;
@@ -614,6 +648,7 @@ sub getDepthPath {
 }
 
 # Returns a linked image tag representing the file provided by $file_name.
+# TODO: Rename file_name to just "file" because it has full path.
 #   getIcon("file name")
 sub getIcon {
   my ($file_name) = @_;
@@ -639,7 +674,7 @@ sub getStaticIcon {
   my ($file_name) = @_;
   my ${icon_file};
   # We can create and upload a static thumbnail icon for any filetype... will replace default question mark
-  my ${static_thumbnail_path} = $STATE{'server_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  my ${static_thumbnail_path} = $ROOT.$file_dirs{$image_name}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
   # Use built-in icon
        if (isFileType(${file_name}, 'folder')) { ${icon_file} = $ICON{'folder'};
   } elsif (isFileType(${file_name}, 'doc')) {    ${icon_file} = $ICON{'doc'};
@@ -662,7 +697,8 @@ sub getStaticIcon {
 }
 
 # Returns an <a> tag containing appropriate href based on the type of file, state, etc.
-#   getLinkTag("name of file", "link content", "file description", "CSS class name")
+# TODO: Rename file_name to just "file" because it has full path.
+#   getLinkTag("full file with path", "link content", "file description", "CSS class name")
 sub getLinkTag {
   my ($file_name, $link_content, $desc, $class) = @_;
   my ${link_tag};
@@ -724,15 +760,15 @@ sub commandLineMakeThumbs {
     # Create small and large thumbnails as needed
     foreach my ${size} ('small', 'large') {
       my ${image_thumb_name} = $IMAGE_GLOBAL{'prefix_'.$size}.${image_name}.$STATE{'thumb_ext_cur'};
-      my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+      my ${image_thumb_path} = $ROOT.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
       print " [${size} :";
       # Make a Thumbnail if necessary
-      if (! -e ${image_thumb}) {
+      if (! -e ${image_thumb_path}) {
         # Manually inject the correct width and height
         $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_'.$size};
         $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_'.$size};
         # Make a thumbnail of the image
-        createImageThumbnail(${image_source}, ${image_thumb});
+        createImageThumbnail(${image_source}, ${image_thumb_path});
         print " OK, CREATED]";
       } else {
         print " OK, EXISTS]";
@@ -774,11 +810,11 @@ sub printFileListHTML {
   my ${file_size};
   # list and thumbnail display modes
   if (isMode('list|thumb')) {
+    # TODO: Rename file_name to just "file" because it has full path.
     foreach ${file_name} (@dir_list) {
       ${file_size} = '';
-      @file_info = stat $STATE{'server_dir'}.${file_name};
-      # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
-      # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
+      @file_info = stat $ROOT.${file_name};
+      # TODO: Delete / recache without loosing info
       if (isMode('list')) {
         # @time_info = localtime ${file_info[9]};
         # EXTRACT FILE INFO FROM ARRAY AND PAD
@@ -877,7 +913,7 @@ sub printFileListHTML {
     if (${file_name}) {
       foreach ${file_name} (@dir_list) {
         ${file_size} = '';
-        @file_info = stat $STATE{'server_dir'}.${file_name};
+        @file_info = stat $ROOT.${file_name};
         # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
         # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
 
@@ -994,7 +1030,7 @@ sub printHtmlHead {
       exit;
     }
   } else {
-    print "Content-type: text/html\n\n";
+    print "Content-Type: text/html\n\n";
   }
 }
 
