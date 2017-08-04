@@ -43,6 +43,8 @@ my(
   @image_array,       # Array of images (full path starting with /pics/)
   %image_hash,        # Hash of each image pointing to its index in @image_array
   %file_descriptions, # Optional html descriptions of each file.
+  %file_dirs,         # Stores the directory (path) of each file.
+  %file_dirs_encoded, # Stores the directory (path) of each file, URL encoded.
   %file_types         # Type of the given file.
 );
 my ${ROOT} = (${COMMANDLINE}) ? '.' : $ENV{DOCUMENT_ROOT};
