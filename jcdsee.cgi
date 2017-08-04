@@ -234,7 +234,7 @@ my %ICON = (
 # Builds image_array, image_hash, file_descriptions, file_types, and dir_list.
 #   loadFileDatabase()
 sub loadFileDatabase {
-  my (@database_raw, @dir_list_raw);
+  my (@database_raw, @dir_list_raw, $file_name);
   # Create the database if it doesn't exist yet.
   if (! -e $STATE{'database_file'}) {
     createDatabase();
@@ -251,36 +251,52 @@ sub loadFileDatabase {
   foreach my ${line} (@database_raw){
     chop(${line});
     # TODO: Allow first line to contain meta data?
-    my($file_name, $description) = split(/[|]/, $line);
-    if (${file_name} ne '') {
+    my($file, $description) = split(/[|]/, $line);
+    # Skip blank lines and comment lines.
+    if ($file eq '' || $file =~ /^#/) return;
+
+    # Determine directory of each file (can now mix images from different folders).
+    # TODO: remove hardcoded 'pics'.
+    if ($file =~ @^/pics/@) {
+      # Extract file_dir is needed because we need to do lots of file name parsing.
+      ($file_dirs{$file}, $file_name) =~ m@^(.*/)(.*)@;
+    } elsif ($file =~ @^[^/]+$@) {
+      # Normal file in current folder
+      $file_name = $file;
+      $file = $STATE{'web_dir'}.$file;
+      $file_dirs{$file} = $STATE{'web_dir'};
+    } else {
+      $STATE{'error_msg'} = "Could not parse local or absolute file path: ${file}";
+      $file_name = $file;
+    }
+    $file_dirs_encoded{$file} = urlEscapeSpaces($file_dirs{$file});
 
     # Identify type of the file or folder
-      if (${file_name} =~ /[.](jp[e]?g|gif|png)$/i) {
-        # Picture
-        $image_array[${img_count}] = ${file_name};
-        $image_hash{${file_name}} = ${img_count};
-        $file_types{${file_name}} = 'pic';
-        ${img_count}++;
-      } elsif (-d $ROOT.${file_name}) {
-        # Folder
-        $file_types{${file_name}} = 'folder';
-      } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
-        # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
-        $file_types{${file_name}} = 'music';
-      # } elsif (${file_name} =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
-      # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
-      # $file_types{${file_name}} = 'video';
-      } elsif (${file_name} =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
-        # Text Document (pdf,doc,txt,htm,html,nfo,css,js)
-        $file_types{${file_name}} = 'doc';
-      } else {
-        # Unknown file
-        $file_types{${file_name}} = 'unknown';
-      }
-      $dir_list[${file_count}] = ${file_name};
-      $file_descriptions{${file_name}} = ${description};
-      ${file_count}++;
+    if ($file_name =~ /[.](jp[e]?g|gif|png)$/i) {
+      # Picture
+      $image_array[$img_count] = $file;
+      $image_hash{$file} = $img_count;
+      $file_types{$file} = 'pic';
+      ${img_count}++;
+    } elsif (-d $ROOT.${file}) {
+      # Folder
+      $file_types{$file} = 'folder';
+    } elsif ($file_name =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
+      # Music (.mpeg,mpg,mp4,mp3,mp2,mp1,wav,asx,asf,wmx,wma,m3u,mid,mod,aif,aiff,qt)
+      $file_types{$file} = 'music';
+    # } elsif ($file_name =~ /[.](mp[e]?g|avi|mov|flv|wmv|qt)$/i) {
+    # Video (.mpeg,mpg,avi,mov,flv,wmv,qt)
+    # $file_types{$file} = 'video';
+    } elsif ($file_name =~ /[.](pdf|doc|htm[l]?|txt|nfo|css|js)$/i) {
+      # Text Document (pdf,doc,txt,htm,html,nfo,css,js)
+      $file_types{$file} = 'doc';
+    } else {
+      # Unknown file
+      $file_types{$file} = 'unknown';
     }
+    $dir_list[$file_count] = $file;
+    $file_descriptions{$file} = $description;
+    $file_count++;
   }
 }
 
@@ -305,7 +321,7 @@ sub createDatabase {
 # Creates a thumbnail image.
 #   createImageThumbnail("source", "destination thumb full path")
 sub createImageThumbnail {
-  my ($image_source, $image_thumb) = @_;
+  my ($image_source, $image_thumb_path) = @_;
   my ${image_obj} = Image::Magick->new;
   my ${img_status} = ${image_obj}->Read(${image_source}); warn ${img_status} if ${img_status};
   ${img_status} = ${image_obj}->Flatten(); # for PSD files
@@ -317,7 +333,7 @@ sub createImageThumbnail {
   ${img_status} = ${image_obj}->Set(compression=>'JPEG');
   ${img_status} = ${image_obj}->Set(quality=>$IMAGE_GLOBAL{'thumb_quality'});
   ${img_status} = ${image_obj}->Set(type=>'Optimize');
-  ${img_status} = ${image_obj}->Write(${image_thumb}); warn ${img_status} if ${img_status};
+  ${img_status} = ${image_obj}->Write(${image_thumb_path}); warn ${img_status} if ${img_status};
   @${image_obj} = (); # Clear memory
 }
 
@@ -326,15 +342,15 @@ sub createImageThumbnail {
 sub getImageTag {
   my ($image_name, $image_prefix) = @_;
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
-  my ${image_thumb} = $ROOT.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
-  my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; # Image url for browser
+  my ${image_thumb_path} = $ROOT.$file_dirs{$image_name}.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+  my ${image_thumb_url} = $file_dirs{$image_name}.${image_thumb_name}; # Image url for browser
   # Make a Thumbnail if necessary
   # Datestamp isn't really important so i'm removing test to speed up display in 99% of cases
-  # if ( ! (-e ${image_thumb}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb}))[9])) ) {
-  if ($STATE{'prefix_cur'} && ! (-e ${image_thumb})) {
-    #Make a thumbnail of the image
-    my ${image_source} = $ROOT.${image_name};
-    createImageThumbnail(${image_source}, ${image_thumb});
+  # if ( ! (-e ${image_thumb_path}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb_path}))[9])) ) {
+  if ($STATE{'prefix_cur'} && ! (-e ${image_thumb_path})) {
+    # Make a thumbnail of the image
+    my ${image_source} = $ROOT.$file_dirs{$image_name}.${image_name};
+    createImageThumbnail(${image_source}, ${image_thumb_path});
   }
   $image_thumb_url = urlEscapeSpaces($image_thumb_url);
   my $alt = (isMode('thumb')) ? stripHTML($file_descriptions{${image_name}}) : '';
@@ -658,7 +674,7 @@ sub getStaticIcon {
   my ($file_name) = @_;
   my ${icon_file};
   # We can create and upload a static thumbnail icon for any filetype... will replace default question mark
-  my ${static_thumbnail_path} = $ROOT.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  my ${static_thumbnail_path} = $ROOT.$file_dirs{$image_name}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
   # Use built-in icon
        if (isFileType(${file_name}, 'folder')) { ${icon_file} = $ICON{'folder'};
   } elsif (isFileType(${file_name}, 'doc')) {    ${icon_file} = $ICON{'doc'};
@@ -744,15 +760,15 @@ sub commandLineMakeThumbs {
     # Create small and large thumbnails as needed
     foreach my ${size} ('small', 'large') {
       my ${image_thumb_name} = $IMAGE_GLOBAL{'prefix_'.$size}.${image_name}.$STATE{'thumb_ext_cur'};
-      my ${image_thumb} = $ROOT.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+      my ${image_thumb_path} = $ROOT.${image_thumb_name}; # This holds the full file path of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
       print " [${size} :";
       # Make a Thumbnail if necessary
-      if (! -e ${image_thumb}) {
+      if (! -e ${image_thumb_path}) {
         # Manually inject the correct width and height
         $IMAGE{'max_width'} = $IMAGE_GLOBAL{'max_width_'.$size};
         $IMAGE{'max_height'} = $IMAGE_GLOBAL{'max_height_'.$size};
         # Make a thumbnail of the image
-        createImageThumbnail(${image_source}, ${image_thumb});
+        createImageThumbnail(${image_source}, ${image_thumb_path});
         print " OK, CREATED]";
       } else {
         print " OK, EXISTS]";
