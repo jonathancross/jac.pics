@@ -261,7 +261,7 @@ sub loadFileDatabase {
         $image_hash{${file_name}} = ${img_count};
         $file_types{${file_name}} = 'pic';
         ${img_count}++;
-      } elsif (-d "$STATE{'server_dir'}${file_name}") {
+      } elsif (-d $ROOT.${file_name}) {
         # Folder
         $file_types{${file_name}} = 'folder';
       } elsif (${file_name} =~ /[.]mp3$|[.]wav$|[.]as[xf]$|[.]wm[a]$|[.]m3u$|[.]m[io]d$|[.]aif+$/i) {
@@ -326,14 +326,14 @@ sub createImageThumbnail {
 sub getImageTag {
   my ($image_name, $image_prefix) = @_;
   my ${image_thumb_name} = ${image_prefix}.${image_name}.$STATE{'thumb_ext_cur'};
-  my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+  my ${image_thumb} = $ROOT.${image_thumb_name}; # This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
   my ${image_thumb_url} = $STATE{'web_dir'}.${image_thumb_name}; # Image url for browser
   # Make a Thumbnail if necessary
   # Datestamp isn't really important so i'm removing test to speed up display in 99% of cases
   # if ( ! (-e ${image_thumb}) || (((stat(${image_source}))[9]) > ((stat(${image_thumb}))[9])) ) {
   if ($STATE{'prefix_cur'} && ! (-e ${image_thumb})) {
     #Make a thumbnail of the image
-    my ${image_source} = $STATE{'server_dir'}.${image_name};
+    my ${image_source} = $ROOT.${image_name};
     createImageThumbnail(${image_source}, ${image_thumb});
   }
   $image_thumb_url = urlEscapeSpaces($image_thumb_url);
@@ -658,7 +658,7 @@ sub getStaticIcon {
   my ($file_name) = @_;
   my ${icon_file};
   # We can create and upload a static thumbnail icon for any filetype... will replace default question mark
-  my ${static_thumbnail_path} = $STATE{'server_dir'}.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
+  my ${static_thumbnail_path} = $ROOT.$STATE{'prefix_cur'}.${file_name}.$STATE{'thumb_ext_cur'};
   # Use built-in icon
        if (isFileType(${file_name}, 'folder')) { ${icon_file} = $ICON{'folder'};
   } elsif (isFileType(${file_name}, 'doc')) {    ${icon_file} = $ICON{'doc'};
@@ -744,7 +744,7 @@ sub commandLineMakeThumbs {
     # Create small and large thumbnails as needed
     foreach my ${size} ('small', 'large') {
       my ${image_thumb_name} = $IMAGE_GLOBAL{'prefix_'.$size}.${image_name}.$STATE{'thumb_ext_cur'};
-      my ${image_thumb} = $STATE{'server_dir'}.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
+      my ${image_thumb} = $ROOT.${image_thumb_name}; #This holds the filename of the current image you will be reading and or writing.  Can be a small thumbnail, large thumbnail or full-size image.
       print " [${size} :";
       # Make a Thumbnail if necessary
       if (! -e ${image_thumb}) {
@@ -797,7 +797,7 @@ sub printFileListHTML {
     # TODO: Rename file_name to just "file" because it has full path.
     foreach ${file_name} (@dir_list) {
       ${file_size} = '';
-      @file_info = stat $STATE{'server_dir'}.${file_name};
+      @file_info = stat $ROOT.${file_name};
       # TODO: Delete / recache without loosing info
       if (isMode('list')) {
         # @time_info = localtime ${file_info[9]};
@@ -897,7 +897,7 @@ sub printFileListHTML {
     if (${file_name}) {
       foreach ${file_name} (@dir_list) {
         ${file_size} = '';
-        @file_info = stat $STATE{'server_dir'}.${file_name};
+        @file_info = stat $ROOT.${file_name};
         # ALL THIS ISDIR SHOULD GO IN THE CACHE FILE!  ALSO NEED TO BE ABLE TO DELETE / RECACHE WITHOUT LOOSING INFO
         # Not used anymore... ${is_dir} = S_ISDIR(${file_info[2]});
 
