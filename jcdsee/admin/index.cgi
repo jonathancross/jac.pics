@@ -1,11 +1,11 @@
 #!/bin/bash
-VERSION=1.9.5
+VERSION=1.9.7
 ADMIN_SCRIPT_NAME="index.cgi"
 CACHE_FILE=".jcdsee" # Should be renamed to DATABASE and used with edit.database
 BACKUP_PREFIX="$(date +'%Y-%m-%d')"
-ROOT="${DOCUMENT_ROOT}"
-BACKUP_DIR="${ROOT}/jcdsee/BACKUP"
-ADMIN_SCRIPT="${ROOT}/jcdsee/admin/${ADMIN_SCRIPT_NAME}"
+ROOT="../pics"
+BACKUP_DIR="BACKUP"
+ADMIN_SCRIPT="${ADMIN_SCRIPT_NAME}"
 PICS="pics"
 MASTER="${ROOT}/${PICS}"
 BACKUP_FILE="${BACKUP_DIR}/${BACKUP_PREFIX}.data.txt"
@@ -18,7 +18,7 @@ percent='%%'
 I=0
 CUR_URL=""
 isCUR_URL=0
-# File seperator hack
+# File separator hack
 IFS=$'\n'
 
 prefix() {
@@ -28,7 +28,7 @@ prefix() {
 
 
 # Unencode the url spaces and break up params into list
-PARAMS=$(echo "${QUERY_STRING}" | sed 's/%20/ /g' | tr '&' '\n')
+PARAMS=$(echo "${QUERY_STRING}" | sed 's/%20/ /g' | tr '&' '\n'); # Fix syntax highlight '
 for PARAM in ${PARAMS[@]};do
   if [ "${PARAM%=*}" == "cur_url" ];then
     CUR_URL="${PARAM#*=}"
@@ -121,14 +121,25 @@ printf "
 </head>
 <body>
 
-<a class='b' href='http://logout:logout@pics.jonathancross.com/jcdsee/logout' style='float:right;'>LOGOUT</a>
+<a class='b' href='http://logout:logout@pics.jonathancross.com/jcdsee/logout' style='float:right;'>TODO:LOGOUT</a>
 <a class='b' title='test-pics.jonathancross.com' href='http://test-pics.jonathancross.com/pics/' target='_blank' style='float:right;margin-right:200px;'>TEST SERVER</a>
 <span class='head'>JCDSee Admin Console v${VERSION}.<br /><code class='date'>$(date)</code>
 </span>
 <pre>";
 printf "<form name='myform' onsubmit='return addURL(\"display_url\",0)'>";
 if [ "${isCUR_URL}" == "0" -a "${CUR_URL}" != "" ];then
-  echo "<div class='error'>[ERROR: INVALID URL!]</div>"
+  echo "<div class='error'>[ERROR: INVALID URL!]</div>
+<pre>
+DOCUMENT_ROOT: $DOCUMENT_ROOT
+ROOT: $ROOT
+isCUR_URL: $isCUR_URL
+CUR_URL: $CUR_URL
+PICS:
+"
+ls -al ../pics/
+echo "
+</pre>
+"
 else
   for COMMAND in ${COMMANDS[@]};do
     if [ "${COMMAND}" == "display_url" ];then
@@ -187,23 +198,16 @@ if [ -d "${MASTER}" ];then
       FLATFILE_DB=.jcdsee_global
       cd ${ROOT}
       echo "CREATING FLATFILE DATABASE: ${ROOT}/${FLATFILE_DB}<br>"
-      printf "# created=$(date)\n" > "${FLATFILE_DB}"
       DIRS=$(find "${PICS}" -type d ! -regex '.*/[.].*' | sort)
+      # This isn't ideal as we will have a broken DB for a few seconds...
+      echo '' > "${FLATFILE_DB}"
       I=0;
       for DIR in ${DIRS[@]};do
-        WEB_DIR="/${DIR}/"
-        echo " + ${WEB_DIR}"
-        printf "# album=${WEB_DIR}\n" >> "${FLATFILE_DB}"
-        cat "${DIR}/.jcdsee" | prefix "${WEB_DIR}" >> "${FLATFILE_DB}"
+        cat "${DIR}/.jcdsee" | prefix "/${DIR}/" >> "${FLATFILE_DB}"
         let I++
       done
       chmod 644 "${FLATFILE_DB}"
       echo "Done. ${I} albums added."
-    elif [ "${COMMAND}" == "backup.listing" ];then
-      cd ${MASTER}
-      echo "BACKED UP FILES IN: ${BACKUP_DIR}<br />"
-      ls -al ${BACKUP_DIR}
-      printf "<br /><b>TOTAL KB: $(du -k ${BACKUP_DIR})</b>";
     elif [ "${COMMAND}" == 'add.albums' ];then ##############  2012 : maybe merge with make.thumbs -- will jcdsee commandline make the database?
       # NO FUNCTIONALITY BELOW YET
       FULL_DIR=''
@@ -211,7 +215,7 @@ if [ -d "${MASTER}" ];then
       DIRS_SKIPPED=0;
       DIRS_TOTAL=0;
       DIRS_NEW=0;
-      IFS=$'\n'; # consider local IFS
+      IFS=$'\n'; # consider local IFS'
       for DIR in $(find . -type d | sort);do
         DIR="${DIR:2}"
         TMP="${DIR##*/}"
@@ -318,7 +322,7 @@ if [ -d "${MASTER}" ];then
         echo "[ ERROR: Could not recognize the file you want to edit. ]"
         exit 1
       fi
-      #Read STDIN to see if there is POST data.  If so, write it to the file.
+      # Read STDIN to see if there is POST data.  If so, write it to the file.
       read FILE_TEXT
       if [ "${FILE_TEXT}" ];then
         if [ -w ${EDIT_FILE} ];then
@@ -334,13 +338,14 @@ if [ -d "${MASTER}" ];then
           echo "[ ERROR: Could not write to \"${EDIT_FILE}\" ]"
         fi
       fi
-      #Display the contents of the file.
+      # Edit a file in the browser.
       if [ -r "${EDIT_FILE}" ];then
         echo "<form method='post' name='fileform' onsubmit='return addURL(\"edit.test\",1)'>"
         printf "<table style='width:800px'><tr><td><a class='b' href='javascript:;' onclick='shrink()'>shrink</a></td><td><span style='font-size:13px;font-family:verdana;'>${EDIT_FILE}</span></td><td align='right'><input type='submit' value='Save File \"${EDIT_FILE##*/}\"' /></td></tr></table>"
         echo "<textarea cols='137' rows='37' name='file' id='file' wrap='off'>$(cat ${EDIT_FILE} | sed 's/&/\&amp;/g' | sed 's/</\&lt;/g')</textarea>"
         printf "<input type='submit' value='Save File \"${EDIT_FILE##*/}\"' /></form>";
-      else echo "[ No file to edit ]";
+      else
+        echo "[ No file to edit ]"
       fi
     elif [ "${COMMAND}" == "clean.thumbs" ];then
       if [[ ${isCUR_URL} && "${CUR_URL:0:6}" == "/${PICS}/" ]];then
@@ -379,7 +384,7 @@ if [ -d "${MASTER}" ];then
       else
         echo "<div class='error'>[ERROR: Thumbnail cleanup requires a current URL under /${PICS}/ !]</div>";break;
       fi
-      IFS=$'\n';
+      IFS=$'\n'; # Fix syntax highlighting '
       # Below in our list of dirs, we remove the trailing / to normalize output as first match always has it, others dont
       for D in $(find .${CUR_URL%/} -type d);do
         printf "  Making thumbs for: ${D#.}/"
@@ -418,7 +423,7 @@ if (( ${isCUR_URL} ));then
 fi
 echo "<table border='0' cellpadding='3'>
 
-  <tr><td class='button'><a class='b' href='javascript:addURL(\"flatfile.sitemap\",0)'>flatfile.sitemap</a></td><td>Make new flatfile sitemap database.</td></tr>
+  <tr><td class='button'><a class='b' href='javascript:addURL(\"flatfile.sitemap\",0)'>flatfile.sitemap</a></td><td>Make new flatfile sitemap (<a href='http://pics.jonathancross.com/.jcdsee_global' target='_blank'>.jcdsee_global</a>) database. STILL UNDER DEV</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"backup.data\",0)'>backup.data</a></td><td>Backup all file description databases.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"clean.misc\",0)'>clean.misc</a></td><td>Clean out random junk files (Thumbs.db, Picasa.ini) and fix permissions.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"edit.jcd\",0)'>edit.jcd</a></td><td>Edit main perl script behind JCDSee.</td></tr>
@@ -426,7 +431,6 @@ echo "<table border='0' cellpadding='3'>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"pub.jcd_test\",0)'>pub.jcd_test</a></td><td>Publish changes made to testing script.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"edit.admin\",0)'>edit.admin</a></td><td>Edit this Admin script.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"edit.database\",0)'>edit.database</a></td><td>Edit the database for the current folder.</td></tr>
-  <tr><td class='button'><a class='b' href='javascript:addURL(\"backup.listing\",0)'>backup.listing</a></td><td>List all the backed up files.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"add.albums\",0)'>add.albums</a></td><td>List all new folders (no real functionality now, but maybe merge with make.thumbs later?).</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"sitemap\",0)'>sitemap</a></td><td>Rebuilds the google sitemap.xml file.</td></tr>
   <tr><td class='button'><a class='b' href='javascript:addURL(\"test\",0)'>Test</a></td><td>Test</td></tr>
@@ -438,13 +442,12 @@ echo "<table border='0' cellpadding='3'>
   <tr><td colspan='2'><hr /></td></tr>
 </table>
 <div class='links'>
-  <a href='https://www.cloudflare.com/cloudflare-settings?z=jonathancross.com' target='_blank' class='first'>CloudFlare settings</a>
-  <a href='https://panel.dreamhost.com/' target='_blank'>DH Panel</a>
-  <a href='/jcdsee/BACKUP/' target='_blank'>BACKED UP Files</a>
+  <a href='https://www.cloudflare.com/a/caching/jonathancross.com' target='_blank' class='first'>CloudFlare settings</a>
+  <a href='BACKUP/' target='_blank'>View BACKED UP Files</a>
 </div>
 <hr />
 <span style='font-family:verdana,arial;font-size:10px;'>
-USAGE: ${0}?[make.flatfile.sitemap|backup.data|clean.misc|make.thumbs|clean.thumbs|clean.data|edit.jcdsee|edit.admin|edit.database|backup.listing|test]<br />
+USAGE: ${0}?[make.flatfile.sitemap|backup.data|clean.misc|make.thumbs|clean.thumbs|clean.data|edit.jcdsee|edit.admin|edit.database|test]<br />
        [cur_url]=[url]
 </span>
 </body>
