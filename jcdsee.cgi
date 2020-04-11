@@ -2,7 +2,7 @@
 #
 # JCDSee by Jonathan Cross : www.JonathanCross.com
 # See GitHub for license, usage, examples and more info:
-#  • https://github.com/jonathancross/pics.jonathancross.com
+#  • https://github.com/jonathancross/jac.pics
 # TODO: Update
 #   file_descriptions
 #   dir_list
@@ -98,7 +98,7 @@ my %STATE = (
   pic_previous_file => '',
   pic_previous_idx  => 0,
   prefix_cur        => '', # Will hold the current prefix (prefix_small or prefix_large)
-  protocol          => 'http://', # TODO: generate this.
+  protocol          => 'https://', # TODO: generate this.
   server_dir        => '', # Full server path to the folder being listed.
   server_name       => $ENV{SERVER_NAME},
   test_mode         => 0,  # Test mode (0 or 1) Default=0
@@ -1031,7 +1031,6 @@ sub printHtmlContent {
       <meta name="description" content="'.$STATE{'page_description'}.'">
       <link rel="canonical" href="'.$STATE{'canonical_url'}.'" />
       <link href="'.${ASSETS}.'/jcdsee.css" rel="stylesheet" type="text/css">
-      <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
   ';
 
   if ($STATE{'test_mode'}) {
@@ -1106,7 +1105,7 @@ sub printHtmlContent {
             <dc:creator><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:creator>
             <dc:rights><Agent><dc:title>Jonathan Cross</dc:title></Agent></dc:rights>
             <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-            <dc:source rdf:resource="http://pics.jonathancross.com" />
+            <dc:source rdf:resource="https://jac.pics" />
           </Work>
           <License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.5/">
             <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
@@ -1150,7 +1149,7 @@ sub printHtmlContent {
           <img alt="Creative Commons License" src="'.$ICON{'copyleft'}.'">
         </a>
         <div id="usage">
-          <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
+          <a href="https://github.com/jonathancross/jac.pics" title="See the latest source code behind this website.">JCDSee '.${VERSION}.'</a><br>
           Script executed in: '.$TIMER{'total'}.' seconds.';
           if ($STATE{'country_code'}) {
             print " Your Location: $STATE{'country_code'}";

@@ -256,12 +256,12 @@
       <h2>About this website</h2>
       <p>
       JCDSee is my personal web based photo viewing / cataloging system written in the Perl scripting language.
-      The script is about 43KB, can be used without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/pics.jonathancross.com" target="_blank">grab the latest version of this code</a>, and use it as you like.
+      The script is about 43KB, can be used without JavaScript and does not use cookies or contain ads.  Feel free to <a href="https://github.com/jonathancross/jac.pics" target="_blank">grab the latest version of this code</a>, and use it as you like.
       </p>
       <p>
       This website has evolved slowly over the last decade starting from a 2-line perl script — most of the development taking place in random Internet cafes around the world.  This latest version (with mobile support) was launched in September of 2015.
       </p>
-      <p><a rel="author" href="https://plus.google.com/u/0/+JonathanCr0ss" target="_blank">Jonathan Cross</a></p>
+      <p><a rel="author" href="https://jonathancross.com" target="_blank">Jonathan Cross</a></p>
     </div>
   </div><!-- Close div#content -->
 
@@ -281,7 +281,7 @@
       <img alt="Creative Commons License" src="/jcdsee/icon_copyleft.png">
     </a>
     <div id="usage">
-      <a href="https://github.com/jonathancross/pics.jonathancross.com" title="See the latest source code behind this website." target="_blank">JCDSee <!--#config errmsg="" --><!--#include virtual="VERSION" --></a>
+      <a href="https://github.com/jonathancross/jac.pics" title="See the latest source code behind this website." target="_blank">JCDSee <!--#config errmsg="" --><!--#include virtual="VERSION" --></a>
       <div>
         Page last modified on
         <!--#config timefmt="%Y-%m-%d"-->
