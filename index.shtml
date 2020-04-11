@@ -18,13 +18,13 @@
   <body id="mode-list" data-adminurl="/jcdsee/admin/index.cgi?display_url&cur_url=/pics/">
 
     <div id="nav">
-      <div id="search-container">
+      <!--div id="search-container">
         <form method="get" action="https://www.google.com/search">
-          <input type="hidden" name="sitesearch" value="pics.jonathancross.com">
+          <input type="hidden" name="sitesearch" value="jac.pics">
           <input type="text" name="q" title="Uses Google to search this site..." size="10" maxlength="255" class="text">
           <input type="submit" title="Uses Google..." value="search" class="search_button">
         </form>
-      </div>
+      </div -->
       <h1>Jonathan Cross: Travel photography and stories.</h1>
     </div>
 
@@ -248,7 +248,7 @@
         </div>
         <div id="map-tab"
              class="jcd-tab"
-             style="background-image: url('//chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:111111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SI|SK|TH|TR|TW|US|VA|VN')">
+             style="background-image: url('//chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:1111111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HK|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SI|SK|TH|TR|TW|US|VA|VN')">
           <!-- Must add a '1' to url for each new country -->
         </div>
       </div>
