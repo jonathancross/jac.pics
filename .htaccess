@@ -11,18 +11,18 @@ DirectoryIndex index.shtml index.xhtml index.html index.cgi
  deny from all
 </Files>
 
-# Protect against DOS attacks by limiting file upload size
-LimitRequestBody 10240000
-
-# Minimize image flicker in IE6
-ExpiresActive On
-ExpiresByType image/gif A2592000
-ExpiresByType image/jpg A2592000
-ExpiresByType image/png A2592000
+# Force SSL
+SSLOptions +StrictRequire
+SSLRequireSSL
+SSLRequire %{HTTP_HOST} eq "jac.pics"
 
 # Custom error pages
+ErrorDocument 401 /error.html
 ErrorDocument 404 /error.html
 ErrorDocument 500 /error.html
+
+# Protect against DOS attacks by limiting file upload size
+LimitRequestBody 10240000
 
 # Clean URLs
 # TODO: I think RewriteRule never contains query string, so [^?]+ could be just .+.
@@ -67,3 +67,20 @@ ErrorDocument 500 /error.html
   RewriteRule ^jcdsee/$ / [redirect=301,last]
 
 </IfModule>
+
+# Protect Entire website:
+AuthType Basic
+AuthName "Password required"
+AuthUserFile /###########/.htpasswd-pics
+# Define exceptions:
+<RequireAny>
+    <RequireAll>
+        Require expr %{REQUEST_URI} =~ m#^/(error_redirect.php|error.html|favicon.ico)$#
+    </RequireAll>
+    # OR
+    Require valid-user
+</RequireAny>
+
+# Redirect to https version of page:
+ErrorDocument 403 /error_redirect.php
+
