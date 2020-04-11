@@ -9,7 +9,6 @@
     <title>Jonathan Cross: Travel photography and stories.</title>
     <meta name="description" content="Travel photography by Jonathan Cross. Includes photos of dozens of countries throughout South Asia, Eastern Europe and the Americas.">
     <link href="/jcdsee/jcdsee.css" rel="stylesheet" type="text/css">
-    <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script><![endif]-->
     <style type="text/css">
       <!--#include virtual="/jcdsee/jcdsee.home.inc.css" -->
     </style>
@@ -249,7 +248,7 @@
         </div>
         <div id="map-tab"
              class="jcd-tab"
-             style="background-image: url('http://chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:111111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SI|SK|TH|TR|TW|US|VA|VN')">
+             style="background-image: url('//chart.apis.google.com/chart?cht=map:fixed=-56,-170,83.6,180&chs=666x443&chf=bg,s,eeeeee&chd=s:111111111111111111111111111111111111111111111111111&chld=AL|AT|BD|BE|BG|CA|CH|CO|CZ|DE|DK|ES|FI|FO|FR|GB|GR|HR|HU|ID|IE|IN|IS|IT|JP|KH|KR|KW|LA|LK|MA|MM|MX|MY|NL|NO|NP|PL|PT|RO|RS|SE|SG|SI|SK|TH|TR|TW|US|VA|VN')">
           <!-- Must add a '1' to url for each new country -->
         </div>
       </div>
@@ -264,17 +263,6 @@
       <p><a rel="author" href="https://jonathancross.com" target="_blank">Jonathan Cross</a></p>
     </div>
   </div><!-- Close div#content -->
-
-  <!--div id="bookmarks">
-    <span style="float:left;">
-    <a href="http://www.dreamhost.com/green.cgi" title="Carbon neutral web servers."><img src="jcdsee/icon_sm_dreamhost.png" alt="" /></a>
-    <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" title="CopyLeft.  All content on this site is available free for non-commercial use."><img src="jcdsee/icon_sm_copyleft.png" alt="Copy Left" /></a>
-    </span>
-    <span style="float:right;">
-    <a href="javascript:adFav()" title="Add to Favorites"><img src="jcdsee/syn_favorites.png" alt="favorites" /></a>
-    <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fpics.JonathanCross.com&amp;t=Jonathan%20Cross:%20Travel%20photography%20and%20stories." title="Facebook"><img src="jcdsee/syn_facebook.png" alt="facebook" /></a>
-    </span>
-  </div-->
 
   <div id="footer">
     <a id="copyleft" rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="Creative Commons license">
