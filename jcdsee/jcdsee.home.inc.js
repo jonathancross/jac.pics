@@ -33,7 +33,7 @@ Toggler.prototype.TAB_CLASS = 'jcd-tab';
 
 
 /**
- * Handles older browsers by forcing simpllified display.
+ * Handles older browsers by forcing simplified display.
  */
 Toggler.prototype.handleOldBrowser = function() {
   // Force to look like JS is disabled.
